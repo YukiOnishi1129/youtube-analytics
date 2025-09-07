@@ -221,7 +221,7 @@ Freeze and persist the ranking at that time (for review and CSV export)
 
 ## Authority Context Aggregates
 
-### C-1) Account
+### C-1) Account (Aggregate Root)
 
 #### Identifier
 - account_id (UUID v7)
@@ -236,29 +236,40 @@ Freeze and persist the ranking at that time (for review and CSV export)
 
 #### Child Entities
 - Identity: Authentication provider info
-  - provider: Provider kind ('google'|'password'|'github')
+  - provider: Provider kind ('password'|'google'|'github')
   - provider_uid: Provider-side UID
+- Role: Permission set
+  - name: 'admin' | 'user' | ... (system-defined)
 
 #### Invariants
-- email is unique
+- email is unique among active accounts
 - (account_id, provider) is unique
-- Deleting an account cascades to related identities
-- Multiple providers can be linked
+- At least one identity must exist per account
+- Deactivated accounts cannot sign in
+- Roles must be within system-defined set; duplicate assignment is not allowed
 
-#### Queries
+#### Commands (Domain Methods)
 ```go
-// Fetch profile
-GetMe() (*Account, []Identity, error)
+// Lifecycle
+Deactivate()
+Reactivate()
+VerifyEmail()
+TouchLogin(now time.Time)
 
-// Create/Update account
-CreateOrUpdateAccount(claims TokenClaims) error
+// Profile
+UpdateProfile(displayName string, photoURL string)
 
-// Link provider
-LinkProvider(accountId string, provider string, providerUid string) error
+// Identity management
+LinkIdentity(provider Provider, providerUID string) error
+UnlinkIdentity(provider Provider) error // cannot unlink last identity
+
+// Role management
+AssignRole(role Role) error
+RevokeRole(role Role) error
 ```
 
 #### Purpose
-User and profile management with multi-provider support
+User management with multi-provider login and role assignment
 
 ## Relationships Between Aggregates
 

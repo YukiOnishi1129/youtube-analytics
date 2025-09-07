@@ -126,9 +126,10 @@ Sign-in, profile, and role management
 - roles (future)
 
 ### Invariants
-- email is unique
+- email is unique among active accounts
 - (account_id, provider) is unique
-- Deleting an account removes related identities
+- At least one identity must exist per account
+- Deactivated account cannot sign in
 
 ## Inter-Context Collaboration
 

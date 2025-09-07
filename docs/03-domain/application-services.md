@@ -213,6 +213,76 @@ func (uc *ApplyWebSubUseCase) Execute(
 }
 ```
 
+## Authority Application Services
+
+### AccountUseCase.SignUpPassword
+
+Purpose
+- Create Account with password identity and default role assignment (e.g., user)
+
+Ports
+- gateway.AccountRepository, gateway.IdentityRepository, gateway.RoleRepository
+
+Flow (high-level)
+1) Check email uniqueness among active accounts
+2) Create Account aggregate (Email, IsActive=true, EmailVerified=false)
+3) Link password Identity
+4) Assign default Role (user)
+5) Persist via repositories (transactional)
+
+### AccountUseCase.SignInPassword
+
+Purpose
+- Validate email/password externally, activate account, update lastLoginAt
+
+Ports
+- gateway.AccountRepository, gateway.IdentityRepository, gateway.Clock
+
+Flow
+1) Lookup by email → load Account
+2) Ensure active → else reject
+3) TouchLogin(now)
+4) Persist
+
+### AccountUseCase.SignInFederated
+
+Purpose
+- Verify OIDC token, map to Identity, load Account, activate and update lastLoginAt
+
+Ports
+- gateway.TokenVerifier, gateway.IdentityRepository, gateway.AccountRepository, gateway.Clock
+
+Flow
+1) Verify(idToken) → claims(provider, providerUID, email, profile)
+2) IdentityRepository.FindByProvider(provider, uid) → Account
+3) Ensure active; UpdateProfile, VerifyEmail (if claims)
+4) TouchLogin(now) → Persist
+
+### AccountUseCase.GetMe
+
+Purpose
+- Return current account profile including identities and roles
+
+Ports
+- gateway.AccountRepository, gateway.IdentityRepository, gateway.RoleRepository, presenter.AuthorityPresenter
+
+Flow
+1) idToken → TokenVerifier.Verify → subject/email
+2) Load Account + Identities + Roles
+3) PresentGetMe(account)
+
+### AccountUseCase.UpdateProfile
+Purpose
+- Update displayName/photoURL
+
+### AccountUseCase.LinkIdentity / UnlinkIdentity
+Purpose
+- Link or unlink provider identities (keeping at least one identity)
+
+### AccountUseCase.AssignRole / RevokeRole
+Purpose
+- Manage role membership per account
+
 ### InsertSnapshot (Snapshot Insertion)
 
 #### Purpose

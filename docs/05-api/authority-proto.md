@@ -19,6 +19,7 @@ message Account {
   string display_name = 4;
   string photo_url = 5;
   repeated Identity identities = 6;
+  repeated string roles = 7; // e.g., ["user", "admin"]
 }
 
 message GetMeRequest {}
@@ -37,3 +38,4 @@ service AuthorityService {
 - **pattern field**: Intended to be shown only in advanced mode (hidden in normal UI)
 - **hide_low_sample**: Server-side default set to true for stable UX
 - **Code generation**: Generate code with buf/protoc to implement handlers for each service
+ - Roles: `Account.roles` returns assigned role names; a future `ListRoles` may expose system role catalog
