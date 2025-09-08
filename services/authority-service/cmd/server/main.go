@@ -1,21 +1,33 @@
 package main
 
 import (
-    "fmt"
+    "context"
     "log"
-    "net/http"
+    "time"
+    "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/adapter/gateway"
+    "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/transport"
+    outgateway "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/output/gateway"
 )
 
-func main() {
-    mux := http.NewServeMux()
-    mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintln(w, "ok")
-    })
+type systemClock struct{}
+func (systemClock) Now() time.Time { return time.Now() }
 
-    addr := ":8080"
-    log.Printf("authority-service listening on %s", addr)
-    if err := http.ListenAndServe(addr, mux); err != nil {
+// TokenVerifier stub: trusts any token and builds minimal claims (DO NOT USE IN PROD)
+type noopVerifier struct{}
+func (noopVerifier) Verify(_ context.Context, _ string) (outgateway.TokenClaims, error) {
+    return outgateway.TokenClaims{Email: "stub@example.com", EmailVerified: true}, nil
+}
+
+func main() {
+    // In-memory repos and stubs for local bootstrap
+    accountRepo := gateway.NewInMemoryAccountRepo()
+    idRepo := &gateway.InMemoryIdentityRepo{}
+    roleRepo := &gateway.InMemoryRoleRepo{}
+    idp := &gateway.IDPClient{}
+    var verifier outgateway.TokenVerifier = noopVerifier{}
+    var clock outgateway.Clock = systemClock{}
+
+    if err := transport.Bootstrap(":8080", accountRepo, idRepo, roleRepo, verifier, idp, clock); err != nil {
         log.Fatal(err)
     }
 }
-
