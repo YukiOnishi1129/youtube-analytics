@@ -8,7 +8,17 @@ Responsibility: Identity Platform integration, ID token verification, profile/ro
 Database
 - Shared Postgres instance with schema-per-service policy (authority schema)
 - Access only own schema; no cross-schema joins
-- Repositories generated via sqlc (see `services/authority-service/sqlc.yaml`)
+- Repositories generated via sqlc (see `services/authority-service/sqlc.yaml`) — build with `-tags sqlc`
+
+Configuration (mandatory)
+- Postgres: provide either `DATABASE_URL` or the individual envs `DB_HOST, DB_PORT(=5432), DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE(=disable)`; `OpenPostgres` constructs DSN when `DATABASE_URL` is absent
+- Identity Platform: `FIREBASE_API_KEY`
+- OIDC verifier: `OIDC_ISSUER`, `OIDC_AUDIENCE`
+
+Adapters (reference: authority-service)
+- DB adapter: Postgres via pgx + sqlc (`internal/adapter/gateway/postgres`)
+- Token verifier: OIDC using go-oidc (`internal/adapter/gateway/firebase/verifier.go`)
+- gRPC auth: Unary interceptor injecting claims (`internal/driver/security/oidc_interceptor.go`)
 
 ### gRPC Methods (MVP)
 

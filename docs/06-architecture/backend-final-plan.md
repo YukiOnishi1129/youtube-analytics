@@ -17,7 +17,7 @@
 - ユーザー API：各サービスが ID トークンを自前検証（go-oidc, JWKS キャッシュ）
 - 内部 API（Cloud Tasks/Scheduler）：Cloud Run IAM のみ許可 + OIDC 二重検証
 - メソッドポリシー：PUBLIC / USER_ID_TOKEN / SERVICE_OIDC（Interceptor で制御）
-- 共通化：`services/pkg/identityauth` に JWKS, Verify, gRPC Interceptor を実装
+  - OIDC 検証と gRPC Interceptor は各サービスの `internal/adapter` / `internal/driver/security` に実装（authority-service をテンプレートに統一）
 
 ## 3) ディレクトリ構成（モノレポ / go.work）
 
@@ -27,7 +27,6 @@ youtube-analytics/
 ├─ services/
 │   ├─ go.work
 │   ├─ pkg/
-│   │   ├─ identityauth/
 │   │   └─ pb/
 │   ├─ ingestion-service/
 │   ├─ analytics-service/
@@ -75,4 +74,3 @@ youtube-analytics/
 - OIDC：`IDP_ISSUER`, `IDP_AUDIENCE`, `JWKS_CACHE_TTL`
 - 内部 API：`TASKS_AUDIENCE`, `INTERNAL_SECRET`
 - 指標：`LIKES_PER_SUBSCRIPTION_SCALE=1000`, `LIKES_PER_SUBSCRIPTION_OFFSET=500`
-

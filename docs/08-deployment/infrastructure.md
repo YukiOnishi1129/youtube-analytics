@@ -35,7 +35,7 @@
 - Policy: schema-per-service, no cross-schema joins
 - Authority migrations: `services/authority-service/internal/driver/datastore/migrations`
 
-Example commands:
+Example commands (using DATABASE_URL):
 ```
 migrate -path services/authority-service/internal/driver/datastore/migrations \
   -database "$DATABASE_URL" up
@@ -56,9 +56,11 @@ DATABASE_URL=... make migrate-down
 
 - Prefer Docker Compose for Postgres during local development.
 - Each service connects to the same instance but uses a dedicated schema.
+- DB configuration: either `DATABASE_URL` or the individual envs:
+  - `DB_HOST`, `DB_PORT`(default 5432), `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`(default disable)
 - Build flags control wiring:
-  - `-tags 'postgres sqlc'` enables pgx driver and postgres repository (sqlc)
-  - otherwise, the service refuses to start if repositories are not wired
+  - `-tags 'sqlc'` enables sqlc-backed repositories
+  - If not built with `-tags sqlc`, the driver returns an error to prevent accidental startup
 
 ## CI Tests
 

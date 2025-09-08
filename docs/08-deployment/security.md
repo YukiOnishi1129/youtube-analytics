@@ -30,13 +30,12 @@ SERVICE_OIDC: Service-to-service communication OIDC token required
 
 ### Common Authentication Implementation
 
-Consolidated in `services/pkg/identityauth` package:
-- JWKS client implementation
-- Token verification logic
-- gRPC interceptor
-- HTTP middleware
+Pattern to follow (use authority-service as template):
+- OIDC verifier: `internal/adapter/gateway/firebase/verifier.go` (go-oidc based)
+- gRPC interceptor: `internal/driver/security/oidc_interceptor.go` (injects TokenClaims into context)
+- Claims provider (for use cases): `internal/adapter/security/claims_provider.go`
 
-All microservices import and use this package
+Each microservice should include these components under its own `internal` tree, keeping dependencies pointing inward (Clean Architecture).
 
 ### Other Security Measures
 

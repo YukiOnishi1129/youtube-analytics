@@ -35,3 +35,5 @@ func WithClaims(ctx context.Context, claims outgateway.TokenClaims) context.Cont
     return context.WithValue(ctx, claimsKey, claims)
 }
 
+// Ensure ContextClaimsProvider implements the output port.
+var _ outgateway.ClaimsProvider = (*ContextClaimsProvider)(nil)
