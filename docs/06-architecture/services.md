@@ -5,6 +5,11 @@
 Location: `/services/authority-service`  
 Responsibility: Identity Platform integration, ID token verification, profile/role management
 
+Database
+- Shared Postgres instance with schema-per-service policy (authority schema)
+- Access only own schema; no cross-schema joins
+- Repositories generated via sqlc (see `services/authority-service/sqlc.yaml`)
+
 ### gRPC Methods (MVP)
 
 | Method | Purpose | Auth | Request/Response |

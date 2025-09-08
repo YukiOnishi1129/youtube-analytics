@@ -1,8 +1,16 @@
 # Authority (Authentication & Authorization) Tables
 
+Schema separation policy
+- Each microservice owns a dedicated PostgreSQL schema. For authority-service, use schema `authority`.
+- Application connections set `search_path` to the service schema.
+- Do not perform cross-schema joins from the service; collaborate via gRPC instead.
+
 ## Accounts (Assuming Identity Platform Integration)
 
 ```sql
+CREATE SCHEMA IF NOT EXISTS authority;
+SET search_path TO authority;
+
 CREATE TABLE accounts (
   id              uuid PRIMARY KEY,                     -- v7
   email           text NOT NULL,

@@ -123,13 +123,17 @@ services/
 │       ├─ adapter/
 │       │   ├─ grpc_handler.go
 │       │   ├─ presenter_grpc.go
-│       │   ├─ db_repository.go
+│       │   ├─ gateway/
+│       │   │   ├─ postgres/
+│       │   │   │   ├─ queries.sql           # sqlc queries (repo impl concern)
+│       │   │   │   └─ sqlcgen/              # sqlc generated code
 │       │   ├─ youtube_client.go
 │       │   └─ tasks_scheduler.go
 │       └─ driver/
 │           ├─ config/
 │           ├─ transport/
 │           ├─ datastore/
+│           │   └─ migrations/               # schema DDL per service (authority schema, golang-migrate)
 │           ├─ security/
 │           ├─ observability/
 │           └─ health/
@@ -141,6 +145,23 @@ services/
 
 proto definitions live at repository root `/proto`.
 buf generate outputs: Go → `/services/pkg/pb`, TS → `/web/client/src/external/client/grpc`.
+
+## Migrations
+
+- Tool: golang-migrate/migrate
+- Files: `NNNN_name.up.sql` and `NNNN_name.down.sql`
+- Run: `migrate -path services/<svc>/internal/driver/datastore/migrations -database "$DATABASE_URL" up`
+
+## Local Dev DB
+
+- Use Docker Compose to run a local Postgres for all services.
+- Each service uses its own schema (e.g., `authority`) and is granted access only to that schema.
+- Avoid in-memory repositories in normal development; wire Postgres via `DATABASE_URL`.
+
+## Testing
+
+- Use `testcontainers-go` to spin up ephemeral Postgres in integration tests.
+- Keep tests service-scoped; no cross-schema joins.
 
 ## Batch Processing & Idempotency
 

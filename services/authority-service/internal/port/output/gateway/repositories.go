@@ -21,8 +21,8 @@ type IdentityRepository interface {
     ListByAccount(ctx context.Context, accountID string) ([]domain.Identity, error)
     // FindByProvider finds the owning account by provider and provider uid.
     FindByProvider(ctx context.Context, provider domain.Provider, providerUID string) (*domain.Account, error)
-    // Save creates or updates an identity for an account.
-    Save(ctx context.Context, accountID string, id domain.Identity) error
+    // Upsert creates or updates an identity for an account.
+    Upsert(ctx context.Context, accountID string, id domain.Identity) error
     // Delete removes an identity from an account.
     Delete(ctx context.Context, accountID string, provider domain.Provider) error
 }
@@ -36,4 +36,3 @@ type RoleRepository interface {
     // Revoke revokes a role from an account.
     Revoke(ctx context.Context, accountID string, role domain.Role) error
 }
-
