@@ -1,4 +1,4 @@
-package account
+package domain
 
 import (
     "errors"
@@ -9,9 +9,9 @@ import (
 // Account represents a user account within the Authority context aggregate root.
 // Aggregates: Account (root) -> Identities (children)
 // Invariants:
-//  - email is unique (enforced by repository/storage)
+//  - email is unique among active accounts (enforced by repository/storage)
 //  - (account_id, provider) is unique (enforced by repository/storage)
-//  - deleting an account cascades to related identities (enforced by repository/storage)
+//  - at least one identity must remain
 //  - multiple providers can be linked
 type Account struct {
     ID            string
@@ -27,40 +27,6 @@ type Account struct {
     Roles      []Role
 }
 
-// Identity stores authentication provider linkage for an account.
-type Identity struct {
-    Provider    Provider
-    ProviderUID string
-}
-
-// Role represents a permission set assigned to an account.
-type Role struct {
-    Name string // e.g., "admin", "user"
-}
-
-// Provider represents an authentication provider kind.
-type Provider string
-
-const (
-    ProviderGoogle   Provider = "google"
-    ProviderPassword Provider = "password"
-    ProviderGithub   Provider = "github"
-)
-
-// TokenClaims is a value object extracted from a verified ID token.
-// This is the minimum set required for CreateOrUpdateAccount and profile sync.
-type TokenClaims struct {
-    Subject       string
-    Email         string
-    EmailVerified bool
-    DisplayName   string
-    PhotoURL      string
-
-    // Provider linkage
-    Provider    Provider
-    ProviderUID string
-}
-
 // Domain errors
 var (
     ErrInvalidEmail          = errors.New("invalid email")
@@ -70,11 +36,13 @@ var (
     ErrAccountInactive       = errors.New("account is inactive")
     ErrRoleAlreadyAssigned   = errors.New("role already assigned")
     ErrRoleNotAssigned       = errors.New("role not assigned")
+    ErrNotFound              = errors.New("account not found")
+    ErrEmailAlreadyUsed      = errors.New("email already in use")
 )
 
-// New creates a new Account aggregate with initial values.
+// NewAccount creates a new Account aggregate with initial values.
 // ID generation policy is handled by the caller (infra), expected to be UUID v7.
-func New(id string, email string) (*Account, error) {
+func NewAccount(id string, email string) (*Account, error) {
     if !isValidEmail(email) {
         return nil, ErrInvalidEmail
     }
@@ -122,9 +90,6 @@ func (a *Account) LinkIdentity(p Provider, providerUID string) error {
     a.Identities = append(a.Identities, Identity{Provider: p, ProviderUID: providerUID})
     return nil
 }
-
-// LinkProvider is kept for backward-compat; delegates to LinkIdentity.
-func (a *Account) LinkProvider(p Provider, providerUID string) error { return a.LinkIdentity(p, providerUID) }
 
 // HasProvider returns true if the account has a link to the specified provider.
 func (a *Account) HasProvider(p Provider) bool {

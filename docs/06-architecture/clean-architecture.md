@@ -42,10 +42,10 @@ Dependency always points inward
   - CollectTrendingVideos
   - CalculateVideoMetrics
   - GenerateRanking
-- Input Port: Public interface of use cases
-- Output Port: Interfaces to external systems (owned by Use Case)
-  - Gateway: DB/external API abstraction (e.g., VideoRepository, AccountRepository, TokenVerifier, Clock)
-  - Presenter: Output boundary
+- Ports (under `internal/port/`)
+  - `input/`: Public interfaces of use cases
+  - `output/gateway/`: DB/external API abstraction (e.g., VideoRepository, AccountRepository, TokenVerifier, Clock)
+  - `output/presenter/`: Output boundary
 
 #### Adapter Layer
 - Controller: gRPC/HTTP handlers
@@ -165,25 +165,25 @@ func (r *PostgresVideoRepository) Save(ctx context.Context, video *domain.Video)
 
 // Authority (Account) specific output ports owned by UseCase
 ```go
-// port/output/gateway/account_repository.go
+// internal/port/output/gateway/repositories.go (excerpt)
 type AccountRepository interface {
-    Save(ctx context.Context, a *account.Account) error
-    FindByID(ctx context.Context, id string) (*account.Account, error)
-    FindByEmail(ctx context.Context, email string) (*account.Account, error)
+    FindByID(ctx context.Context, id string) (*domain.Account, error)
+    FindByEmail(ctx context.Context, email string) (*domain.Account, error)
+    Save(ctx context.Context, a *domain.Account) error
 }
 
-// port/output/gateway/identity_repository.go
+// internal/port/output/gateway/repositories.go (excerpt)
 type IdentityRepository interface {
-    ListByAccount(ctx context.Context, accountID string) ([]account.Identity, error)
-    FindByProvider(ctx context.Context, provider account.Provider, providerUID string) (*account.Account, error)
-    Save(ctx context.Context, accountID string, id account.Identity) error
-    Delete(ctx context.Context, accountID string, provider account.Provider) error
+    ListByAccount(ctx context.Context, accountID string) ([]domain.Identity, error)
+    FindByProvider(ctx context.Context, provider domain.Provider, providerUID string) (*domain.Account, error)
+    Save(ctx context.Context, accountID string, id domain.Identity) error
+    Delete(ctx context.Context, accountID string, provider domain.Provider) error
 }
 
-// port/output/gateway/role_repository.go
+// internal/port/output/gateway/repositories.go (excerpt)
 type RoleRepository interface {
-    ListByAccount(ctx context.Context, accountID string) ([]account.Role, error)
-    Assign(ctx context.Context, accountID string, role account.Role) error
-    Revoke(ctx context.Context, accountID string, role account.Role) error
+    ListByAccount(ctx context.Context, accountID string) ([]domain.Role, error)
+    Assign(ctx context.Context, accountID string, role domain.Role) error
+    Revoke(ctx context.Context, accountID string, role domain.Role) error
 }
 ```

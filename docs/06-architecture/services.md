@@ -5,11 +5,15 @@
 Location: `/services/authority-service`  
 Responsibility: Identity Platform integration, ID token verification, profile/role management
 
-### gRPC Methods
+### gRPC Methods (MVP)
 
 | Method | Purpose | Auth | Request/Response |
 |--------|---------|------|------------------|
-| GetMe | Get own profile | User login required | → {id,email,display_name,identities} |
+| GetAccount | Get own profile | USER_ID_TOKEN | {id_token} → {account} |
+| SignUp | Register with email/password | PUBLIC | {email,password} → {account,id_token,refresh_token} |
+| SignIn | Login with email/password | PUBLIC | {email,password} → {id_token,refresh_token} |
+| SignOut | Logout (revoke refresh token) | USER_ID_TOKEN | {refresh_token} → {} |
+| ResetPassword | Send reset email | PUBLIC | {email} → {} |
 
 ## ingestion-service (Collection & Storage)
 

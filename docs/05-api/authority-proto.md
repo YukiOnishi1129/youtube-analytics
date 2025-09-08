@@ -7,35 +7,48 @@ package authority.v1;
 
 option go_package = "github.com/yourorg/youtube-analytics/proto/authority/v1;authorityv1";
 
-message Identity {
-  string provider = 1;       // 'google' | 'password' | 'github' ...
-  string provider_uid = 2;   // arbitrary
-}
-
 message Account {
   string id = 1;             // uuid v7
   string email = 2;
   bool   email_verified = 3;
   string display_name = 4;
   string photo_url = 5;
-  repeated Identity identities = 6;
-  repeated string roles = 7; // e.g., ["user", "admin"]
+  bool   is_active = 6;
+  string last_login_at = 7;  // RFC3339
+  repeated string roles = 8; // ["user"], extendable
 }
 
-message GetMeRequest {}
-message GetMeResponse { 
-  Account account = 1; 
-}
+// GetAccount
+message GetAccountRequest {}
+message GetAccountResponse { Account account = 1; }
+
+// SignUp
+message SignUpRequest { string email = 1; string password = 2; string display_name = 3; }
+message SignUpResponse { Account account = 1; string id_token = 2; string refresh_token = 3; }
+
+// SignIn
+message SignInRequest { string email = 1; string password = 2; }
+message SignInResponse { string id_token = 1; string refresh_token = 2; int64 expires_in = 3; }
+
+// SignOut
+message SignOutRequest { string refresh_token = 1; }
+message SignOutResponse { bool success = 1; }
+
+// ResetPassword
+message ResetPasswordRequest { string email = 1; }
+message ResetPasswordResponse { bool email_sent = 1; }
 
 service AuthorityService {
-  rpc GetMe (GetMeRequest) returns (GetMeResponse);
+  rpc GetAccount (GetAccountRequest) returns (GetAccountResponse);
+  rpc SignUp (SignUpRequest) returns (SignUpResponse);
+  rpc SignIn (SignInRequest) returns (SignInResponse);
+  rpc SignOut (SignOutRequest) returns (SignOutResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
 }
 ```
 
 ## Notes
 
-- **Date format**: Uses RFC3339 string throughout (easy to handle between frontend/backend)
-- **pattern field**: Intended to be shown only in advanced mode (hidden in normal UI)
-- **hide_low_sample**: Server-side default set to true for stable UX
-- **Code generation**: Generate code with buf/protoc to implement handlers for each service
- - Roles: `Account.roles` returns assigned role names; a future `ListRoles` may expose system role catalog
+- Roles: `Account.roles` returns assigned role names; MVP defaults to ["user"].
+- Identity management endpoints (LinkIdentity, AssignRole) are deferred for MVP.
+- Use Identity Platform (e.g., Firebase) for authentication flows; this service acts as a facade for account retrieval and basic ID flows.

@@ -7,9 +7,11 @@
 - Layer responsibilities:
   - domain: Business rules (Entity, ValueObject, DomainService)
   - usecase: Application logic (Interactor, Application Service)
-  - port/input: Public interfaces of use cases
-  - port/output/gateway: Abstractions for DB/external APIs
-  - port/output/presenter: Output boundary
+  - port: UseCase ports
+    - input/: Public interfaces of use cases
+    - output/
+      - gateway/: Abstractions for DB/external APIs
+      - presenter/: Output boundary
   - adapter: Concrete implementations of controller/presenter/gateway
   - driver: Bootstrapping, config, security, observability
   - cmd: Composition root
@@ -96,11 +98,41 @@ services/
 │   ├─ cmd/server/main.go
 │   └─ internal/
 │       ├─ domain/
-│       ├─ port/input/
-│       ├─ port/output/{gateway,presenter}/
+│       │   ├─ keyword.go
+│       │   ├─ keyword_service.go
+│       │   ├─ video.go
+│       │   ├─ video_snapshot.go
+│       │   ├─ metric.go
+│       │   ├─ metric_formula.go
+│       │   ├─ account.go
+│       │   ├─ identity.go
+│       │   └─ role.go
 │       ├─ usecase/
-│       ├─ adapter/{controller,gateway,presenter}/
-│       └─ driver/{config,transport,datastore,security,observability,health}
+│       │   ├─ keyword.go
+│       │   ├─ video.go
+│       │   └─ ranking.go
+│       ├─ port/
+│       │   ├─ input/
+│       │   │   └─ authority.go
+│       │   └─ output/
+│       │       ├─ gateway/
+│       │       │   ├─ repositories.go
+│       │       │   └─ system.go
+│       │       └─ presenter/
+│       │           └─ authority.go
+│       ├─ adapter/
+│       │   ├─ grpc_handler.go
+│       │   ├─ presenter_grpc.go
+│       │   ├─ db_repository.go
+│       │   ├─ youtube_client.go
+│       │   └─ tasks_scheduler.go
+│       └─ driver/
+│           ├─ config/
+│           ├─ transport/
+│           ├─ datastore/
+│           ├─ security/
+│           ├─ observability/
+│           └─ health/
 ├─ analytics-service/
 │   └─ ...
 └─ authority-service/
