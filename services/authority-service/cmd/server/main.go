@@ -16,26 +16,19 @@ type systemClock struct{}
 
 func (systemClock) Now() time.Time { return time.Now() }
 
-// TokenVerifier stub: trusts any token and builds minimal claims (DO NOT USE IN PROD)
-type noopVerifier struct{}
-
-func (noopVerifier) Verify(_ context.Context, _ string) (outgateway.TokenClaims, error) {
-	return outgateway.TokenClaims{Email: "stub@example.com", EmailVerified: true}, nil
-}
-
 func main() {
-	// Load configuration
-	cfg := cfgpkg.Load()
+    // Load configuration
+    cfg := cfgpkg.Load()
 
-	// Repositories (wired to Postgres)
-	var (
-		accountRepo outgateway.AccountRepository
-		idRepo      outgateway.IdentityRepository
-		roleRepo    outgateway.RoleRepository
-	)
-	var idp outgateway.IdentityProvider = noopIDP{}
-	var verifier outgateway.TokenVerifier = noopVerifier{}
-	var clock outgateway.Clock = systemClock{}
+    // Repositories (wired to Postgres)
+    var (
+        accountRepo outgateway.AccountRepository
+        idRepo      outgateway.IdentityRepository
+        roleRepo    outgateway.RoleRepository
+    )
+    var idp outgateway.IdentityProvider
+    var verifier outgateway.TokenVerifier
+    var clock outgateway.Clock = systemClock{}
 
 	// Datastore: open Postgres and run migrations (no-op unless built with tags)
 	if cfg.DatabaseURL == "" {
@@ -52,31 +45,23 @@ func main() {
     }
     accountRepo, idRepo, roleRepo = ar, ir, rr
 
-	// Identity Platform & OIDC
-	if cfg.FirebaseAPIKey != "" {
-		idp = fb.New(cfg.FirebaseAPIKey)
-	}
-	if cfg.OIDCIssuer != "" && cfg.OIDCAudience != "" {
-		if v, err := fb.NewOIDCVerifier(context.Background(), cfg.OIDCIssuer, cfg.OIDCAudience); err == nil {
-			verifier = v
-		} else {
-			log.Printf("OIDC verifier init failed, using noop: %v", err)
-		}
-	}
+    // Identity Platform (mandatory)
+    if cfg.FirebaseAPIKey == "" {
+        log.Fatal("FIREBASE_API_KEY is required")
+    }
+    idp = fb.New(cfg.FirebaseAPIKey)
 
-	if err := transport.Bootstrap(cfg.GRPCAddr, accountRepo, idRepo, roleRepo, verifier, idp, clock); err != nil {
-		log.Fatal(err)
-	}
-}
+    // OIDC verifier (mandatory)
+    if cfg.OIDCIssuer == "" || cfg.OIDCAudience == "" {
+        log.Fatal("OIDC_ISSUER and OIDC_AUDIENCE are required")
+    }
+    v, err := fb.NewOIDCVerifier(context.Background(), cfg.OIDCIssuer, cfg.OIDCAudience)
+    if err != nil {
+        log.Fatalf("OIDC verifier init failed: %v", err)
+    }
+    verifier = v
 
-// noopIDP implements IdentityProvider for local runs without Firebase.
-type noopIDP struct{}
-
-func (noopIDP) SignUp(ctx context.Context, email, password string) (outgateway.AuthTokens, error) {
-	return outgateway.AuthTokens{IDToken: "stub", RefreshToken: "stub", ExpiresIn: 3600}, nil
+    if err := transport.Bootstrap(cfg.GRPCAddr, accountRepo, idRepo, roleRepo, verifier, idp, clock); err != nil {
+        log.Fatal(err)
+    }
 }
-func (noopIDP) SignIn(ctx context.Context, email, password string) (outgateway.AuthTokens, error) {
-	return outgateway.AuthTokens{IDToken: "stub", RefreshToken: "stub", ExpiresIn: 3600}, nil
-}
-func (noopIDP) SignOut(ctx context.Context, refreshToken string) error { return nil }
-func (noopIDP) ResetPassword(ctx context.Context, email string) error  { return nil }
