@@ -30,10 +30,7 @@ func main() {
     var verifier outgateway.TokenVerifier
     var clock outgateway.Clock = systemClock{}
 
-	// Datastore: open Postgres and run migrations (no-op unless built with tags)
-	if cfg.DatabaseURL == "" {
-		log.Fatal("DATABASE_URL is required")
-	}
+	// Datastore: open Postgres (reads DB_* envs if DATABASE_URL is empty)
 	db, err := datastore.OpenPostgres(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Postgres connect failed: %v", err)
