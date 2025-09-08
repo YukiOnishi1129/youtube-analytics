@@ -7,7 +7,7 @@ sql:
       - internal/adapter/gateway/postgres/queries.sql
     gen:
       go:
-        package: authdb
+        package: sqlcgen
         out: internal/adapter/gateway/postgres/sqlcgen
         sql_package: database/sql
         emit_json_tags: true

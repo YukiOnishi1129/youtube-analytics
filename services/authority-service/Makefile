@@ -7,12 +7,13 @@ help:
 	@echo "  sqlc          Generate typed queries (sqlc generate)"
 	@echo "  sqlc-clean    Remove generated sql (sqlcgen)"
 	@echo "  build-postgres Build with Postgres+sqlc tags"
-    @echo "  migrate-up    Run DB migrations (golang-migrate)"
-    @echo "  migrate-down  Rollback one migration"
+	@echo "  migrate-up    Run DB migrations (golang-migrate)"
+	@echo "  migrate-down  Rollback one migration"
 
 # Generate sqlc code into internal/adapter/gateway/postgres/sqlcgen
 sqlc:
 	@echo "==> sqlc generate"
+	@command -v sqlc >/dev/null 2>&1 || { echo "sqlc not found. Install with: brew install sqlc"; exit 1; }
 	@sqlc generate
 
 sqlc-clean:
