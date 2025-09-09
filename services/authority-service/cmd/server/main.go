@@ -1,15 +1,16 @@
 package main
 
 import (
-	"context"
-	"log"
-	"time"
+    "context"
+    "log"
+    "time"
 
-	fb "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/adapter/gateway/firebase"
-	cfgpkg "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/config"
-	"github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/datastore"
-	"github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/transport"
-	outgateway "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/output/gateway"
+    fb "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/adapter/gateway/firebase"
+    insecure "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/adapter/gateway/insecure"
+    cfgpkg "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/config"
+    "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/datastore"
+    "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/driver/transport"
+    outgateway "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/output/gateway"
 )
 
 type systemClock struct{}
@@ -42,21 +43,25 @@ func main() {
 	}
 	accountRepo, idRepo, roleRepo = ar, ir, rr
 
-	// Identity Platform (mandatory)
-	if cfg.FirebaseAPIKey == "" {
-		log.Fatal("FIREBASE_API_KEY is required")
-	}
-	idp = fb.New(cfg.FirebaseAPIKey)
+    // Identity Platform (fallback to dummy in local when unset)
+    if cfg.FirebaseAPIKey == "" {
+        log.Printf("[WARN] FIREBASE_API_KEY not set; using dummy IdentityProvider for local dev")
+        idp = insecure.DummyIDP{}
+    } else {
+        idp = fb.New(cfg.FirebaseAPIKey)
+    }
 
-	// OIDC verifier (mandatory)
-	if cfg.OIDCIssuer == "" || cfg.OIDCAudience == "" {
-		log.Fatal("OIDC_ISSUER and OIDC_AUDIENCE are required")
-	}
-	v, err := fb.NewOIDCVerifier(context.Background(), cfg.OIDCIssuer, cfg.OIDCAudience)
-	if err != nil {
-		log.Fatalf("OIDC verifier init failed: %v", err)
-	}
-	verifier = v
+    // OIDC verifier (fallback to no-op in local when unset)
+    if cfg.OIDCIssuer == "" || cfg.OIDCAudience == "" {
+        log.Printf("[WARN] OIDC_ISSUER/AUDIENCE not set; using NoopVerifier for local dev")
+        verifier = insecure.NoopVerifier{}
+    } else {
+        v, err := fb.NewOIDCVerifier(context.Background(), cfg.OIDCIssuer, cfg.OIDCAudience)
+        if err != nil {
+            log.Fatalf("OIDC verifier init failed: %v", err)
+        }
+        verifier = v
+    }
 
 	if err := transport.Bootstrap(cfg.GRPCAddr, accountRepo, idRepo, roleRepo, verifier, idp, clock); err != nil {
 		log.Fatal(err)

@@ -6,7 +6,8 @@
     { "name": "pkg", "path": "services/pkg" },
     { "name": "proto", "path": "proto" },
     { "name": "docs", "path": "docs" },
-    { "name": "web", "path": "web" }
+    { "name": "web", "path": "web" },
+    { "name": "root", "path": "./" }
   ]
 }
 

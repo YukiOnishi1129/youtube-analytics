@@ -1,0 +1,93 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ya-postgres
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  authority-migrate:
+    image: youtube-analytics/authority-service:dev
+    build:
+      context: .
+      dockerfile: services/authority-service/Dockerfile
+    container_name: ya-authority-migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    volumes:
+      - type: bind
+        source: ${MIGRATIONS_DIR}
+        target: /migrations
+        read_only: true
+    entrypoint: ["/bin/sh", "-lc"]
+    command: ["migrate -path /migrations -database \"postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSLMODE}\" up"]
+    restart: "no"
+
+  authority-service:
+    build:
+      context: .
+      dockerfile: services/authority-service/Dockerfile
+    image: youtube-analytics/authority-service:dev
+    container_name: ya-authority-service
+    depends_on:
+      db:
+        condition: service_healthy
+      authority-migrate:
+        condition: service_completed_successfully
+    env_file:
+      - ./.env
+    environment:
+      # Service listen address
+      GRPC_ADDR: ${GRPC_ADDR}
+      # Use split DB_* variables (DATABASE_URL intentionally omitted)
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE}
+
+      # Identity Platform / OIDC (required by the app)
+      FIREBASE_API_KEY: ${FIREBASE_API_KEY}
+      OIDC_ISSUER: ${OIDC_ISSUER}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # web:
+  #   image: node:20-alpine
+  #   container_name: ya-web
+  #   working_dir: /app
+  #   depends_on:
+  #     - authority-service
+  #   environment:
+  #     PORT: 3000
+  #     # Example of exposing backend endpoint to the client app
+  #     # NEXT_PUBLIC_AUTHORITY_ENDPOINT: http://authority-service:8080
+  #   volumes:
+  #     - ./web/client:/app
+  #     - web_client_node_modules:/app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   command: ["/bin/sh", "-lc", "corepack enable && pnpm install && pnpm dev --port 3000 --hostname 0.0.0.0"]
+  #   restart: unless-stopped
+
+volumes:
+  pgdata:
+  web_client_node_modules:
