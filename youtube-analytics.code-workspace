@@ -1,0 +1,12 @@
+{
+  "folders": [
+    { "name": "authority-service", "path": "services/authority-service" },
+    { "name": "analytics-service", "path": "services/analytics-service" },
+    { "name": "ingestion-service", "path": "services/ingestion-service" },
+    { "name": "pkg", "path": "services/pkg" },
+    { "name": "proto", "path": "proto" },
+    { "name": "docs", "path": "docs" },
+    { "name": "web", "path": "web" }
+  ]
+}
+
