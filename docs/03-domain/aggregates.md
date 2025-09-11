@@ -2,104 +2,165 @@
 
 Aggregates define transactional consistency boundaries and the invariants they must uphold.
 
-## Ingestion Context Aggregates
+## Ingestion Context
 
-### A-1) FilterKeyword
+The Ingestion Service is responsible for:
+- Ingesting data from YouTube
+- Registering new videos as monitoring targets  
+- Saving D0/3h/6h/12h/24h/48h/72h/168h snapshots
+- Filtering videos by keywords
+- Managing channel subscriptions
 
-#### Identifier
-- KeywordId (UUID v7)
+All internal entities use UUID v7 as primary keys, while YouTube external IDs are stored in separate fields.
 
-#### Attributes
-- name: Display name (e.g., "React", "Next.js")
-- filter_type: Filter type (include | exclude)
-- pattern: Regular expression pattern
-- enabled: Enabled flag
-- description: Description
+### Common Value Objects
+
+```go
+type UUID = string                    // v7 assumed
+type YouTubeVideoID = string
+type YouTubeChannelID = string  
+type CategoryID = int                 // YouTube videos.snippet.categoryId as int
+type CheckpointHour = int             // 0,3,6,12,24,48,72,168
+```
+
+### Ingestion Context Aggregates
+
+### A-1) Keyword
+
+#### Purpose
+Define inclusion/exclusion rules for trending video selection
+
+#### Entity
+```go
+type FilterType string
+const (
+    Include FilterType = "include"
+    Exclude FilterType = "exclude"
+)
+
+type Keyword struct {
+    ID          UUID
+    Name        string
+    FilterType  FilterType     // include / exclude
+    Pattern     string         // Normalized regex pattern
+    Enabled     bool
+    Description *string
+}
+```
+
+#### Domain Service
+```go
+// Pure function to build pattern from name
+func BuildPattern(name string) (string, error)
+```
 
 #### Invariants
-- filter_type ∈ {include, exclude}
+- Pattern != "" (must not be empty)
+- FilterType ∈ {include, exclude}
+- (Name, FilterType) logical uniqueness (enforced at app/repo level)
 - Disabled keywords are not used for judgment
-- pattern is auto-generated from name
-- Deletion is soft-delete (set deleted_at)
+- Pattern is auto-generated from Name
 
 #### Commands
 ```go
 // Register or update a keyword
 PutKeyword(name string, filterType FilterType, description string) error
-// pattern is auto-generated as: pattern = BuildPattern(name)
 
 // Enable/Disable
-EnableKeyword(id KeywordId) error
-DisableKeyword(id KeywordId) error
+EnableKeyword(id UUID) error
+DisableKeyword(id UUID) error
 
 // Remove (soft delete)
-RemoveKeyword(id KeywordId) error
+RemoveKeyword(id UUID) error
 ```
-
-#### Purpose
-Apply consistent inclusion/exclusion rules during ingestion
 
 ### A-2) Channel
 
-#### Identifier
-- channel_id (YouTube Channel ID)
+#### Purpose
+Manage subscription state and track subscriber trends. External ID is stored separately.
 
-#### Attributes
-- title: Channel name
-- thumbnail_url: Thumbnail URL
-- subscribed: WebSub subscription state
-- subscription_expires_at: Subscription expiration
+#### Entity
+```go
+type Channel struct {
+    ID               UUID              // Internal PK
+    YouTubeChannelID YouTubeChannelID  // External ID
+    Title            string
+    ThumbnailURL     string
+    Subscribed       bool              // WebSub subscription target
+}
+```
 
-#### Child Entities
-- ChannelSnapshot: Time series of subscriber counts
-  - measured_at: Measurement datetime
-  - subscription_count: Subscriber count
+#### Child Entity
+```go
+type ChannelSnapshot struct {
+    ID                UUID              // Snapshot UUID (for aggregation/audit)
+    ChannelID         UUID              // Internal FK
+    MeasuredAt        time.Time
+    SubscriptionCount int
+}
+```
 
 #### Invariants
-- channel_id is immutable (from YouTube)
-- subscribed is a single boolean flag
-- Expired subscriptions are renewed automatically or manually
+- YouTubeChannelID must not be empty
+- ChannelSnapshot: (ChannelID, MeasuredAt) logical uniqueness (insert-only)
+- Only Subscribed=true channels are WebSub renewal targets
+- Channel ID is immutable once created
 
 #### Commands
 ```go
 // Subscription management
-SubscribeChannel(channelId string) error
-UnsubscribeChannel(channelId string) error
-RenewSubscription(channelId string) error
+SubscribeChannel(channelId UUID) error
+UnsubscribeChannel(channelId UUID) error
+RenewSubscription(channelId UUID) error
 
 // Record subscriber counts
-RecordSubscriberCount(channelId string, measuredAt time.Time, count int64) error
+RecordSubscriberCount(channelId UUID, measuredAt time.Time, count int64) error
 ```
-
-#### Purpose
-Maintain subscription continuity and subscriber trends (reference for video snapshot measurements)
 
 ### A-3) Video
 
-#### Identifier
-- video_id (YouTube Video ID)
+#### Purpose
+Track monitored videos with metadata and checkpoint snapshots. External ID is stored separately.
 
-#### Attributes
-- channel_id: Owning channel
-- title: Video title
-- published_at: Publication datetime
-- thumbnail_url: Thumbnail URL
-- video_url: Video URL
-- youtube_category_id: YouTube category
+#### Entity
+```go
+type Video struct {
+    ID               UUID              // Internal PK
+    YouTubeVideoID   YouTubeVideoID    // External ID
+    ChannelID        UUID              // Internal FK
+    YouTubeChannelID YouTubeChannelID  // Redundant for JOIN optimization
+    Title            string
+    PublishedAt      time.Time
+    CategoryID       CategoryID        // YouTube categoryId (e.g. 27,28)
+    ThumbnailURL     string
+    VideoURL         string
+}
+```
 
-#### Child Entities
-- VideoSnapshot: Snapshot at each checkpoint
-  - checkpoint_hour: Checkpoint ∈ {0,3,6,12,24,48,72,168}
-  - views_count: Views
-  - likes_count: Likes
-  - subscription_count: Channel subscriber count at that time (embedded)
-  - measured_at: Measurement datetime
-  - source: Data source ('websub'|'task'|'manual')
+#### Child Entity
+```go
+type VideoSnapshot struct {
+    ID                UUID             // Snapshot UUID
+    VideoID           UUID             // Internal FK
+    CheckpointHour    CheckpointHour   // 0,3,6,12,24,48,72,168
+    MeasuredAt        time.Time
+    ViewsCount        int64
+    LikesCount        int64
+    SubscriptionCount int64            // Channel subscriber count at time (copy)
+}
+```
+
+#### Domain Service
+```go
+// Schedule snapshots for +3/6/12/24/48/72/168h via Cloud Tasks
+ScheduleSnapshots(videoID UUID) error
+```
 
 #### Invariants
-- (video_id, checkpoint_hour) is insert-only (at most once)
-- checkpoint_hour increases in ascending order
-- subscription_count embeds the channel subscriber count at that time
+- MeasuredAt >= Video.PublishedAt
+- VideoSnapshot: (VideoID, CheckpointHour) logical uniqueness (insert-only)
+- Snapshots are immutable (no updates, only inserts)
+- CheckpointHour increases in ascending order
 
 #### Commands
 ```go
@@ -107,23 +168,20 @@ Maintain subscription continuity and subscriber trends (reference for video snap
 RegisterVideoFromTrending(meta VideoMeta) error
 
 // WebSub notification handling (finalize D0 and schedule follow-ups)
-ApplyWebSubNotification(videoId string) error
+ApplyWebSubNotification(ytVideoID YouTubeVideoID) error
 
-// Add snapshot
-AddSnapshot(videoId string, checkpoint int, counts SnapshotCounts) error
+// Add snapshot (idempotent)
+AddSnapshot(videoID UUID, checkpoint CheckpointHour, counts SnapshotCounts) error
 ```
 
 #### Event
 ```go
 SnapshotAdded {
-    VideoId: string
-    CheckpointHour: int
+    VideoId: UUID
+    CheckpointHour: CheckpointHour
     MeasuredAt: time.Time
 }
 ```
-
-#### Purpose
-Collect and accumulate data across the video's lifecycle
 
 ## Analytics Context Aggregates
 

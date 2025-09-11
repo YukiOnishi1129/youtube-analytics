@@ -33,9 +33,21 @@ Adapters (reference: authority-service)
 ## ingestion-service (Collection & Storage)
 
 Location: `/services/ingestion-service`  
-Responsibility: Video collection, WebSub receiver, snapshot storage, keyword management
+Responsibility: Video collection from YouTube, WebSub receiver, snapshot storage, keyword filter management
 
-### gRPC Methods
+### Authentication Policies
+
+- **PUBLIC**: Unauthenticated allowed (WebSub Verify/Notify for Hub→Server S2S)
+- **USER_ID_TOKEN**: Identity Platform ID token (user operations)
+- **SERVICE_OIDC**: Cloud Tasks/Scheduler OIDC (aud=service URL)
+- Operation: Cloud Run disables unauthenticated calls, Tasks/Scheduler SA gets Invoker role
+- WebSub is PUBLIC, internal APIs use SERVICE_OIDC middleware validation
+
+### gRPC API (User/Admin UI)
+
+Service: `ingestion.v1.IngestionService`
+
+#### Keyword Management
 
 | Method | Purpose | Auth | Request/Response |
 |--------|---------|------|------------------|
@@ -47,16 +59,61 @@ Responsibility: Video collection, WebSub receiver, snapshot storage, keyword man
 | DeleteKeyword | Delete keyword | User login required | {id} → void |
 | InsertSnapshot | Save snapshot (internal) | Service | {video_id,checkpoint_hour} → void |
 
-### HTTP APIs (External Events)
+### HTTP APIs (Hub → Server)
 
-| API | Method/Path | Caller | Purpose | Protection |
-|-----|-------------|--------|---------|-----------|
-| WebSub Verify | GET /yt/websub | YouTube Hub | Subscription verification (return hub.challenge) | Public (lightly protected) |
-| WebSub Notify | POST /yt/websub | YouTube Hub | New video notification | Public (signature verification) |
-| Snapshot | POST /snapshot | Cloud Tasks | Fetch snapshot at ETA → UPSERT | OIDC/HMAC |
-| Collect Trending | POST /admin/collect-trending | Cloud Scheduler | Collect categories 27/28 | OIDC/HMAC |
-| Renew Subscriptions | POST /admin/renew-subscriptions | Cloud Scheduler | Refresh WebSub leases | OIDC/HMAC |
-| Warm | GET /warm | Cloud Scheduler | Cold start mitigation | Optional |
+#### WebSub Endpoints
+
+| Endpoint | Purpose | Auth | Request → Response |
+|----------|---------|------|-------------------|
+| GET /websub/youtube | Verify subscription | PUBLIC | Query: hub.mode, hub.topic, hub.challenge, hub.lease_seconds → Body: hub.challenge |
+| POST /websub/youtube | Receive notification | PUBLIC + Secret | Body: Atom XML → 204 No Content |
+
+**Processing:**
+1. Extract videoId from Atom XML → `ApplyWebSubNotification(videoId)`
+2. Get D0 snapshot → `ScheduleSnapshots(+3,+6,+12,+24,+48,+72,+168)`
+3. Idempotency: D0 uses `UNIQUE(video_id, cp=0)` with `ON CONFLICT DO NOTHING`
+4. Always return 2xx for Hub retry handling
+
+### HTTP APIs (Cloud Tasks)
+
+| Endpoint | Purpose | Auth | Request → Response |
+|----------|---------|------|-------------------|
+| POST /tasks/snapshot | Save checkpoint snapshot | SERVICE_OIDC | {video_id, checkpoint_hour} → 204 |
+
+**Details:**
+- Headers: `Authorization: Bearer <OIDC>` (Tasks-provided, aud=service URL)
+- Processing: YouTube API → `video_snapshots.Insert` (idempotent)
+- Idempotency: `UNIQUE(video_id, checkpoint_hour)` prevents duplicates
+- TaskID: `snap:{video_id}:{checkpoint_hour}` (deterministic)
+- Retry: 5xx only, exponential backoff
+
+### HTTP APIs (Cloud Scheduler)
+
+| Endpoint | Purpose | Auth | Request → Response |
+|----------|---------|------|-------------------|
+| POST /admin/collect-trending | Collect trending videos | SERVICE_OIDC | {region?, category_ids?, pages?} → {collected, adopted} |
+| POST /admin/renew-subscriptions | Renew WebSub leases | SERVICE_OIDC | {} → {renewed} |
+| GET /warm | Keep instance warm | SERVICE_OIDC | {} → "ok" |
+
+**Collect Trending Details:**
+- Default: `{region: "JP", category_ids: [27, 28], pages: 1}`
+- Process: YouTube trending → Keyword filter → Register if matched
+- Idempotency: `youtube_video_id UNIQUE` ignores duplicates
+
+### Admin/Debug Endpoints (Optional)
+
+| Endpoint | Purpose | Auth | Request → Response |
+|----------|---------|------|-------------------|
+| POST /admin/apply-websub-notification | Manual D0 retry | SERVICE_OIDC | {youtube_video_id} → 204 |
+
+### Idempotency & Constraints
+
+- **VideoSnapshot**: `UNIQUE(video_id, checkpoint_hour)` + `INSERT ... ON CONFLICT DO NOTHING`
+- **Videos**: `youtube_video_id UNIQUE` (absorbs trending duplicates)
+- **Channels**: `youtube_channel_id UNIQUE` (absorbs subscription duplicates)
+- **Tasks**: TaskID = `snap:{video}:{cp}` (prevents duplicate enqueue)
+- **Rate limit**: Consider token bucket on `/tasks/snapshot` via interceptor
+- **Retry**: YouTube API handled by adapter with timeout/retry/backoff
 
 ## analytics-service (Analysis & Serving)
 
