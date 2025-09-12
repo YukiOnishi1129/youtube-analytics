@@ -10,6 +10,7 @@ import (
 // SnapshotScheduler is a domain service for scheduling video snapshots
 type SnapshotScheduler interface {
 	ScheduleSnapshots(video *domain.Video) ([]ScheduledSnapshot, error)
+	DetermineCheckpoints(video *domain.Video) []valueobject.CheckpointHour
 }
 
 // ScheduledSnapshot represents a scheduled snapshot task
@@ -51,4 +52,24 @@ func (s *snapshotScheduler) ScheduleSnapshots(video *domain.Video) ([]ScheduledS
 	}
 	
 	return scheduled, nil
+}
+
+// DetermineCheckpoints determines which checkpoint hours are needed for a video
+func (s *snapshotScheduler) DetermineCheckpoints(video *domain.Video) []valueobject.CheckpointHour {
+	now := time.Now()
+	var checkpoints []valueobject.CheckpointHour
+	
+	// Get all checkpoint hours after D0
+	allCheckpoints := valueobject.GetCheckpointHoursAfter(valueobject.CheckpointHour0)
+	
+	for _, cp := range allCheckpoints {
+		eta := video.PublishedAt.Add(time.Duration(cp) * time.Hour)
+		
+		// Include if ETA hasn't passed yet
+		if eta.After(now) {
+			checkpoints = append(checkpoints, cp)
+		}
+	}
+	
+	return checkpoints
 }

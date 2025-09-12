@@ -102,3 +102,9 @@ func (s Source) IsValid() bool {
 		return false
 	}
 }
+
+// GenerateUUID generates a new UUID
+func GenerateUUID() UUID {
+	// This is a placeholder - in production, use a proper UUID generator
+	return UUID("generated-uuid")
+}

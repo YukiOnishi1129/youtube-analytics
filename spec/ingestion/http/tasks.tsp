@@ -4,7 +4,7 @@ import "@typespec/rest";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
-@service({
+@service(#{
   title: "Ingestion Service Cloud Tasks API",
 })
 @server("https://ingestion.youtube-analytics.example.com", "Production server")

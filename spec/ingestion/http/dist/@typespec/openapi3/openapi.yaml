@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: Ingestion Service Admin API
+  version: 0.0.0
+tags: []
+paths:
+  /admin/collect-subscriptions:
+    post:
+      operationId: Admin_collectSubscriptions
+      description: Collect subscribed channel videos
+      parameters:
+        - name: X-CloudScheduler-JobName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudScheduler-ScheduleTime
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectSubscriptionsResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/collect-trending:
+    post:
+      operationId: Admin_collectTrending
+      description: Collect trending videos
+      parameters:
+        - name: X-CloudScheduler-JobName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudScheduler-ScheduleTime
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectTrendingResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/schedule-snapshots:
+    post:
+      operationId: Admin_scheduleSnapshots
+      description: Schedule video snapshots
+      parameters:
+        - name: X-CloudScheduler-JobName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudScheduler-ScheduleTime
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleSnapshotsResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/update-channels:
+    post:
+      operationId: Admin_updateChannels
+      description: Update channel metadata
+      parameters:
+        - name: X-CloudScheduler-JobName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudScheduler-ScheduleTime
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateChannelsResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    CollectSubscriptionsResponse:
+      type: object
+      required:
+        - channelsProcessed
+        - videosProcessed
+        - videosAdded
+        - duration
+      properties:
+        channelsProcessed:
+          type: integer
+          format: int32
+        videosProcessed:
+          type: integer
+          format: int32
+        videosAdded:
+          type: integer
+          format: int32
+        duration:
+          type: string
+    CollectTrendingResponse:
+      type: object
+      required:
+        - videosProcessed
+        - videosAdded
+        - duration
+      properties:
+        videosProcessed:
+          type: integer
+          format: int32
+        videosAdded:
+          type: integer
+          format: int32
+        duration:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ScheduleSnapshotsResponse:
+      type: object
+      required:
+        - videosProcessed
+        - tasksScheduled
+        - duration
+      properties:
+        videosProcessed:
+          type: integer
+          format: int32
+        tasksScheduled:
+          type: integer
+          format: int32
+        duration:
+          type: string
+    UpdateChannelsResponse:
+      type: object
+      required:
+        - channelsProcessed
+        - channelsUpdated
+        - duration
+      properties:
+        channelsProcessed:
+          type: integer
+          format: int32
+        channelsUpdated:
+          type: integer
+          format: int32
+        duration:
+          type: string
+servers:
+  - url: https://ingestion.youtube-analytics.example.com
+    description: Production server
+    variables: {}

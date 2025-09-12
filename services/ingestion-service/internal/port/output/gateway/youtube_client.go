@@ -14,6 +14,8 @@ type YouTubeClient interface {
 	ListMostPopular(ctx context.Context, categoryID valueobject.CategoryID, pageToken *string) (*TrendingVideos, error)
 	GetVideo(ctx context.Context, ytVideoID valueobject.YouTubeVideoID) (*VideoMeta, error)
 	GetChannel(ctx context.Context, ytChannelID valueobject.YouTubeChannelID) (*ChannelMeta, error)
+	GetTrendingVideos(ctx context.Context) ([]*VideoMeta, error)
+	GetChannelVideos(ctx context.Context, channelID valueobject.YouTubeChannelID) ([]*VideoMeta, error)
 }
 
 // VideoStats represents video statistics from YouTube API
@@ -31,21 +33,23 @@ type ChannelStats struct {
 
 // VideoMeta represents video metadata from YouTube API
 type VideoMeta struct {
-	ID          valueobject.YouTubeVideoID
-	ChannelID   valueobject.YouTubeChannelID
-	Title       string
-	Description string
-	PublishedAt time.Time
-	CategoryID  valueobject.CategoryID
-	Thumbnails  Thumbnails
+	ID           valueobject.YouTubeVideoID
+	ChannelID    valueobject.YouTubeChannelID
+	Title        string
+	Description  string
+	PublishedAt  time.Time
+	CategoryID   valueobject.CategoryID
+	Thumbnails   Thumbnails
+	ThumbnailURL string
 }
 
 // ChannelMeta represents channel metadata from YouTube API
 type ChannelMeta struct {
-	ID          valueobject.YouTubeChannelID
-	Title       string
-	Description string
-	Thumbnails  Thumbnails
+	ID           valueobject.YouTubeChannelID
+	Title        string
+	Description  string
+	Thumbnails   Thumbnails
+	ThumbnailURL string
 }
 
 // Thumbnails represents YouTube thumbnails
