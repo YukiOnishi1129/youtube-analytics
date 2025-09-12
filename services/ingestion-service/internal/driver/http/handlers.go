@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/driver/http/generated"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/input"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Server struct {
@@ -126,7 +126,10 @@ func (s *Server) TasksCreateSnapshot(c *gin.Context, params generated.TasksCreat
 	}
 
 	// Create snapshot
-	_, err = s.systemUseCase.CreateSnapshot(c.Request.Context(), videoID, int(req.CheckpointHour))
+	_, err = s.systemUseCase.CreateSnapshot(c.Request.Context(), &input.CreateSnapshotInput{
+		VideoID:        videoID,
+		CheckpointHour: int(req.CheckpointHour),
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, generated.Error{
 			Code:    "INTERNAL_ERROR",

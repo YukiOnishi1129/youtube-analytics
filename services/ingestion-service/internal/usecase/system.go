@@ -73,9 +73,9 @@ func (u *systemUseCase) ScheduleSnapshots(ctx context.Context) (*input.ScheduleS
 	}, nil
 }
 
-func (u *systemUseCase) CreateSnapshot(ctx context.Context, videoID uuid.UUID, checkpointHour int) (*domain.VideoSnapshot, error) {
+func (u *systemUseCase) CreateSnapshot(ctx context.Context, input *input.CreateSnapshotInput) (*domain.VideoSnapshot, error) {
 	// Get video
-	video, err := u.videoRepo.GetByID(ctx, valueobject.UUID(videoID.String()))
+	video, err := u.videoRepo.GetByID(ctx, valueobject.UUID(input.VideoID.String()))
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +89,8 @@ func (u *systemUseCase) CreateSnapshot(ctx context.Context, videoID uuid.UUID, c
 	// Create snapshot
 	snapshot := &domain.VideoSnapshot{
 		ID:                valueobject.UUID(uuid.New().String()),
-		VideoID:           valueobject.UUID(videoID.String()),
-		CheckpointHour:    valueobject.CheckpointHour(checkpointHour),
+		VideoID:           valueobject.UUID(input.VideoID.String()),
+		CheckpointHour:    valueobject.CheckpointHour(input.CheckpointHour),
 		MeasuredAt:        time.Now(),
 		ViewsCount:        stats.ViewCount,
 		LikesCount:        stats.LikeCount,
