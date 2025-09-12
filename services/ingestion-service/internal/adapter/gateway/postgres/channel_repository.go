@@ -66,6 +66,32 @@ func (r *channelRepository) Update(ctx context.Context, ch *domain.Channel) erro
 	})
 }
 
+// GetByID gets a channel by ID
+func (r *channelRepository) GetByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error) {
+	uid, err := uuid.Parse(string(id))
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := r.q.GetChannelByID(ctx, uid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrChannelNotFound
+		}
+		return nil, err
+	}
+
+	return &domain.Channel{
+		ID:               valueobject.UUID(row.ID.String()),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		ThumbnailURL:     row.ThumbnailUrl,
+		Subscribed:       row.Subscribed.Bool,
+		CreatedAt:        row.CreatedAt.Time,
+		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
+	}, nil
+}
+
 // FindByID finds a channel by ID
 func (r *channelRepository) FindByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error) {
 	uid, err := uuid.Parse(string(id))

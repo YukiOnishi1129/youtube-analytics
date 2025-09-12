@@ -123,3 +123,11 @@ func (c *youtubeClient) GetChannelVideos(ctx context.Context, channelID valueobj
 		},
 	}, nil
 }
+
+func (c *youtubeClient) GetVideoStatistics(ctx context.Context, ytVideoID string) (*gateway.VideoStats, error) {
+	return &gateway.VideoStats{
+		ViewCount:    1000,
+		LikeCount:    100,
+		CommentCount: 50,
+	}, nil
+}

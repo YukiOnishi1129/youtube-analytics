@@ -48,6 +48,32 @@ func (r *videoRepository) Save(ctx context.Context, v *domain.Video) error {
 	})
 }
 
+// GetByID gets a video by ID
+func (r *videoRepository) GetByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error) {
+	uid, err := uuid.Parse(string(id))
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := r.q.GetVideoByID(ctx, uid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrVideoNotFound
+		}
+		return nil, err
+	}
+
+	return &domain.Video{
+		ID:               valueobject.UUID(row.ID.String()),
+		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		ThumbnailURL:     row.ThumbnailUrl,
+		PublishedAt:      row.PublishedAt,
+		CreatedAt:        row.CreatedAt.Time,
+	}, nil
+}
+
 // FindByID finds a video by ID
 func (r *videoRepository) FindByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error) {
 	uid, err := uuid.Parse(string(id))
