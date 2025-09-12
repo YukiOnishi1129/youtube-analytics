@@ -19,6 +19,9 @@ var (
 	ErrSnapshotAlreadyExists = errors.New("snapshot already exists")
 	ErrInvalidCheckpoint     = errors.New("invalid checkpoint hour")
 
+	// Keyword errors
+	ErrKeywordNotFound = errors.New("keyword not found")
+
 	// General errors
 	ErrInvalidInput = errors.New("invalid input")
 	ErrNotFound     = errors.New("not found")

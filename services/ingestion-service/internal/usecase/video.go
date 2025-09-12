@@ -32,6 +32,7 @@ func NewVideoUseCase(
 }
 
 func (u *videoUseCase) CollectTrending(ctx context.Context) (*input.CollectTrendingResult, error) {
+	start := time.Now()
 	// Fetch trending videos from YouTube API
 	trendingVideos, err := u.youtubeAPI.GetTrendingVideos(ctx)
 	if err != nil {
@@ -76,10 +77,12 @@ func (u *videoUseCase) CollectTrending(ctx context.Context) (*input.CollectTrend
 	return &input.CollectTrendingResult{
 		VideosProcessed: len(trendingVideos),
 		VideosAdded:     videosAdded,
+		Duration:        time.Since(start),
 	}, nil
 }
 
 func (u *videoUseCase) CollectSubscriptions(ctx context.Context) (*input.CollectSubscriptionsResult, error) {
+	start := time.Now()
 	// Get all subscribed channels
 	channels, err := u.channelRepo.ListSubscribed(ctx)
 	if err != nil {
@@ -137,5 +140,6 @@ func (u *videoUseCase) CollectSubscriptions(ctx context.Context) (*input.Collect
 		ChannelsProcessed: len(channels),
 		VideosProcessed:   totalVideos,
 		VideosAdded:       videosAdded,
+		Duration:          time.Since(start),
 	}, nil
 }

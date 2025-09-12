@@ -4,10 +4,6 @@ import "@typespec/rest";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
-@service(#{
-  title: "Ingestion Service WebSub API",
-})
-@server("https://ingestion.youtube-analytics.example.com", "Production server")
 namespace IngestionService.WebSub;
 
 @route("/websub/youtube")

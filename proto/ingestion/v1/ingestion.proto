@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package ingestion.v1;
+
+option go_package = "github.com/YukiOnishi1129/youtube-analytics/proto/ingestion/v1;ingestionv1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// IngestionService provides gRPC API for video ingestion operations
+service IngestionService {
+  // Channel operations
+  rpc GetChannel(GetChannelRequest) returns (GetChannelResponse);
+  rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse);
+  rpc SubscribeChannel(SubscribeChannelRequest) returns (SubscribeChannelResponse);
+  rpc UnsubscribeChannel(UnsubscribeChannelRequest) returns (UnsubscribeChannelResponse);
+  
+  // Video operations
+  rpc GetVideo(GetVideoRequest) returns (GetVideoResponse);
+  rpc ListVideos(ListVideosRequest) returns (ListVideosResponse);
+  rpc CollectTrending(CollectTrendingRequest) returns (CollectTrendingResponse);
+  rpc CollectSubscriptions(CollectSubscriptionsRequest) returns (CollectSubscriptionsResponse);
+  
+  // Snapshot operations
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
+  rpc GetSnapshot(GetSnapshotRequest) returns (GetSnapshotResponse);
+  rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse);
+  
+  // System operations
+  rpc ScheduleSnapshots(ScheduleSnapshotsRequest) returns (ScheduleSnapshotsResponse);
+  rpc UpdateChannels(UpdateChannelsRequest) returns (UpdateChannelsResponse);
+}
+
+// Channel messages
+message Channel {
+  string id = 1;
+  string youtube_channel_id = 2;
+  string title = 3;
+  string thumbnail_url = 4;
+  bool subscribed = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  google.protobuf.Timestamp deleted_at = 8;
+}
+
+message GetChannelRequest {
+  string id = 1;
+}
+
+message GetChannelResponse {
+  Channel channel = 1;
+}
+
+message ListChannelsRequest {
+  bool subscribed_only = 1;
+  string query = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListChannelsResponse {
+  repeated Channel channels = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message SubscribeChannelRequest {
+  string youtube_channel_id = 1;
+}
+
+message SubscribeChannelResponse {
+  Channel channel = 1;
+}
+
+message UnsubscribeChannelRequest {
+  string channel_id = 1;
+}
+
+message UnsubscribeChannelResponse {
+  Channel channel = 1;
+}
+
+// Video messages
+message Video {
+  string id = 1;
+  string youtube_video_id = 2;
+  string youtube_channel_id = 3;
+  string title = 4;
+  string thumbnail_url = 5;
+  google.protobuf.Timestamp published_at = 6;
+  int32 category_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp deleted_at = 10;
+}
+
+message GetVideoRequest {
+  string id = 1;
+}
+
+message GetVideoResponse {
+  Video video = 1;
+}
+
+message ListVideosRequest {
+  string channel_id = 1;
+  google.protobuf.Timestamp published_after = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListVideosResponse {
+  repeated Video videos = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message CollectTrendingRequest {
+  string region_code = 1;
+  int32 category_id = 2;
+}
+
+message CollectTrendingResponse {
+  int32 videos_processed = 1;
+  int32 videos_added = 2;
+  int64 duration_ms = 3;
+}
+
+message CollectSubscriptionsRequest {
+  // Empty - collects for all subscribed channels
+}
+
+message CollectSubscriptionsResponse {
+  int32 channels_processed = 1;
+  int32 videos_processed = 2;
+  int32 videos_added = 3;
+  int64 duration_ms = 4;
+}
+
+// Snapshot messages
+message VideoSnapshot {
+  string id = 1;
+  string video_id = 2;
+  int32 checkpoint_hour = 3;
+  google.protobuf.Timestamp measured_at = 4;
+  int64 views_count = 5;
+  int64 likes_count = 6;
+  int64 subscription_count = 7;
+  string source = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message CreateSnapshotRequest {
+  string video_id = 1;
+  int32 checkpoint_hour = 2;
+}
+
+message CreateSnapshotResponse {
+  VideoSnapshot snapshot = 1;
+}
+
+message GetSnapshotRequest {
+  string video_id = 1;
+  int32 checkpoint_hour = 2;
+}
+
+message GetSnapshotResponse {
+  VideoSnapshot snapshot = 1;
+}
+
+message ListSnapshotsRequest {
+  string video_id = 1;
+}
+
+message ListSnapshotsResponse {
+  repeated VideoSnapshot snapshots = 1;
+}
+
+// System operation messages
+message ScheduleSnapshotsRequest {
+  // Empty - schedules for all active videos
+}
+
+message ScheduleSnapshotsResponse {
+  int32 videos_processed = 1;
+  int32 tasks_scheduled = 2;
+  int64 duration_ms = 3;
+}
+
+message UpdateChannelsRequest {
+  // Empty - updates all channels
+}
+
+message UpdateChannelsResponse {
+  int32 channels_processed = 1;
+  int32 channels_updated = 2;
+  int64 duration_ms = 3;
+}

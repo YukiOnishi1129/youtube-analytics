@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Ingestion Service Admin API
+  title: Ingestion Service API
   version: 0.0.0
 tags: []
 paths:
@@ -116,6 +116,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /tasks/snapshot:
+    post:
+      operationId: Tasks_createSnapshot
+      description: Create video snapshot task
+      parameters:
+        - name: X-CloudTasks-TaskName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudTasks-QueueName
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-CloudTasks-TaskRetryCount
+          in: header
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: X-CloudTasks-TaskExecutionCount
+          in: header
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: X-CloudTasks-TaskETA
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSnapshotRequest'
+  /websub/youtube/notify:
+    post:
+      operationId: WebSub_notify
+      description: WebSub notification endpoint for YouTube
+      parameters:
+        - name: X-Hub-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/atom+xml:
+            schema:
+              type: string
+  /websub/youtube/verify:
+    get:
+      operationId: WebSub_verify
+      description: WebSub verification endpoint for YouTube
+      parameters:
+        - name: hub.mode
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - subscribe
+              - unsubscribe
+          explode: false
+        - name: hub.topic
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: hub.challenge
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: hub.lease_seconds
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: The server cannot find the requested resource.
 components:
   schemas:
     CollectSubscriptionsResponse:
@@ -152,6 +272,25 @@ components:
           format: int32
         duration:
           type: string
+    CreateSnapshotRequest:
+      type: object
+      required:
+        - videoId
+        - checkpointHour
+      properties:
+        videoId:
+          type: string
+        checkpointHour:
+          type: number
+          enum:
+            - 0
+            - 3
+            - 6
+            - 12
+            - 24
+            - 48
+            - 72
+            - 168
     Error:
       type: object
       required:

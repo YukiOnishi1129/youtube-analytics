@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/driver/http/generated"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/input"
 	"github.com/gin-gonic/gin"
@@ -102,4 +103,55 @@ func (s *Server) AdminUpdateChannels(c *gin.Context, params generated.AdminUpdat
 		ChannelsUpdated:   int32(result.ChannelsUpdated),
 		Duration:          time.Since(start).String(),
 	})
+}
+
+func (s *Server) TasksCreateSnapshot(c *gin.Context, params generated.TasksCreateSnapshotParams) {
+	var req generated.CreateSnapshotRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, generated.Error{
+			Code:    "INVALID_REQUEST",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	// Parse video ID
+	videoID, err := uuid.Parse(req.VideoId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, generated.Error{
+			Code:    "INVALID_VIDEO_ID",
+			Message: "Invalid video ID format",
+		})
+		return
+	}
+
+	// Create snapshot
+	_, err = s.systemUseCase.CreateSnapshot(c.Request.Context(), videoID, int(req.CheckpointHour))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, generated.Error{
+			Code:    "INTERNAL_ERROR",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (s *Server) WebSubVerify(c *gin.Context, params generated.WebSubVerifyParams) {
+	// Verify the subscription request
+	if params.HubMode == "subscribe" || params.HubMode == "unsubscribe" {
+		// Return the challenge to confirm the subscription
+		c.String(http.StatusOK, params.HubChallenge)
+		return
+	}
+
+	c.Status(http.StatusNotFound)
+}
+
+func (s *Server) WebSubNotify(c *gin.Context, params generated.WebSubNotifyParams) {
+	// TODO: Implement WebSub notification handling
+	// This would parse the YouTube push notification and trigger appropriate actions
+	// For now, just acknowledge receipt
+	c.Status(http.StatusOK)
 }

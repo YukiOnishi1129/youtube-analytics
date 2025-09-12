@@ -1,3 +1,1 @@
-import "./websub.tsp";
-import "./tasks.tsp";
-import "./admin.tsp";
+import "./all.tsp";

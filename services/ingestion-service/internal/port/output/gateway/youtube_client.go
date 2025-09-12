@@ -10,6 +10,7 @@ import (
 // YouTubeClient is the gateway interface for YouTube Data API
 type YouTubeClient interface {
 	GetVideoStats(ctx context.Context, ytVideoID valueobject.YouTubeVideoID) (*VideoStats, error)
+	GetVideoStatistics(ctx context.Context, ytVideoID string) (*VideoStats, error)
 	GetChannelStats(ctx context.Context, ytChannelID valueobject.YouTubeChannelID) (*ChannelStats, error)
 	ListMostPopular(ctx context.Context, categoryID valueobject.CategoryID, pageToken *string) (*TrendingVideos, error)
 	GetVideo(ctx context.Context, ytVideoID valueobject.YouTubeVideoID) (*VideoMeta, error)

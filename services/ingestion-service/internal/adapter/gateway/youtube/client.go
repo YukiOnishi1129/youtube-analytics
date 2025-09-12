@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/api/option"
-	"google.golang.org/api/youtube/v3"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/domain/valueobject"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/output/gateway"
+	"google.golang.org/api/option"
+	"google.golang.org/api/youtube/v3"
 )
 
 // client is a real YouTube API client implementation
@@ -39,6 +39,26 @@ func (c *client) GetVideoStats(ctx context.Context, ytVideoID valueobject.YouTub
 	}
 
 	if len(response.Items) == 0 {
+		return nil, fmt.Errorf("video not found: %s", ytVideoID)
+	}
+
+	stats := response.Items[0].Statistics
+	return &gateway.VideoStats{
+		ViewCount:    int64(stats.ViewCount),
+		LikeCount:    int64(stats.LikeCount),
+		CommentCount: int64(stats.CommentCount),
+	}, nil
+}
+
+// GetVideoStatistics gets video statistics (string version)
+func (c *client) GetVideoStatistics(ctx context.Context, ytVideoID string) (*gateway.VideoStats, error) {
+	call := c.service.Videos.List([]string{"statistics"}).Id(ytVideoID)
+	response, err := call.Do()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get video statistics: %w", err)
+	}
+
+		if len(response.Items) == 0 {
 		return nil, fmt.Errorf("video not found: %s", ytVideoID)
 	}
 

@@ -20,6 +20,7 @@ type KeywordRepository interface {
 type ChannelRepository interface {
 	Save(ctx context.Context, ch *domain.Channel) error
 	Update(ctx context.Context, ch *domain.Channel) error
+	GetByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error)
 	FindByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error)
 	FindByYouTubeID(ctx context.Context, ytID valueobject.YouTubeChannelID) (*domain.Channel, error)
 	FindByYouTubeChannelID(ctx context.Context, youtubeChannelID valueobject.YouTubeChannelID) (*domain.Channel, error)
@@ -39,6 +40,7 @@ type ChannelSnapshotRepository interface {
 // VideoRepository is the repository interface for Video aggregate
 type VideoRepository interface {
 	Save(ctx context.Context, v *domain.Video) error
+	GetByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error)
 	FindByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error)
 	FindByYouTubeID(ctx context.Context, ytID valueobject.YouTubeVideoID) (*domain.Video, error)
 	ExistsByYouTubeVideoID(ctx context.Context, youtubeVideoID valueobject.YouTubeVideoID) (bool, error)
@@ -49,8 +51,10 @@ type VideoRepository interface {
 
 // VideoSnapshotRepository is the repository interface for VideoSnapshot
 type VideoSnapshotRepository interface {
+	Save(ctx context.Context, s *domain.VideoSnapshot) error
 	Insert(ctx context.Context, s *domain.VideoSnapshot) error
 	Exists(ctx context.Context, videoID valueobject.UUID, cp valueobject.CheckpointHour) (bool, error)
 	FindByVideoAndCP(ctx context.Context, videoID valueobject.UUID, cp valueobject.CheckpointHour) (*domain.VideoSnapshot, error)
 	ListByVideo(ctx context.Context, videoID valueobject.UUID) ([]*domain.VideoSnapshot, error)
+	ListByVideoID(ctx context.Context, videoID valueobject.UUID) ([]*domain.VideoSnapshot, error)
 }

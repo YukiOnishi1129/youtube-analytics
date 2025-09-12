@@ -25,6 +25,15 @@ type ServerInterface interface {
 
 	// (POST /admin/update-channels)
 	AdminUpdateChannels(c *gin.Context, params AdminUpdateChannelsParams)
+
+	// (POST /tasks/snapshot)
+	TasksCreateSnapshot(c *gin.Context, params TasksCreateSnapshotParams)
+
+	// (POST /websub/youtube/notify)
+	WebSubNotify(c *gin.Context, params WebSubNotifyParams)
+
+	// (GET /websub/youtube/verify)
+	WebSubVerify(c *gin.Context, params WebSubVerifyParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -292,6 +301,249 @@ func (siw *ServerInterfaceWrapper) AdminUpdateChannels(c *gin.Context) {
 	siw.Handler.AdminUpdateChannels(c, params)
 }
 
+// TasksCreateSnapshot operation middleware
+func (siw *ServerInterfaceWrapper) TasksCreateSnapshot(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params TasksCreateSnapshotParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-CloudTasks-TaskName" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CloudTasks-TaskName")]; found {
+		var XCloudTasksTaskName string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-CloudTasks-TaskName, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CloudTasks-TaskName", valueList[0], &XCloudTasksTaskName, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-CloudTasks-TaskName: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XCloudTasksTaskName = XCloudTasksTaskName
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-CloudTasks-TaskName is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-CloudTasks-QueueName" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CloudTasks-QueueName")]; found {
+		var XCloudTasksQueueName string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-CloudTasks-QueueName, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CloudTasks-QueueName", valueList[0], &XCloudTasksQueueName, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-CloudTasks-QueueName: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XCloudTasksQueueName = XCloudTasksQueueName
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-CloudTasks-QueueName is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-CloudTasks-TaskRetryCount" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CloudTasks-TaskRetryCount")]; found {
+		var XCloudTasksTaskRetryCount int32
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-CloudTasks-TaskRetryCount, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CloudTasks-TaskRetryCount", valueList[0], &XCloudTasksTaskRetryCount, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-CloudTasks-TaskRetryCount: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XCloudTasksTaskRetryCount = XCloudTasksTaskRetryCount
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-CloudTasks-TaskRetryCount is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-CloudTasks-TaskExecutionCount" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CloudTasks-TaskExecutionCount")]; found {
+		var XCloudTasksTaskExecutionCount int32
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-CloudTasks-TaskExecutionCount, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CloudTasks-TaskExecutionCount", valueList[0], &XCloudTasksTaskExecutionCount, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-CloudTasks-TaskExecutionCount: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XCloudTasksTaskExecutionCount = XCloudTasksTaskExecutionCount
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-CloudTasks-TaskExecutionCount is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-CloudTasks-TaskETA" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CloudTasks-TaskETA")]; found {
+		var XCloudTasksTaskETA string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-CloudTasks-TaskETA, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CloudTasks-TaskETA", valueList[0], &XCloudTasksTaskETA, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-CloudTasks-TaskETA: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XCloudTasksTaskETA = XCloudTasksTaskETA
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-CloudTasks-TaskETA is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.TasksCreateSnapshot(c, params)
+}
+
+// WebSubNotify operation middleware
+func (siw *ServerInterfaceWrapper) WebSubNotify(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params WebSubNotifyParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Hub-Signature" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Hub-Signature")]; found {
+		var XHubSignature string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Hub-Signature, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Hub-Signature", valueList[0], &XHubSignature, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Hub-Signature: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.XHubSignature = XHubSignature
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Hub-Signature is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.WebSubNotify(c, params)
+}
+
+// WebSubVerify operation middleware
+func (siw *ServerInterfaceWrapper) WebSubVerify(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params WebSubVerifyParams
+
+	// ------------- Required query parameter "hub.mode" -------------
+
+	if paramValue := c.Query("hub.mode"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument hub.mode is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", false, true, "hub.mode", c.Request.URL.Query(), &params.HubMode)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter hub.mode: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required query parameter "hub.topic" -------------
+
+	if paramValue := c.Query("hub.topic"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument hub.topic is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", false, true, "hub.topic", c.Request.URL.Query(), &params.HubTopic)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter hub.topic: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required query parameter "hub.challenge" -------------
+
+	if paramValue := c.Query("hub.challenge"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument hub.challenge is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", false, true, "hub.challenge", c.Request.URL.Query(), &params.HubChallenge)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter hub.challenge: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "hub.lease_seconds" -------------
+
+	err = runtime.BindQueryParameter("form", false, false, "hub.lease_seconds", c.Request.URL.Query(), &params.HubLeaseSeconds)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter hub.lease_seconds: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.WebSubVerify(c, params)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -323,4 +575,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/admin/collect-trending", wrapper.AdminCollectTrending)
 	router.POST(options.BaseURL+"/admin/schedule-snapshots", wrapper.AdminScheduleSnapshots)
 	router.POST(options.BaseURL+"/admin/update-channels", wrapper.AdminUpdateChannels)
+	router.POST(options.BaseURL+"/tasks/snapshot", wrapper.TasksCreateSnapshot)
+	router.POST(options.BaseURL+"/websub/youtube/notify", wrapper.WebSubNotify)
+	router.GET(options.BaseURL+"/websub/youtube/verify", wrapper.WebSubVerify)
 }
