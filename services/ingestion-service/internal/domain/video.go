@@ -27,6 +27,9 @@ type Video struct {
 	CreatedAt        time.Time
 	UpdatedAt        *time.Time
 	DeletedAt        *time.Time
+	
+	// Snapshots that need to be persisted (transient field)
+	newSnapshots []*VideoSnapshot
 }
 
 // NewVideo creates a new video
@@ -86,4 +89,31 @@ func (v *Video) Delete() {
 // IsDeleted checks if the video is deleted
 func (v *Video) IsDeleted() bool {
 	return v.DeletedAt != nil
+}
+
+// AddSnapshot adds a new snapshot to the video
+func (v *Video) AddSnapshot(snapshot *VideoSnapshot) error {
+	// Validate snapshot belongs to this video
+	if snapshot.VideoID != v.ID {
+		return errors.New("snapshot does not belong to this video")
+	}
+	
+	// Validate snapshot with video
+	if err := snapshot.ValidateWithVideo(v); err != nil {
+		return err
+	}
+	
+	// Add to new snapshots list
+	v.newSnapshots = append(v.newSnapshots, snapshot)
+	return nil
+}
+
+// GetNewSnapshots returns snapshots that need to be persisted
+func (v *Video) GetNewSnapshots() []*VideoSnapshot {
+	return v.newSnapshots
+}
+
+// ClearNewSnapshots clears the new snapshots after persistence
+func (v *Video) ClearNewSnapshots() {
+	v.newSnapshots = nil
 }

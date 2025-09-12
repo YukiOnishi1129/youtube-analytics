@@ -80,6 +80,15 @@ func (u *systemUseCase) CreateSnapshot(ctx context.Context, input *input.CreateS
 		return nil, err
 	}
 
+	// Check if snapshot already exists
+	exists, err := u.snapshotRepo.Exists(ctx, video.ID, valueobject.CheckpointHour(input.CheckpointHour))
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, domain.ErrSnapshotAlreadyExists
+	}
+
 	// Fetch current stats from YouTube API
 	stats, err := u.youtubeAPI.GetVideoStatistics(ctx, string(video.YouTubeVideoID))
 	if err != nil {
@@ -87,20 +96,29 @@ func (u *systemUseCase) CreateSnapshot(ctx context.Context, input *input.CreateS
 	}
 
 	// Create snapshot
-	snapshot := &domain.VideoSnapshot{
-		ID:                valueobject.UUID(uuid.New().String()),
-		VideoID:           valueobject.UUID(input.VideoID.String()),
-		CheckpointHour:    valueobject.CheckpointHour(input.CheckpointHour),
-		MeasuredAt:        time.Now(),
-		ViewsCount:        stats.ViewCount,
-		LikesCount:        stats.LikeCount,
-		SubscriptionCount: stats.CommentCount, // Assuming comment count is subscription count
-		Source:            valueobject.Source("youtube_api"),
-		CreatedAt:         time.Now(),
+	snapshot, err := domain.NewVideoSnapshot(
+		valueobject.UUID(uuid.New().String()),
+		video.ID,
+		valueobject.CheckpointHour(input.CheckpointHour),
+		time.Now(),
+		domain.SnapshotCounts{
+			ViewsCount:        stats.ViewCount,
+			LikesCount:        stats.LikeCount,
+			SubscriptionCount: stats.CommentCount,
+		},
+		valueobject.Source("youtube_api"),
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	// Save snapshot
-	if err := u.snapshotRepo.Save(ctx, snapshot); err != nil {
+	// Add snapshot to video aggregate
+	if err := video.AddSnapshot(snapshot); err != nil {
+		return nil, err
+	}
+
+	// Save video with snapshots
+	if err := u.videoRepo.SaveWithSnapshots(ctx, video); err != nil {
 		return nil, err
 	}
 

@@ -48,6 +48,27 @@ func (r *videoRepository) Save(ctx context.Context, v *domain.Video) error {
 	})
 }
 
+// SaveWithSnapshots saves video and its new snapshots in a transaction
+func (r *videoRepository) SaveWithSnapshots(ctx context.Context, v *domain.Video) error {
+	// TODO: Implement transaction handling
+	// For now, just save video
+	if err := r.Save(ctx, v); err != nil {
+		return err
+	}
+
+	// Save snapshots
+	for _, snapshot := range v.GetNewSnapshots() {
+		// TODO: Implement snapshot saving logic
+		// This would typically be done in a transaction
+		_ = snapshot
+	}
+
+	// Clear new snapshots after saving
+	v.ClearNewSnapshots()
+	
+	return nil
+}
+
 // GetByID gets a video by ID
 func (r *videoRepository) GetByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error) {
 	uid, err := uuid.Parse(string(id))

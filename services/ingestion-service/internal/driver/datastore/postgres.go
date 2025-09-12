@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
-// OpenPostgres opens a Postgres connection using the pgx stdlib driver.
+// OpenPostgres opens a Postgres connection.
 // If dsn is empty, it constructs one from environment variables:
 //
 //	DB_HOST, DB_PORT (default 5432), DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE (default disable)
@@ -20,7 +22,18 @@ func OpenPostgres(dsn string) (*sql.DB, error) {
 			return nil, err
 		}
 	}
-	return sql.Open("pgx", dsn)
+
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database: %w", err)
+	}
+
+	// Verify connection
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	return db, nil
 }
 
 func buildDSNFromEnv() (string, error) {

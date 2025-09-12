@@ -21,6 +21,9 @@ type Channel struct {
 	CreatedAt        time.Time
 	UpdatedAt        *time.Time
 	DeletedAt        *time.Time
+	
+	// Snapshots that need to be persisted (transient field)
+	newSnapshots []*ChannelSnapshot
 }
 
 // NewChannel creates a new channel
@@ -76,5 +79,27 @@ func (c *Channel) Delete() {
 // IsDeleted checks if the channel is deleted
 func (c *Channel) IsDeleted() bool {
 	return c.DeletedAt != nil
+}
+
+// AddSnapshot adds a new snapshot to the channel
+func (c *Channel) AddSnapshot(snapshot *ChannelSnapshot) error {
+	// Validate snapshot belongs to this channel
+	if snapshot.ChannelID != c.ID {
+		return errors.New("snapshot does not belong to this channel")
+	}
+	
+	// Add to new snapshots list
+	c.newSnapshots = append(c.newSnapshots, snapshot)
+	return nil
+}
+
+// GetNewSnapshots returns snapshots that need to be persisted
+func (c *Channel) GetNewSnapshots() []*ChannelSnapshot {
+	return c.newSnapshots
+}
+
+// ClearNewSnapshots clears the new snapshots after persistence
+func (c *Channel) ClearNewSnapshots() {
+	c.newSnapshots = nil
 }
 

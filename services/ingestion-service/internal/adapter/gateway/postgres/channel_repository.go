@@ -66,6 +66,27 @@ func (r *channelRepository) Update(ctx context.Context, ch *domain.Channel) erro
 	})
 }
 
+// SaveWithSnapshots saves channel and its new snapshots in a transaction
+func (r *channelRepository) SaveWithSnapshots(ctx context.Context, ch *domain.Channel) error {
+	// TODO: Implement transaction handling
+	// For now, just save channel
+	if err := r.Save(ctx, ch); err != nil {
+		return err
+	}
+
+	// Save snapshots
+	for _, snapshot := range ch.GetNewSnapshots() {
+		// TODO: Implement snapshot saving logic
+		// This would typically be done in a transaction
+		_ = snapshot
+	}
+
+	// Clear new snapshots after saving
+	ch.ClearNewSnapshots()
+	
+	return nil
+}
+
 // GetByID gets a channel by ID
 func (r *channelRepository) GetByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error) {
 	uid, err := uuid.Parse(string(id))

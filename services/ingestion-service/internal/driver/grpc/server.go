@@ -21,6 +21,7 @@ type Server struct {
 	channelUseCase input.ChannelInputPort
 	videoUseCase   input.VideoInputPort
 	systemUseCase  input.SystemInputPort
+	keywordUseCase input.KeywordInputPort // Optional keyword use case
 }
 
 func NewServer(
@@ -32,6 +33,21 @@ func NewServer(
 		channelUseCase: channelUseCase,
 		videoUseCase:   videoUseCase,
 		systemUseCase:  systemUseCase,
+	}
+}
+
+// NewServerWithKeyword creates a new server with keyword support
+func NewServerWithKeyword(
+	channelUseCase input.ChannelInputPort,
+	videoUseCase input.VideoInputPort,
+	systemUseCase input.SystemInputPort,
+	keywordUseCase input.KeywordInputPort,
+) *Server {
+	return &Server{
+		channelUseCase: channelUseCase,
+		videoUseCase:   videoUseCase,
+		systemUseCase:  systemUseCase,
+		keywordUseCase: keywordUseCase,
 	}
 }
 

@@ -19,6 +19,7 @@ type KeywordRepository interface {
 // ChannelRepository is the repository interface for Channel aggregate
 type ChannelRepository interface {
 	Save(ctx context.Context, ch *domain.Channel) error
+	SaveWithSnapshots(ctx context.Context, ch *domain.Channel) error // Save channel and its new snapshots
 	Update(ctx context.Context, ch *domain.Channel) error
 	GetByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error)
 	FindByID(ctx context.Context, id valueobject.UUID) (*domain.Channel, error)
@@ -30,9 +31,8 @@ type ChannelRepository interface {
 	ListSubscribed(ctx context.Context) ([]*domain.Channel, error)
 }
 
-// ChannelSnapshotRepository is the repository interface for ChannelSnapshot
+// ChannelSnapshotRepository is the repository interface for ChannelSnapshot (read-only)
 type ChannelSnapshotRepository interface {
-	Append(ctx context.Context, snap *domain.ChannelSnapshot) error
 	Latest(ctx context.Context, channelID valueobject.UUID) (*domain.ChannelSnapshot, error)
 	ListByChannel(ctx context.Context, channelID valueobject.UUID, limit int) ([]*domain.ChannelSnapshot, error)
 }
@@ -40,6 +40,7 @@ type ChannelSnapshotRepository interface {
 // VideoRepository is the repository interface for Video aggregate
 type VideoRepository interface {
 	Save(ctx context.Context, v *domain.Video) error
+	SaveWithSnapshots(ctx context.Context, v *domain.Video) error // Save video and its new snapshots
 	GetByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error)
 	FindByID(ctx context.Context, id valueobject.UUID) (*domain.Video, error)
 	FindByYouTubeID(ctx context.Context, ytID valueobject.YouTubeVideoID) (*domain.Video, error)
@@ -49,10 +50,8 @@ type VideoRepository interface {
 	ListActive(ctx context.Context, since time.Time) ([]*domain.Video, error)
 }
 
-// VideoSnapshotRepository is the repository interface for VideoSnapshot
+// VideoSnapshotRepository is the repository interface for VideoSnapshot (read-only)
 type VideoSnapshotRepository interface {
-	Save(ctx context.Context, s *domain.VideoSnapshot) error
-	Insert(ctx context.Context, s *domain.VideoSnapshot) error
 	Exists(ctx context.Context, videoID valueobject.UUID, cp valueobject.CheckpointHour) (bool, error)
 	FindByVideoAndCP(ctx context.Context, videoID valueobject.UUID, cp valueobject.CheckpointHour) (*domain.VideoSnapshot, error)
 	ListByVideo(ctx context.Context, videoID valueobject.UUID) ([]*domain.VideoSnapshot, error)
