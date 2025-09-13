@@ -4,77 +4,76 @@ Technical specifications for a video trend analysis system designed to support Y
 
 ## 📚 Documentation Structure
 
-### 🎯 Overview
-- [Background and Purpose](./01-overview/background.md) - Project background, objectives, and expected outcomes
+### 🎯 01-overview/ - Project Background
+- [01-background.md](./01-overview/01-background.md) - Project purpose, objectives, and expected outcomes
 
-### 📋 Use Cases
-- [Automated Processes](./02-use-cases/automated-processes.md) - Batch processing details
-- [User Operations](./02-use-cases/user-operations.md) - Screen-based operations
-- [Data Collection](./02-use-cases/data-collection.md) - Ingestion-related user flows
-- [Workflows](./02-use-cases/workflows.md) - Main processing flows
-- [Implementation Tasks](./02-use-cases/implementation-tasks.md) - MVP implementation sequence
-- [Management & Operations](./02-use-cases/management-operations.md) - Admin/ops flows and tasks
+### 📋 02-use-cases/ - System Requirements  
+- [01-README.md](./02-use-cases/01-README.md) - Use cases overview and categories
+- [02-data-collection.md](./02-use-cases/02-data-collection.md) - Automated data collection processes
+- [03-admin-management.md](./02-use-cases/03-admin-management.md) - Administrative functions and management
+- [04-user-operations.md](./02-use-cases/04-user-operations.md) - End-user features and analytics
+- [05-automated-processes.md](./02-use-cases/05-automated-processes.md) - System automation and batch jobs
+- [06-workflows.md](./02-use-cases/06-workflows.md) - Business workflows and processes
+- [07-management-operations.md](./02-use-cases/07-management-operations.md) - Operational management tasks
+- [08-implementation-tasks.md](./02-use-cases/08-implementation-tasks.md) - MVP implementation checklist
 
-### 🧠 Domain
-- [Ubiquitous Language](./03-domain/ubiquitous-language.md) - Shared vocabulary and definitions
-- [Bounded Contexts](./03-domain/bounded-contexts.md) - Context boundaries and responsibilities
-- [Aggregates](./03-domain/aggregates.md) - Transactional boundaries and invariants
-- [Application Services](./03-domain/application-services.md) - Use case orchestration layer
-- [Domain Services & Policies](./03-domain/domain-services.md) - Cross-aggregate logic and rules
-- [Representative Flows](./03-domain/domain-flows.md) - Key domain flows and sequences
+### 🧠 03-domain/ - Business Logic
+- [01-ubiquitous-language.md](./03-domain/01-ubiquitous-language.md) - Domain terminology and definitions
+- [02-bounded-contexts.md](./03-domain/02-bounded-contexts.md) - Context boundaries and responsibilities
+- [03-aggregates.md](./03-domain/03-aggregates.md) - Domain aggregates, entities, and invariants
+- [04-domain-services.md](./03-domain/04-domain-services.md) - Cross-aggregate logic and domain services
+- [05-domain-flows.md](./03-domain/05-domain-flows.md) - Key business process flows
+- [06-application-services.md](./03-domain/06-application-services.md) - Use case orchestration layer
 
-### 💾 Database
-- [Schema Design](./04-database/schema.md) - Ingestion table definitions
-- [Analytics Tables](./04-database/analytics-tables.md) - Analysis table definitions
-- [Authentication Tables](./04-database/auth-tables.md) - Account and permission management
-- [Metrics Calculation](./04-database/metrics.md) - Derived metric calculation formulas
+### 💾 04-database/ - Data Design
+- [01-schema-overview.md](./04-database/01-schema-overview.md) - Database architecture overview
+- [02-ingestion-tables.md](./04-database/02-ingestion-tables.md) - Data collection and storage tables
+- [03-analytics-tables.md](./04-database/03-analytics-tables.md) - Analytics and metrics tables
+- [04-auth-tables.md](./04-database/04-auth-tables.md) - Authentication and authorization tables
+- [05-metrics.md](./04-database/05-metrics.md) - Metric calculation formulas
+- [06-schema-migration-guide.md](./04-database/06-schema-migration-guide.md) - Migration guide for multi-genre support
 
-### 🔌 API Specifications
-- [Analytics API](./05-api/analytics-proto.md) - Rankings, history, and video details
-- [Ingestion API](./05-api/ingestion-proto.md) - Channel and keyword management
-- [Authority API](./05-api/authority-proto.md) - Authentication and profiles
+### 🔌 05-api/ - Service Interfaces
+- [01-authority-proto.md](./05-api/01-authority-proto.md) - Authentication service API
+- [02-ingestion-proto.md](./05-api/02-ingestion-proto.md) - Data ingestion service API
+- [03-analytics-proto.md](./05-api/03-analytics-proto.md) - Analytics service API
 
-### 🏗️ Architecture
-- [System Overview](./06-architecture/system-overview.md) - Overall architecture and microservice composition
-- [Backend Design](./06-architecture/backend-design.md) - Clean Architecture + DDD details
-- [Clean Architecture Details](./06-architecture/clean-architecture.md) - Layer composition and DDD implementation patterns
-- [Service Details](./06-architecture/services.md) - Detailed specifications for auth-svc and yt-svc
-- [Testing Strategy](./06-architecture/testing-strategy.md) - Test pyramid and idempotency testing
+### 🏗️ 06-architecture/ - Technical Design
+- [01-system-overview.md](./06-architecture/01-system-overview.md) - High-level system architecture
+- [02-clean-architecture.md](./06-architecture/02-clean-architecture.md) - Clean Architecture principles and patterns
+- [03-services.md](./06-architecture/03-services.md) - Detailed service specifications
+- [04-backend-design.md](./06-architecture/04-backend-design.md) - Backend implementation details
+- [05-backend-final-plan.md](./06-architecture/05-backend-final-plan.md) - Final implementation plan
+- [06-testing-strategy.md](./06-architecture/06-testing-strategy.md) - Testing approach and strategies
 
-### 🎨 Frontend
-- [Architecture](./07-frontend/architecture.md) - Next.js design and directory structure
-- [Screen Specifications](./07-frontend/screens.md) - Detailed specifications for each screen
-- [Domain Type Definitions](./07-frontend/domain-types.md) - TypeScript type definitions
+### 🎨 07-frontend/ - UI Implementation
+- [01-architecture.md](./07-frontend/01-architecture.md) - Frontend architecture and structure
+- [02-domain-types.md](./07-frontend/02-domain-types.md) - TypeScript domain type definitions
+- [03-screens.md](./07-frontend/03-screens.md) - Screen specifications and wireframes
 
-### 🚀 Deployment
-- [Environment Variables](./08-deployment/environment.md) - Required environment variable list
-- [Schedule Settings](./08-deployment/schedule.md) - Cloud Scheduler/Tasks configuration
-- [Security](./08-deployment/security.md) - Authentication flow and security settings
-- [Infrastructure](./08-deployment/infrastructure.md) - Cloud Run and resource configuration
-
-### 📋 Use Cases
-- [Automated Processes](./08-use-cases/automated-processes.md) - Batch processing details
-- [User Operations](./08-use-cases/user-operations.md) - Screen-based operations
-- [Data Collection](./08-use-cases/data-collection.md) - Ingestion-related user flows
-- [Workflows](./08-use-cases/workflows.md) - Main processing flows
-- [Implementation Tasks](./08-use-cases/implementation-tasks.md) - MVP implementation sequence
-- [Management & Operations](./08-use-cases/management-operations.md) - Admin/ops flows and tasks
+### 🚀 08-deployment/ - Operations
+- [01-environment.md](./08-deployment/01-environment.md) - Environment variables and configuration
+- [02-infrastructure.md](./08-deployment/02-infrastructure.md) - Cloud infrastructure components
+- [03-security.md](./08-deployment/03-security.md) - Security considerations and practices
+- [04-schedule.md](./08-deployment/04-schedule.md) - Batch job and scheduler configuration
 
 ## 🎯 System Purpose
 
 Quantitatively discover "what themes should be used for videos to gain traction" and accelerate YouTube channel growth.
 
 ### Key Features
-1. **Competitor Channel Tracking** - WebSub real-time detection + periodic snapshots
-2. **New Video Discovery** - Keyword filtering from trending videos
-3. **Theme Rankings** - Automatic extraction of frequent themes
-4. **Growth Analysis** - Tracking view and like count changes over time
+1. **Multi-Genre Support** - Track videos across different regions, languages, and categories
+2. **Competitor Channel Tracking** - WebSub real-time detection + periodic snapshots
+3. **Smart Video Discovery** - Genre-specific keyword filtering from trending videos
+4. **Theme Rankings** - Automatic extraction of successful video patterns
+5. **Growth Analysis** - Track view and like count changes over time (0/3/6/12/24/48/72/168h)
+6. **Admin Management** - Configure genres, keywords, and categories through admin portal
 
 ## 🛠️ Technology Stack
 
 ### Backend
 - **Language**: Go
-- **Architecture**: Clean Architecture + DDD
+- **Architecture**: Clean Architecture + DDD (Hexagonal)
 - **Communication**: gRPC (internal) + HTTP (external events)
 - **Database**: PostgreSQL (Neon)
 - **Infrastructure**: Cloud Run, Cloud Tasks, Cloud Scheduler
@@ -85,9 +84,16 @@ Quantitatively discover "what themes should be used for videos to gain traction"
 - **State Management**: TanStack Query
 - **Authentication**: Auth.js + Identity Platform
 
+## 📖 Reading Guide
+
+1. **New to the project?** Start with [01-overview/01-background.md](./01-overview/01-background.md)
+2. **Understanding features?** Read [02-use-cases/01-README.md](./02-use-cases/01-README.md)
+3. **Learning the domain?** Begin with [03-domain/01-ubiquitous-language.md](./03-domain/01-ubiquitous-language.md)
+4. **Implementing features?** Follow the numbered sequence in each directory
+
 ## 🚦 Quick Start
 
-For detailed implementation steps, refer to [Implementation Tasks](./02-use-cases/implementation-tasks.md).
+For detailed implementation steps, refer to [02-use-cases/08-implementation-tasks.md](./02-use-cases/08-implementation-tasks.md).
 
 ## 📝 License
 
