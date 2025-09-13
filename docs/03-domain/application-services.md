@@ -4,7 +4,52 @@ Service layer that executes use cases and orchestrates domain models.
 
 ## Ingestion Application Services
 
-### CollectTrending (Trending Video Collection)
+### KeywordUseCase (Filter Keyword Management)
+
+#### Purpose
+CRUD operations for filter keywords (include/exclude rules)
+
+#### Operations
+- `ListKeywords`: List all keywords including enabled/disabled
+- `CreateKeyword`: Register new keyword with name/filterType, auto-generate pattern
+- `UpdateKeyword`: Update keyword name or description, regenerate pattern
+- `EnableKeyword`/`DisableKeyword`: Toggle keyword activation
+- `DeleteKeyword`: Soft delete (set deleted_at)
+
+### ChannelUseCase (Channel Subscription Management)
+
+#### Purpose
+Manage monitored channels and WebSub subscription renewals
+
+#### Operations
+- `SubscribeChannel`: Add channel to monitoring (subscribed=true, request WebSub)
+- `UnsubscribeChannel`: Remove channel from monitoring
+- `RenewSubscriptions`: Periodically renew WebSub subscriptions for all subscribed channels
+- `ListChannels`: List channels with filtering (subscribed/all/search)
+
+### VideoUseCase (Video Monitoring & Snapshots)
+
+#### Purpose
+Register new videos and save checkpoint snapshots
+
+#### Operations
+- `RegisterFromTrending`: Apply keyword filter to trending videos, register matches
+- `ApplyWebSubNotification`: Process hub notification → save D0 → schedule +3/6/12/24/48/72/168h
+- `AddSnapshot`: Called by Cloud Tasks, fetch YouTube stats and save (idempotent)
+
+### SystemUseCase (System Operations)
+
+#### Purpose
+Internal operations triggered by external events
+
+#### Operations
+- `CollectTrending`: Cron job to fetch region=JP, category=27/28 trending videos
+- `HealthCheck`: WebSub hub.challenge verification endpoint
+- `Warm`: Dummy endpoint for Cloud Scheduler keep-alive
+
+## Implementation Details
+
+### CollectTrending (System Use Case)
 
 #### Purpose
 Collect trending videos from specified categories and register/subscribe after filter evaluation
@@ -213,34 +258,7 @@ func (uc *ApplyWebSubUseCase) Execute(
 }
 ```
 
-## Authority Application Services (MVP)
-
-### GetAccount
-- Purpose: Return current account profile (auth via interceptor)
-- Ports: port/output/gateway.ClaimsProvider, port/output/gateway.AccountRepository, port/output/presenter.AuthorityPresenter
-- Flow: ClaimsProvider.Current(ctx) → FindByEmail or FindByProvider → PresentGetAccount
-
-### SignUp
-- Purpose: Register account via identity provider (email/password)
-- Ports: port/output/gateway.IdentityProvider, port/output/gateway.AccountRepository, port/output/presenter.AuthorityPresenter
-- Flow: IDP.SignUp(email,password) → Create Account if missing (role=user, link password identity) → Save → PresentSignUp(tokens)
-
-### SignIn
-- Purpose: Authenticate via identity provider (email/password)
-- Ports: port/output/gateway.IdentityProvider, port/output/gateway.AccountRepository, port/output/gateway.Clock, port/output/presenter.AuthorityPresenter
-- Flow: IDP.SignIn(email,password) → If account exists TouchLogin(now) → Save → PresentSignIn(tokens)
-
-### SignOut
-- Purpose: Revoke refresh token
-- Ports: port/output/gateway.IdentityProvider, port/output/presenter.AuthorityPresenter
-- Flow: IDP.SignOut(refreshToken) → PresentSignOut
-
-### ResetPassword
-- Purpose: Send reset email via identity provider
-- Ports: port/output/gateway.IdentityProvider, port/output/presenter.AuthorityPresenter
-- Flow: IDP.ResetPassword(email) → PresentResetPassword
-
-### InsertSnapshot (Snapshot Insertion)
+## Analytics Application Services
 
 #### Purpose
 Retrieve and save actual measurements when ETA arrives, trigger metrics recalculation
@@ -313,36 +331,54 @@ func (uc *InsertSnapshotUseCase) Execute(
 }
 ```
 
-### ManageKeywords (Keyword Management)
+### InsertSnapshot (Video Use Case)
 
 #### Purpose
-CRUD operations for filter keywords
+Retrieve and save actual measurements when checkpoint time arrives
 
-#### Implementation
+### Triggers by Source
+
+#### Human/Admin Operations (UI/CLI)
+- ListKeywords, CreateKeyword, UpdateKeyword, Enable/Disable/DeleteKeyword
+- Subscribe/UnsubscribeChannel, ListChannels
+
+#### External Events
+- WebSub hub.challenge → HealthCheck
+- WebSub notification(videoId) → ApplyWebSubNotification
+
+#### Scheduler/Tasks
+- Cloud Scheduler → CollectTrending, RenewSubscriptions, Warm
+- Cloud Tasks → AddSnapshot
+
+## Implementation Examples
+
+### KeywordUseCase Implementation
 ```go
-type ManageKeywordsUseCase struct {
-    keywordRepo    FilterKeywordRepository
+type KeywordUseCase struct {
+    keywordRepo    KeywordRepository
     patternBuilder PatternBuilder
 }
 
-// List keywords
-func (uc *ManageKeywordsUseCase) List(
+// List all keywords
+func (uc *KeywordUseCase) ListKeywords(
     ctx context.Context,
-) ([]*FilterKeyword, error) {
+) ([]*Keyword, error) {
     return uc.keywordRepo.FindAll(ctx)
 }
 
-// Register/update keyword
-func (uc *ManageKeywordsUseCase) Put(
+// Create new keyword
+func (uc *KeywordUseCase) CreateKeyword(
     ctx context.Context,
     name string,
     filterType FilterType,
     description string,
-) (*FilterKeyword, error) {
-    // Auto-generate pattern
-    pattern := uc.patternBuilder.BuildPattern(name)
+) (*Keyword, error) {
+    pattern, err := uc.patternBuilder.BuildPattern(name)
+    if err != nil {
+        return nil, err
+    }
     
-    keyword := &FilterKeyword{
+    keyword := &Keyword{
         ID:          uuid.New(),
         Name:        name,
         FilterType:  filterType,
@@ -351,33 +387,104 @@ func (uc *ManageKeywordsUseCase) Put(
         Enabled:     true,
     }
     
-    err := uc.keywordRepo.Upsert(ctx, keyword)
-    return keyword, err
+    return keyword, uc.keywordRepo.Save(ctx, keyword)
+}
+```
+
+### InsertSnapshot Implementation
+```go
+type InsertSnapshotUseCase struct {
+    youtubeClient  YouTubeClient
+    videoRepo      VideoRepository
+    snapshotRepo   VideoSnapshotRepository
+    eventPublisher EventPublisher
 }
 
-// Enable/disable toggle
-func (uc *ManageKeywordsUseCase) SetEnabled(
+func (uc *InsertSnapshotUseCase) Execute(
     ctx context.Context,
-    id string,
-    enabled bool,
+    videoID string,
+    checkpointHour int,
 ) error {
-    keyword, err := uc.keywordRepo.FindByID(ctx, id)
+    // 1. Check existing (idempotency)
+    existing, _ := uc.snapshotRepo.FindByVideoAndCP(
+        ctx, videoID, checkpointHour,
+    )
+    if existing != nil {
+        log.Printf("Snapshot already exists: %s@%dh", 
+            videoID, checkpointHour)
+        return nil
+    }
+    
+    // 2. Get latest data from YouTube API
+    stats, err := uc.youtubeClient.GetVideoStats(ctx, videoID)
     if err != nil {
         return err
     }
     
-    keyword.Enabled = enabled
-    return uc.keywordRepo.Update(ctx, keyword)
-}
-
-// Delete (soft delete)
-func (uc *ManageKeywordsUseCase) Remove(
-    ctx context.Context,
-    id string,
-) error {
-    return uc.keywordRepo.SoftDelete(ctx, id)
+    video, err := uc.videoRepo.FindByID(ctx, videoID)
+    if err != nil {
+        return err
+    }
+    
+    channelStats, err := uc.youtubeClient.GetChannelStats(
+        ctx, video.ChannelID,
+    )
+    if err != nil {
+        return err
+    }
+    
+    // 3. Save snapshot
+    snapshot := &VideoSnapshot{
+        VideoID:          videoID,
+        CheckpointHour:   checkpointHour,
+        MeasuredAt:       time.Now(),
+        ViewsCount:       stats.ViewCount,
+        LikesCount:       stats.LikeCount,
+        SubscriptionCount: channelStats.SubscriberCount,
+        Source:           "task",
+    }
+    
+    if err := uc.snapshotRepo.Create(ctx, snapshot); err != nil {
+        return err
+    }
+    
+    // 4. Publish event (notify Analytics)
+    event := SnapshotAddedEvent{
+        VideoID:        videoID,
+        CheckpointHour: checkpointHour,
+        MeasuredAt:     snapshot.MeasuredAt,
+    }
+    
+    return uc.eventPublisher.Publish(ctx, event)
 }
 ```
+
+## Authority Application Services (MVP)
+
+### GetAccount
+- Purpose: Return current account profile (auth via interceptor)
+- Ports: port/output/gateway.ClaimsProvider, port/output/gateway.AccountRepository, port/output/presenter.AuthorityPresenter
+- Flow: ClaimsProvider.Current(ctx) → FindByEmail or FindByProvider → PresentGetAccount
+
+### SignUp
+- Purpose: Register account via identity provider (email/password)
+- Ports: port/output/gateway.IdentityProvider, port/output/gateway.AccountRepository, port/output/presenter.AuthorityPresenter
+- Flow: IDP.SignUp(email,password) → Create Account if missing (role=user, link password identity) → Save → PresentSignUp(tokens)
+
+### SignIn
+- Purpose: Authenticate via identity provider (email/password)
+- Ports: port/output/gateway.IdentityProvider, port/output/gateway.AccountRepository, port/output/gateway.Clock, port/output/presenter.AuthorityPresenter
+- Flow: IDP.SignIn(email,password) → If account exists TouchLogin(now) → Save → PresentSignIn(tokens)
+
+### SignOut
+- Purpose: Revoke refresh token
+- Ports: port/output/gateway.IdentityProvider, port/output/presenter.AuthorityPresenter
+- Flow: IDP.SignOut(refreshToken) → PresentSignOut
+
+### ResetPassword
+- Purpose: Send reset email via identity provider
+- Ports: port/output/gateway.IdentityProvider, port/output/presenter.AuthorityPresenter
+- Flow: IDP.ResetPassword(email) → PresentResetPassword
 
 ## Analytics Application Services
 

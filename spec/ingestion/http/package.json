@@ -1,0 +1,19 @@
+{
+  "name": "@youtube-analytics/ingestion-http-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "compile": "tsp compile .",
+    "watch": "tsp compile . --watch",
+    "format": "tsp format **/*.tsp"
+  },
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/rest": "latest",
+    "@typespec/openapi3": "latest"
+  },
+  "devDependencies": {
+    "@typespec/prettier-plugin-typespec": "latest"
+  }
+}

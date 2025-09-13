@@ -3,7 +3,7 @@ package presenter
 import (
 	"github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/domain"
 	outpresenter "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/output/presenter"
-    pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/proto/authority/v1"
+	pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/authority/v1"
 )
 
 // GRPCPresenter collects results to be returned by gRPC handlers.
