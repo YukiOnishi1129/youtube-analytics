@@ -1,5 +1,6 @@
 import "@typespec/http";
 import "@typespec/rest";
+import "./models.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -52,30 +53,7 @@ namespace Admin {
   ): UpdateChannelsResponse | {@statusCode statusCode: 500; @body error: Error;};
 }
 
-model CollectTrendingResponse {
-  videosProcessed: int32;
-  videosAdded: int32;
-  duration: string;
-}
-
-model CollectSubscriptionsResponse {
-  channelsProcessed: int32;
-  videosProcessed: int32;
-  videosAdded: int32;
-  duration: string;
-}
-
-model ScheduleSnapshotsResponse {
-  videosProcessed: int32;
-  tasksScheduled: int32;
-  duration: string;
-}
-
-model UpdateChannelsResponse {
-  channelsProcessed: int32;
-  channelsUpdated: int32;
-  duration: string;
-}
+// These models are now in models.tsp
 
 // ==================== WebSub API ====================
 @route("/websub/youtube")

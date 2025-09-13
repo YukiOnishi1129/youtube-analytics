@@ -40,7 +40,7 @@ func main() {
 	videoRepo := postgres.NewVideoRepository(repo)
 	channelSnapshotRepo := postgres.NewChannelSnapshotRepository(repo)
 	videoSnapshotRepo := postgres.NewVideoSnapshotRepository(repo)
-	
+
 	// Use mock keyword repository for now until SQL queries are generated
 	keywordRepo := mock.NewKeywordRepository()
 

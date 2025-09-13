@@ -4,7 +4,7 @@
 
 # Proto generation commands
 PROTO_DIR = proto
-PROTO_OUT_DIR = pkg/proto
+PROTO_OUT_DIR = services/pkg/pb
 
 # Help command
 help:

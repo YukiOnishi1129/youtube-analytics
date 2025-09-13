@@ -20,7 +20,8 @@ var (
 	ErrInvalidCheckpoint     = errors.New("invalid checkpoint hour")
 
 	// Keyword errors
-	ErrKeywordNotFound = errors.New("keyword not found")
+	ErrKeywordNotFound  = errors.New("keyword not found")
+	ErrKeywordDuplicate = errors.New("keyword already exists")
 
 	// General errors
 	ErrInvalidInput = errors.New("invalid input")

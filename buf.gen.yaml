@@ -1,8 +1,8 @@
 version: v1
 plugins:
   - plugin: go
-    out: services/pkg
+    out: services/pkg/pb
     opt: paths=import
   - plugin: go-grpc
-    out: services/pkg
+    out: services/pkg/pb
     opt: paths=import

@@ -238,21 +238,47 @@ paths:
           description: The server cannot find the requested resource.
 components:
   schemas:
+    Channel:
+      type: object
+      required:
+        - id
+        - youtubeChannelId
+        - title
+        - thumbnailUrl
+        - subscribed
+        - createdAt
+      properties:
+        id:
+          type: string
+        youtubeChannelId:
+          type: string
+        title:
+          type: string
+        thumbnailUrl:
+          type: string
+        subscribed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     CollectSubscriptionsResponse:
       type: object
       required:
         - channelsProcessed
-        - videosProcessed
-        - videosAdded
+        - videosCollected
+        - videosCreated
         - duration
       properties:
         channelsProcessed:
           type: integer
           format: int32
-        videosProcessed:
+        videosCollected:
           type: integer
           format: int32
-        videosAdded:
+        videosCreated:
           type: integer
           format: int32
         duration:
@@ -260,14 +286,18 @@ components:
     CollectTrendingResponse:
       type: object
       required:
-        - videosProcessed
-        - videosAdded
+        - videosCollected
+        - videosUpdated
+        - videosCreated
         - duration
       properties:
-        videosProcessed:
+        videosCollected:
           type: integer
           format: int32
-        videosAdded:
+        videosUpdated:
+          type: integer
+          format: int32
+        videosCreated:
           type: integer
           format: int32
         duration:
@@ -301,6 +331,67 @@ components:
           type: string
         message:
           type: string
+    Keyword:
+      type: object
+      required:
+        - id
+        - name
+        - filterType
+        - pattern
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        filterType:
+          type: string
+        pattern:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ListChannelsResponse:
+      type: object
+      required:
+        - channels
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+    ListKeywordsResponse:
+      type: object
+      required:
+        - keywords
+      properties:
+        keywords:
+          type: array
+          items:
+            $ref: '#/components/schemas/Keyword'
+    ListSnapshotsResponse:
+      type: object
+      required:
+        - snapshots
+      properties:
+        snapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/VideoSnapshot'
+    ListVideosResponse:
+      type: object
+      required:
+        - videos
+      properties:
+        videos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Video'
     ScheduleSnapshotsResponse:
       type: object
       required:
@@ -331,6 +422,106 @@ components:
           format: int32
         duration:
           type: string
+    Video:
+      type: object
+      required:
+        - id
+        - youtubeVideoId
+        - channelId
+        - title
+        - thumbnailUrl
+        - publishedAt
+        - viewCount
+        - likeCount
+        - dislikeCount
+        - commentCount
+        - categoryId
+        - tags
+        - durationSeconds
+        - privacyStatus
+        - isDeleted
+        - createdAt
+      properties:
+        id:
+          type: string
+        youtubeVideoId:
+          type: string
+        channelId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+        viewCount:
+          type: integer
+          format: int32
+        likeCount:
+          type: integer
+          format: int32
+        dislikeCount:
+          type: integer
+          format: int32
+        commentCount:
+          type: integer
+          format: int32
+        categoryId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        durationSeconds:
+          type: integer
+          format: int32
+        privacyStatus:
+          type: string
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    VideoSnapshot:
+      type: object
+      required:
+        - id
+        - videoId
+        - viewCount
+        - likeCount
+        - dislikeCount
+        - commentCount
+        - snapshotAt
+        - createdAt
+      properties:
+        id:
+          type: string
+        videoId:
+          type: string
+        viewCount:
+          type: integer
+          format: int32
+        likeCount:
+          type: integer
+          format: int32
+        dislikeCount:
+          type: integer
+          format: int32
+        commentCount:
+          type: integer
+          format: int32
+        snapshotAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
 servers:
   - url: https://ingestion.youtube-analytics.example.com
     description: Production server
