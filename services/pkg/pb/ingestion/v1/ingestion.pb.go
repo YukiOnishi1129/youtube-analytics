@@ -9,7 +9,6 @@ package ingestionv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -2264,7 +2263,7 @@ var File_ingestion_v1_ingestion_proto protoreflect.FileDescriptor
 
 const file_ingestion_v1_ingestion_proto_rawDesc = "" +
 	"\n" +
-	"\x1cingestion/v1/ingestion.proto\x12\fingestion.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xd3\x02\n" +
+	"\x1cingestion/v1/ingestion.proto\x12\fingestion.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd3\x02\n" +
 	"\aChannel\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
 	"\x12youtube_channel_id\x18\x02 \x01(\tR\x10youtubeChannelId\x12\x14\n" +
