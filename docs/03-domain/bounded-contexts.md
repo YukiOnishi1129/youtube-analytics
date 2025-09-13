@@ -8,19 +8,23 @@ System boundary definitions in Domain-Driven Design. Each context owns its langu
 Ingest videos/channels and accurately accumulate their post-publication trajectory
 
 ### Key Vocabulary
+- YouTubeCategory
+- Genre (with region, categories, language settings)
+- Keyword (associated with Genre)
 - Channel
 - ChannelSnapshot
 - Video
 - VideoSnapshot
-- FilterKeyword
 
 ### External Dependencies
 - YouTube Data API v3
 - YouTube WebSub Hub
 
 ### Representative Behaviors
-- Popular collection: Fetch popular videos by category and evaluate with filters
-- Filter judgment: Include/exclude by keyword rules on video titles
+- Category management: Update YouTube category information
+- Genre management: Create/update/enable/disable genres for collection
+- Popular collection: Fetch popular videos per genre (region + categories) and evaluate with genre-specific filters
+- Filter judgment: Include/exclude by genre-specific keyword patterns on video titles
 - Subscription management: Manage channels' WebSub subscription state
 - Snapshot storage: Persist measured values at specified times
 - Next measurements scheduling: Register tasks per checkpoint
@@ -32,11 +36,14 @@ Ingest videos/channels and accurately accumulate their post-publication trajecto
 ```
 
 ### Table Responsibilities
+- genres
+- keywords (with genre_id)
+- youtube_categories
 - channels
 - channel_snapshots
 - videos
+- video_genres (junction table for M:N relationship)
 - video_snapshots
-- video_filter_keywords
 
 ## B) Analytics (Processing & Serving)
 

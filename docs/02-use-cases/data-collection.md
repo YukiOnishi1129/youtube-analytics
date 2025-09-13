@@ -4,12 +4,18 @@
 
 - **Actor**: System (automated batch)
 - **Timing**: Several times per day at specified times (e.g., daily at 03:00 and 15:00)
-- **Input**: Trending video list from "Education" and "Science & Technology" categories (fetched from YouTube API)
-- **Processing**:
-  1. Match each video title and tags against keyword rules
-  2. Discard if exclusion rules match
-  3. Register as "monitored video" if inclusion rules match
-- **Output**: Monitored videos are added to the system
+- **Input**: Enabled genres from the system
+- **Processing**: For each enabled genre:
+  1. Get genre configuration (region, YouTube categories, keywords)
+  2. Fetch trending videos from YouTube API for that region and categories
+  3. Match each video title against genre-specific keyword patterns
+  4. Discard if exclusion rules match
+  5. Register as "monitored video" if inclusion rules match, tagged with genre_id
+- **Output**: Monitored videos are added to the system with their genre association
+- **Examples**:
+  - Genre "Engineering (JP)": Fetch JP trending from categories 27,28, filter by Japanese tech keywords
+  - Genre "Engineering (EN)": Fetch US trending from categories 27,28, filter by English tech keywords
+  - Genre "English Learning (JP)": Fetch JP trending from category 27, filter by English learning keywords
 
 ## New Video Monitoring (WebSub)
 

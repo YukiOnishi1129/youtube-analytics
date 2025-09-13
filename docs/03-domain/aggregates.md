@@ -25,10 +25,66 @@ type CheckpointHour = int             // 0,3,6,12,24,48,72,168
 
 ### Ingestion Context Aggregates
 
-### A-1) Keyword
+### A-1) YouTubeCategory
 
 #### Purpose
-Define inclusion/exclusion rules for trending video selection
+Manage YouTube category reference data with admin control
+
+#### Entity
+```go
+type YouTubeCategory struct {
+    ID          CategoryID  // YouTube's category ID (e.g., 27, 28)
+    Name        string      // Category name (e.g., "Education", "Science & Technology")
+    Assignable  bool        // Whether videos can be assigned to this category
+}
+```
+
+#### Invariants
+- ID must be a valid YouTube category ID
+- Name must not be empty
+- Only assignable categories can be used for videos
+
+#### Commands
+```go
+// Update category information
+UpdateCategory(name string, assignable bool) error
+```
+
+### A-2) Genre
+
+#### Purpose
+Define collection targets with region, categories, and language settings
+
+#### Entity
+```go
+type Genre struct {
+    ID           UUID
+    Code         string         // e.g., "engineering_jp", "engineering_en"
+    Name         string         // e.g., "Engineering (JP)"
+    Language     string         // e.g., "ja", "en"
+    RegionCode   string         // e.g., "JP", "US"
+    CategoryIDs  []CategoryID   // e.g., [27, 28] for Education & Science
+    Enabled      bool
+}
+```
+
+#### Invariants
+- Code must be unique
+- RegionCode must be valid YouTube region
+- CategoryIDs must contain at least one valid category
+- Only enabled genres are processed in batch collection
+
+#### Commands
+```go
+// Enable/Disable genre
+EnableGenre(id UUID) error
+DisableGenre(id UUID) error
+```
+
+### A-3) Keyword
+
+#### Purpose
+Define inclusion/exclusion rules for video selection within a genre
 
 #### Entity
 ```go
@@ -40,6 +96,7 @@ const (
 
 type Keyword struct {
     ID          UUID
+    GenreID     UUID           // Associated genre
     Name        string
     FilterType  FilterType     // include / exclude
     Pattern     string         // Normalized regex pattern
@@ -57,14 +114,15 @@ func BuildPattern(name string) (string, error)
 #### Invariants
 - Pattern != "" (must not be empty)
 - FilterType ∈ {include, exclude}
-- (Name, FilterType) logical uniqueness (enforced at app/repo level)
+- (GenreID, Name, FilterType) logical uniqueness (enforced at app/repo level)
 - Disabled keywords are not used for judgment
 - Pattern is auto-generated from Name
+- Keywords belong to exactly one genre
 
 #### Commands
 ```go
-// Register or update a keyword
-PutKeyword(name string, filterType FilterType, description string) error
+// Register or update a keyword for a genre
+PutKeyword(genreID UUID, name string, filterType FilterType, description string) error
 
 // Enable/Disable
 EnableKeyword(id UUID) error
@@ -74,7 +132,7 @@ DisableKeyword(id UUID) error
 RemoveKeyword(id UUID) error
 ```
 
-### A-2) Channel
+### A-4) Channel
 
 #### Purpose
 Manage subscription state and track subscriber trends. External ID is stored separately.
@@ -117,7 +175,7 @@ RenewSubscription(channelId UUID) error
 RecordSubscriberCount(channelId UUID, measuredAt time.Time, count int64) error
 ```
 
-### A-3) Video
+### A-5) Video
 
 #### Purpose
 Track monitored videos with metadata and checkpoint snapshots. External ID is stored separately.
@@ -128,12 +186,9 @@ type Video struct {
     ID               UUID              // Internal PK
     YouTubeVideoID   YouTubeVideoID    // External ID
     ChannelID        UUID              // Internal FK
-    YouTubeChannelID YouTubeChannelID  // Redundant for JOIN optimization
     Title            string
     PublishedAt      time.Time
     CategoryID       CategoryID        // YouTube categoryId (e.g. 27,28)
-    ThumbnailURL     string
-    VideoURL         string
 }
 ```
 
@@ -144,8 +199,8 @@ type VideoSnapshot struct {
     VideoID           UUID             // Internal FK
     CheckpointHour    CheckpointHour   // 0,3,6,12,24,48,72,168
     MeasuredAt        time.Time
-    ViewsCount        int64
-    LikesCount        int64
+    ViewCount         int64
+    LikeCount         int64
     SubscriptionCount int64            // Channel subscriber count at time (copy)
 }
 ```
@@ -161,11 +216,12 @@ ScheduleSnapshots(videoID UUID) error
 - VideoSnapshot: (VideoID, CheckpointHour) logical uniqueness (insert-only)
 - Snapshots are immutable (no updates, only inserts)
 - CheckpointHour increases in ascending order
+- Videos can be associated with multiple genres (M:N relationship)
 
 #### Commands
 ```go
-// New registration from trending
-RegisterVideoFromTrending(meta VideoMeta) error
+// New registration from trending (with genre associations)
+RegisterVideoFromTrending(genreIDs []UUID, meta VideoMeta) error
 
 // WebSub notification handling (finalize D0 and schedule follow-ups)
 ApplyWebSubNotification(ytVideoID YouTubeVideoID) error

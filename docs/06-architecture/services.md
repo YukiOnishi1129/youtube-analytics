@@ -33,7 +33,7 @@ Adapters (reference: authority-service)
 ## ingestion-service (Collection & Storage)
 
 Location: `/services/ingestion-service`  
-Responsibility: Video collection from YouTube, WebSub receiver, snapshot storage, keyword filter management
+Responsibility: Video collection from YouTube by genre, WebSub receiver, snapshot storage, keyword filter management, genre management
 
 ### Authentication Policies
 
@@ -47,16 +47,37 @@ Responsibility: Video collection from YouTube, WebSub receiver, snapshot storage
 
 Service: `ingestion.v1.IngestionService`
 
-#### Keyword Management
+#### YouTube Category Management (Admin only)
+
+| Method | Purpose | Auth | Request/Response |
+|--------|---------|------|------------------|
+| ListYouTubeCategories | List all YouTube categories | Admin required | → [YouTubeCategory] |
+| UpdateYouTubeCategory | Update category info | Admin required | {id,name,assignable} → YouTubeCategory |
+
+#### Genre Management (Admin only)
+
+| Method | Purpose | Auth | Request/Response |
+|--------|---------|------|------------------|
+| ListGenres | List all genres | Admin required | → [Genre] |
+| CreateGenre | Create new genre | Admin required | {code,name,language,region_code,category_ids} → Genre |
+| UpdateGenre | Update genre settings | Admin required | {id,name,enabled,category_ids} → Genre |
+| DeleteGenre | Delete genre | Admin required | {id} → void |
+
+#### Keyword Management (Admin only)
+
+| Method | Purpose | Auth | Request/Response |
+|--------|---------|------|------------------|
+| ListKeywordsByGenre | List keywords for genre | Admin required | {genre_id} → [Keyword] |
+| CreateKeyword | Create keyword for genre | Admin required | {genre_id,name,pattern,filter_type,description} → Keyword |
+| UpdateKeyword | Update keyword | Admin required | {id,name,pattern,filter_type,enabled,description} → Keyword |
+| DeleteKeyword | Delete keyword | Admin required | {id} → void |
+
+#### Channel Management
 
 | Method | Purpose | Auth | Request/Response |
 |--------|---------|------|------------------|
 | ListChannels | List monitored channels | User login required | query → [ChannelListItem] |
 | SetChannelSubscription | Set channel subscription | User login required | {channel_id,subscribed} → void |
-| ListKeywords | List keywords | User login required | → [Keyword] |
-| CreateKeyword | Create keyword | User login required | {name,filter_type,description} → Keyword |
-| UpdateKeyword | Update keyword | User login required | {id,name,filter_type,enabled,description} → Keyword |
-| DeleteKeyword | Delete keyword | User login required | {id} → void |
 | InsertSnapshot | Save snapshot (internal) | Service | {video_id,checkpoint_hour} → void |
 
 ### HTTP APIs (Hub → Server)
@@ -96,9 +117,16 @@ Service: `ingestion.v1.IngestionService`
 | GET /warm | Keep instance warm | SERVICE_OIDC | {} → "ok" |
 
 **Collect Trending Details:**
-- Default: `{region: "JP", category_ids: [27, 28], pages: 1}`
-- Process: YouTube trending → Keyword filter → Register if matched
+- Process: For each enabled genre:
+  1. Get genre settings (region_code, category_ids, keywords)
+  2. Fetch YouTube trending for that region/categories
+  3. Apply genre-specific keyword filters
+  4. Register matched videos with genre_id
 - Idempotency: `youtube_video_id UNIQUE` ignores duplicates
+- Genre Examples:
+  - Engineering (JP): region="JP", categories=[27,28], keywords=Japanese tech terms
+  - Engineering (EN): region="US", categories=[27,28], keywords=English tech terms
+  - English Learning (JP): region="JP", categories=[27], keywords=English learning terms
 
 ### Admin/Debug Endpoints (Optional)
 
