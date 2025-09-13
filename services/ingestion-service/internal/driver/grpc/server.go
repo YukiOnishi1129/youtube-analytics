@@ -1,23 +1,25 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 
-	// pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/proto/ingestion/v1"
+	pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/ingestion/v1"
+	"github.com/google/uuid"
 
+	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/domain"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/input"
 	"google.golang.org/grpc"
-	// "google.golang.org/grpc/codes"
-	// "google.golang.org/grpc/status"
-	// "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Server implements the gRPC server for ingestion service
-// Note: The actual gRPC implementation is commented out until proto generation is properly set up
 type Server struct {
-	// pb.UnimplementedIngestionServiceServer // Commented out until proto generation is fixed
+	pb.UnimplementedIngestionServiceServer
 	channelUseCase input.ChannelInputPort
 	videoUseCase   input.VideoInputPort
 	systemUseCase  input.SystemInputPort
@@ -59,15 +61,13 @@ func (s *Server) Start(port int) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	// pb.RegisterIngestionServiceServer(grpcServer, s) // Commented out until proto generation is fixed
+	pb.RegisterIngestionServiceServer(grpcServer, s)
 
-	log.Printf("gRPC server starting on port %d (note: no services registered until proto generation is fixed)", port)
+	log.Printf("gRPC server starting on port %d", port)
 	return grpcServer.Serve(lis)
 }
 
-/*
-// The following methods will be uncommented once proto generation is properly set up
-
+// GetChannel gets a channel by ID
 func (s *Server) GetChannel(ctx context.Context, req *pb.GetChannelRequest) (*pb.GetChannelResponse, error) {
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "channel id is required")
@@ -144,7 +144,10 @@ func (s *Server) CreateSnapshot(ctx context.Context, req *pb.CreateSnapshotReque
 		return nil, status.Error(codes.InvalidArgument, "invalid video_id format")
 	}
 
-	snapshot, err := s.systemUseCase.CreateSnapshot(ctx, videoID, int(req.CheckpointHour))
+	snapshot, err := s.systemUseCase.CreateSnapshot(ctx, &input.CreateSnapshotInput{
+		VideoID:        videoID,
+		CheckpointHour: int(req.CheckpointHour),
+	})
 	if err != nil {
 		if err == domain.ErrVideoNotFound {
 			return nil, status.Error(codes.NotFound, "video not found")
@@ -249,4 +252,3 @@ func domainSnapshotToProto(snapshot *domain.VideoSnapshot) *pb.VideoSnapshot {
 
 	return proto
 }
-*/

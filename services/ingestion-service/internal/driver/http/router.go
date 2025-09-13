@@ -20,3 +20,30 @@ func SetupRouter(
 
 	return router
 }
+
+// SetupRouterWithPresenters creates a new router with presenters for response formatting
+func SetupRouterWithPresenters(
+	channelUseCase input.ChannelInputPort,
+	videoUseCase input.VideoInputPort,
+	systemUseCase input.SystemInputPort,
+	keywordUseCase input.KeywordInputPort,
+	channelPresenter interface{},
+	videoPresenter interface{},
+	systemPresenter interface{},
+	keywordPresenter interface{},
+) *gin.Engine {
+	router := gin.Default()
+
+	// Create server with keyword support
+	server := NewServerWithKeyword(
+		channelUseCase,
+		videoUseCase,
+		systemUseCase,
+		keywordUseCase,
+	)
+
+	// Register handlers with generated server interface
+	generated.RegisterHandlers(router, server)
+
+	return router
+}
