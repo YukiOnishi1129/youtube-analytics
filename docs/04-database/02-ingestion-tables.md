@@ -75,7 +75,7 @@ YouTube channels being monitored.
 | description | TEXT | | Channel description |
 | country | VARCHAR(10) | | Channel country |
 | view_count | BIGINT | | Total channel views |
-| subscriber_count | BIGINT | | Current subscriber count |
+| subscription_count | BIGINT | | Current subscriber count |
 | video_count | BIGINT | | Total videos |
 | subscribed | BOOLEAN | NOT NULL DEFAULT false | WebSub subscription status |
 | created_at | TIMESTAMP | NOT NULL DEFAULT NOW() | First seen timestamp |
@@ -176,6 +176,49 @@ Time-series video metrics at checkpoint hours.
 6. **WebSub**: Channels are subscribed for real-time notifications
 7. **Snapshots**: Video metrics collected at 0/3/6/12/24/48/72/168 hours
 
+### audit_logs
+
+Audit trail for administrative actions.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID (v7) | PRIMARY KEY | Log entry identifier |
+| actor_id | UUID | NOT NULL | User who performed action |
+| actor_email | VARCHAR(255) | NOT NULL | Actor email for reference |
+| action | VARCHAR(100) | NOT NULL | Action performed |
+| resource_type | VARCHAR(50) | NOT NULL | Type of resource affected |
+| resource_id | VARCHAR(100) | | ID of affected resource |
+| old_values | JSONB | | Previous values (for updates) |
+| new_values | JSONB | | New values (for updates) |
+| ip_address | INET | | Client IP address |
+| user_agent | TEXT | | Client user agent |
+| created_at | TIMESTAMP | NOT NULL DEFAULT NOW() | Action timestamp |
+
+**Indexes:**
+- `idx_audit_logs_actor` on (actor_id, created_at DESC)
+- `idx_audit_logs_resource` on (resource_type, resource_id)
+- `idx_audit_logs_created` on (created_at DESC)
+
+### batch_jobs
+
+Batch job execution history.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID (v7) | PRIMARY KEY | Job execution identifier |
+| job_type | VARCHAR(50) | NOT NULL | Type of job (collect_trending, renew_subscriptions) |
+| status | VARCHAR(20) | NOT NULL | Job status (pending, running, completed, failed) |
+| parameters | JSONB | | Job parameters |
+| started_at | TIMESTAMP | | Job start time |
+| completed_at | TIMESTAMP | | Job completion time |
+| error_message | TEXT | | Error details if failed |
+| statistics | JSONB | | Job statistics (collected, adopted, etc.) |
+| created_at | TIMESTAMP | NOT NULL DEFAULT NOW() | Job creation timestamp |
+
+**Indexes:**
+- `idx_batch_jobs_type_status` on (job_type, status)
+- `idx_batch_jobs_created` on (created_at DESC)
+
 ## Migration from Single-Region Design
 
 The new design supports multiple regions/languages by:
@@ -183,3 +226,4 @@ The new design supports multiple regions/languages by:
 - Moving keywords under genres for targeted filtering
 - Adding M:N video-genre relationships
 - Keeping existing snapshot/channel structure intact
+- Adding audit and job tracking tables

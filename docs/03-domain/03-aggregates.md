@@ -21,6 +21,15 @@ type YouTubeVideoID = string
 type YouTubeChannelID = string  
 type CategoryID = int                 // YouTube videos.snippet.categoryId as int
 type CheckpointHour = int             // 0,3,6,12,24,48,72,168
+
+// VideoMeta represents video metadata for registration
+type VideoMeta struct {
+    YouTubeVideoID   YouTubeVideoID
+    YouTubeChannelID YouTubeChannelID
+    Title            string
+    PublishedAt      time.Time
+    CategoryID       CategoryID
+}
 ```
 
 ### Ingestion Context Aggregates
@@ -100,8 +109,10 @@ type Keyword struct {
     Name        string
     FilterType  FilterType     // include / exclude
     Pattern     string         // Normalized regex pattern
+    TargetField string         // TITLE, DESCRIPTION, etc.
     Enabled     bool
     Description *string
+    DeletedAt   *time.Time     // Soft delete timestamp
 }
 ```
 
@@ -128,7 +139,7 @@ PutKeyword(genreID UUID, name string, filterType FilterType, description string)
 EnableKeyword(id UUID) error
 DisableKeyword(id UUID) error
 
-// Remove (soft delete)
+// Remove (soft delete - sets DeletedAt)
 RemoveKeyword(id UUID) error
 ```
 
@@ -144,6 +155,11 @@ type Channel struct {
     YouTubeChannelID YouTubeChannelID  // External ID
     Title            string
     ThumbnailURL     string
+    Description      *string           // Channel description
+    Country          *string           // Channel country
+    ViewCount        int64             // Total channel views
+    SubscriberCount  int64             // Current subscribers
+    VideoCount       int64             // Total videos
     Subscribed       bool              // WebSub subscription target
 }
 ```
@@ -154,7 +170,9 @@ type ChannelSnapshot struct {
     ID                UUID              // Snapshot UUID (for aggregation/audit)
     ChannelID         UUID              // Internal FK
     MeasuredAt        time.Time
-    SubscriptionCount int
+    SubscriptionCount int64             // Subscriber count at time
+    ViewCount         int64             // Total views at time
+    VideoCount        int64             // Total videos at time
 }
 ```
 
@@ -171,8 +189,8 @@ SubscribeChannel(channelId UUID) error
 UnsubscribeChannel(channelId UUID) error
 RenewSubscription(channelId UUID) error
 
-// Record subscriber counts
-RecordSubscriberCount(channelId UUID, measuredAt time.Time, count int64) error
+// Record channel metrics snapshot
+RecordChannelSnapshot(channelId UUID, measuredAt time.Time, subscriberCount, viewCount, videoCount int64) error
 ```
 
 ### A-5) Video

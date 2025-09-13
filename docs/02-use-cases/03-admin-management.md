@@ -244,6 +244,26 @@ Administrative functions for managing the YouTube Analytics system configuration
   - Subscription table with expiry countdown
   - Bulk renewal button
 
+### Manage Channel Subscriptions
+
+- **Actor**: Administrator
+- **Precondition**: Logged in with admin role
+- **Input**: Channel ID, action (subscribe/unsubscribe/renew)
+- **Processing**:
+  1. For subscribe: Send subscription request to YouTube WebSub hub
+  2. For unsubscribe: Send unsubscription request
+  3. For renew: Refresh subscription before expiry
+  4. Update channel subscription status
+  5. Log the action
+- **Output**: Updated subscription status
+- **UI Elements**:
+  - Subscribe/Unsubscribe toggle per channel
+  - Renew button for active subscriptions
+  - Subscription history log
+- **Notes**: 
+  - WebSub subscriptions typically last 10 days
+  - Auto-renewal handled by batch job
+
 ## System Monitoring
 
 ### View System Health

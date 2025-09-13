@@ -10,8 +10,9 @@
   2. Fetch trending videos from YouTube API for that region and categories
   3. Match each video title against genre-specific keyword patterns
   4. Discard if exclusion rules match
-  5. Register as "monitored video" if inclusion rules match, tagged with genre_id
-- **Output**: Monitored videos are added to the system with their genre association
+  5. Register as "monitored video" if inclusion rules match
+  6. Associate video with the matching genre (videos can belong to multiple genres)
+- **Output**: Monitored videos are added to the system with their genre associations (M:N relationship)
 - **Examples**:
   - Genre "Engineering (JP)": Fetch JP trending from categories 27,28, filter by Japanese tech keywords
   - Genre "Engineering (EN)": Fetch US trending from categories 27,28, filter by English tech keywords
