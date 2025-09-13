@@ -1,11 +1,10 @@
-node_modules/
-
 .env
 
 # Go build files
 # Ignore all binary files without extension
 **/main
-**/*-service
+# Ignore service binaries but not source code
+*-service
 # Common binary patterns
 *.exe
 *.exe~
@@ -44,3 +43,9 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Node.js dependencies
+**/node_modules/
+
+
+

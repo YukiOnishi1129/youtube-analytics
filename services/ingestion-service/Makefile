@@ -1,6 +1,6 @@
 # Ingestion Service Makefile
 
-.PHONY: help sqlc sqlc-clean build-postgres migrate-up migrate-down generate-http
+.PHONY: help sqlc sqlc-clean build-postgres migrate-up migrate-down generate-http seed
 
 help:
 	@echo "Targets:"
@@ -10,6 +10,7 @@ help:
 	@echo "  migrate-up    Run DB migrations (golang-migrate)"
 	@echo "  migrate-down  Rollback one migration"
 	@echo "  generate-http Generate HTTP types from TypeSpec"
+	@echo "  seed          Run database seeds"
 
 # Generate sqlc code into internal/adapter/gateway/postgres/sqlcgen
 sqlc:
@@ -42,3 +43,26 @@ migrate-down:
 generate-http:
 	@echo "==> Generating HTTP types from TypeSpec"
 	@bash scripts/generate-http-types.sh
+
+# Run database seeds
+seed:
+	@echo "==> Running database seeds"
+	@go run cmd/seeder/main.go -target=all
+
+seed-keywords:
+	@echo "==> Running keyword seeds"
+	@go run cmd/seeder/main.go -target=keywords
+
+seed-dry-run:
+	@echo "==> Showing seed SQL (dry run)"
+	@go run cmd/seeder/main.go -target=all -dry-run
+
+# Build seeder binary
+build-seeder:
+	@echo "==> Building seeder binary"
+	@go build -o bin/seeder cmd/seeder/main.go
+
+# Build seeder Docker image
+docker-build-seeder:
+	@echo "==> Building seeder Docker image"
+	@docker build -f Dockerfile.seeder -t ingestion-seeder:latest .
