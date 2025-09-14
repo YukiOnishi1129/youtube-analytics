@@ -25,16 +25,48 @@ service IngestionService {
   rpc GetSnapshot(GetSnapshotRequest) returns (GetSnapshotResponse);
   rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse);
   
-  // Keyword operations
+  // Genre operations
+  rpc ListGenres(ListGenresRequest) returns (ListGenresResponse);
+  rpc GetGenre(GetGenreRequest) returns (GetGenreResponse);
+  rpc GetGenreByCode(GetGenreByCodeRequest) returns (GetGenreByCodeResponse);
+  rpc CreateGenre(CreateGenreRequest) returns (CreateGenreResponse);
+  rpc UpdateGenre(UpdateGenreRequest) returns (UpdateGenreResponse);
+  rpc EnableGenre(EnableGenreRequest) returns (EnableGenreResponse);
+  rpc DisableGenre(DisableGenreRequest) returns (DisableGenreResponse);
+  
+  // YouTube Category operations
+  rpc ListYouTubeCategories(ListYouTubeCategoriesRequest) returns (ListYouTubeCategoriesResponse);
+  rpc GetYouTubeCategory(GetYouTubeCategoryRequest) returns (GetYouTubeCategoryResponse);
+  rpc UpdateYouTubeCategory(UpdateYouTubeCategoryRequest) returns (UpdateYouTubeCategoryResponse);
+  
+  // Keyword operations (updated with genre support)
   rpc GetKeyword(GetKeywordRequest) returns (GetKeywordResponse);
   rpc ListKeywords(ListKeywordsRequest) returns (ListKeywordsResponse);
+  rpc ListKeywordsByGenre(ListKeywordsByGenreRequest) returns (ListKeywordsByGenreResponse);
   rpc CreateKeyword(CreateKeywordRequest) returns (CreateKeywordResponse);
   rpc UpdateKeyword(UpdateKeywordRequest) returns (UpdateKeywordResponse);
+  rpc EnableKeyword(EnableKeywordRequest) returns (EnableKeywordResponse);
+  rpc DisableKeyword(DisableKeywordRequest) returns (DisableKeywordResponse);
   rpc DeleteKeyword(DeleteKeywordRequest) returns (DeleteKeywordResponse);
+  
+  // Video-Genre operations
+  rpc ListVideoGenres(ListVideoGenresRequest) returns (ListVideoGenresResponse);
+  rpc AssignVideoToGenre(AssignVideoToGenreRequest) returns (AssignVideoToGenreResponse);
+  rpc RemoveVideoFromGenre(RemoveVideoFromGenreRequest) returns (RemoveVideoFromGenreResponse);
+  
+  // Audit operations
+  rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsResponse);
+  rpc GetAuditLog(GetAuditLogRequest) returns (GetAuditLogResponse);
+  
+  // Batch job operations
+  rpc ListBatchJobs(ListBatchJobsRequest) returns (ListBatchJobsResponse);
+  rpc GetBatchJob(GetBatchJobRequest) returns (GetBatchJobResponse);
   
   // System operations
   rpc ScheduleSnapshots(ScheduleSnapshotsRequest) returns (ScheduleSnapshotsResponse);
   rpc UpdateChannels(UpdateChannelsRequest) returns (UpdateChannelsResponse);
+  rpc CollectTrendingByGenre(CollectTrendingByGenreRequest) returns (CollectTrendingByGenreResponse);
+  rpc CollectAllTrending(CollectAllTrendingRequest) returns (CollectAllTrendingResponse);
 }
 
 // Channel messages
@@ -43,10 +75,15 @@ message Channel {
   string youtube_channel_id = 2;
   string title = 3;
   string thumbnail_url = 4;
-  bool subscribed = 5;
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
-  google.protobuf.Timestamp deleted_at = 8;
+  string description = 5;
+  string country = 6;
+  int64 view_count = 7;
+  int64 subscription_count = 8;
+  int64 video_count = 9;
+  bool subscribed = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  google.protobuf.Timestamp deleted_at = 13;
 }
 
 message GetChannelRequest {
@@ -92,12 +129,12 @@ message Video {
   string youtube_video_id = 2;
   string youtube_channel_id = 3;
   string title = 4;
-  string thumbnail_url = 5;
-  google.protobuf.Timestamp published_at = 6;
-  int32 category_id = 7;
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
-  google.protobuf.Timestamp deleted_at = 10;
+  google.protobuf.Timestamp published_at = 5;
+  int32 category_id = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  google.protobuf.Timestamp deleted_at = 9;
+  repeated string genre_ids = 10;  // Associated genre IDs
 }
 
 message GetVideoRequest {
@@ -113,6 +150,7 @@ message ListVideosRequest {
   google.protobuf.Timestamp published_after = 2;
   int32 page_size = 3;
   string page_token = 4;
+  string genre_id = 5;  // Filter by genre
 }
 
 message ListVideosResponse {
@@ -122,14 +160,14 @@ message ListVideosResponse {
 }
 
 message CollectTrendingRequest {
-  string region_code = 1;
-  int32 category_id = 2;
+  string genre_id = 1;  // Optional: collect for specific genre
 }
 
 message CollectTrendingResponse {
   int32 videos_processed = 1;
   int32 videos_added = 2;
   int64 duration_ms = 3;
+  string genre_code = 4;
 }
 
 message CollectSubscriptionsRequest {}
@@ -139,6 +177,329 @@ message CollectSubscriptionsResponse {
   int32 videos_processed = 2;
   int32 videos_added = 3;
   int64 duration_ms = 4;
+}
+
+// Genre messages
+message Genre {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string language = 4;
+  string region_code = 5;
+  repeated int32 category_ids = 6;
+  bool enabled = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message ListGenresRequest {
+  bool enabled_only = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListGenresResponse {
+  repeated Genre genres = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetGenreRequest {
+  string id = 1;
+}
+
+message GetGenreResponse {
+  Genre genre = 1;
+}
+
+message GetGenreByCodeRequest {
+  string code = 1;
+}
+
+message GetGenreByCodeResponse {
+  Genre genre = 1;
+}
+
+message CreateGenreRequest {
+  string code = 1;
+  string name = 2;
+  string language = 3;
+  string region_code = 4;
+  repeated int32 category_ids = 5;
+}
+
+message CreateGenreResponse {
+  Genre genre = 1;
+}
+
+message UpdateGenreRequest {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string language = 4;
+  string region_code = 5;
+  repeated int32 category_ids = 6;
+}
+
+message UpdateGenreResponse {
+  Genre genre = 1;
+}
+
+message EnableGenreRequest {
+  string id = 1;
+}
+
+message EnableGenreResponse {
+  Genre genre = 1;
+}
+
+message DisableGenreRequest {
+  string id = 1;
+}
+
+message DisableGenreResponse {
+  Genre genre = 1;
+}
+
+// YouTube Category messages
+message YouTubeCategory {
+  int32 id = 1;
+  string title = 2;
+  string channel_id = 3;
+  bool assignable = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message ListYouTubeCategoriesRequest {
+  bool assignable_only = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListYouTubeCategoriesResponse {
+  repeated YouTubeCategory categories = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetYouTubeCategoryRequest {
+  int32 id = 1;
+}
+
+message GetYouTubeCategoryResponse {
+  YouTubeCategory category = 1;
+}
+
+message UpdateYouTubeCategoryRequest {
+  int32 id = 1;
+  string title = 2;
+  string channel_id = 3;
+  bool assignable = 4;
+}
+
+message UpdateYouTubeCategoryResponse {
+  YouTubeCategory category = 1;
+}
+
+// Keyword messages (updated)
+message Keyword {
+  string id = 1;
+  string genre_id = 2;
+  string name = 3;
+  string filter_type = 4;
+  string pattern = 5;
+  string target_field = 6;
+  bool enabled = 7;
+  string description = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  google.protobuf.Timestamp deleted_at = 11;
+}
+
+message GetKeywordRequest {
+  string id = 1;
+}
+
+message GetKeywordResponse {
+  Keyword keyword = 1;
+}
+
+message ListKeywordsRequest {
+  string query = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+  bool enabled_only = 4;
+}
+
+message ListKeywordsResponse {
+  repeated Keyword keywords = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message ListKeywordsByGenreRequest {
+  string genre_id = 1;
+  bool enabled_only = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListKeywordsByGenreResponse {
+  repeated Keyword keywords = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message CreateKeywordRequest {
+  string genre_id = 1;
+  string name = 2;
+  string filter_type = 3;
+  string pattern = 4;
+  string target_field = 5;
+  string description = 6;
+}
+
+message CreateKeywordResponse {
+  Keyword keyword = 1;
+}
+
+message UpdateKeywordRequest {
+  string id = 1;
+  string name = 2;
+  string filter_type = 3;
+  string pattern = 4;
+  string target_field = 5;
+  string description = 6;
+  bool enabled = 7;
+}
+
+message UpdateKeywordResponse {
+  Keyword keyword = 1;
+}
+
+message EnableKeywordRequest {
+  string id = 1;
+}
+
+message EnableKeywordResponse {
+  Keyword keyword = 1;
+}
+
+message DisableKeywordRequest {
+  string id = 1;
+}
+
+message DisableKeywordResponse {
+  Keyword keyword = 1;
+}
+
+message DeleteKeywordRequest {
+  string id = 1;
+}
+
+message DeleteKeywordResponse {}
+
+// Video-Genre relationship messages
+message VideoGenre {
+  string video_id = 1;
+  string genre_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message ListVideoGenresRequest {
+  string video_id = 1;
+}
+
+message ListVideoGenresResponse {
+  repeated VideoGenre video_genres = 1;
+}
+
+message AssignVideoToGenreRequest {
+  string video_id = 1;
+  string genre_id = 2;
+}
+
+message AssignVideoToGenreResponse {
+  VideoGenre video_genre = 1;
+}
+
+message RemoveVideoFromGenreRequest {
+  string video_id = 1;
+  string genre_id = 2;
+}
+
+message RemoveVideoFromGenreResponse {}
+
+// Audit log messages
+message AuditLog {
+  string id = 1;
+  string actor_id = 2;
+  string actor_email = 3;
+  string action = 4;
+  string resource_type = 5;
+  string resource_id = 6;
+  map<string, string> old_values = 7;
+  map<string, string> new_values = 8;
+  string ip_address = 9;
+  string user_agent = 10;
+  google.protobuf.Timestamp created_at = 11;
+}
+
+message ListAuditLogsRequest {
+  string actor_id = 1;
+  string resource_type = 2;
+  string resource_id = 3;
+  int32 page_size = 4;
+  string page_token = 5;
+}
+
+message ListAuditLogsResponse {
+  repeated AuditLog audit_logs = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetAuditLogRequest {
+  string id = 1;
+}
+
+message GetAuditLogResponse {
+  AuditLog audit_log = 1;
+}
+
+// Batch job messages
+message BatchJob {
+  string id = 1;
+  string job_type = 2;
+  string status = 3;
+  map<string, string> parameters = 4;
+  google.protobuf.Timestamp started_at = 5;
+  google.protobuf.Timestamp completed_at = 6;
+  string error_message = 7;
+  map<string, string> statistics = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message ListBatchJobsRequest {
+  string job_type = 1;
+  string status = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListBatchJobsResponse {
+  repeated BatchJob batch_jobs = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message GetBatchJobRequest {
+  string id = 1;
+}
+
+message GetBatchJobResponse {
+  BatchJob batch_job = 1;
 }
 
 // Snapshot messages
@@ -197,62 +558,23 @@ message UpdateChannelsResponse {
   int64 duration_ms = 3;
 }
 
-// Keyword messages
-message Keyword {
-  string id = 1;
-  string name = 2;
-  string filter_type = 3;
-  string pattern = 4;
-  string description = 5;
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+message CollectTrendingByGenreRequest {
+  string genre_id = 1;
 }
 
-message GetKeywordRequest {
-  string id = 1;
+message CollectTrendingByGenreResponse {
+  string genre_code = 1;
+  int32 videos_processed = 2;
+  int32 videos_added = 3;
+  int64 duration_ms = 4;
 }
 
-message GetKeywordResponse {
-  Keyword keyword = 1;
-}
+message CollectAllTrendingRequest {}
 
-message ListKeywordsRequest {
-  string query = 1;
-  int32 page_size = 2;
-  string page_token = 3;
+message CollectAllTrendingResponse {
+  int32 genres_processed = 1;
+  int32 total_videos = 2;
+  int32 total_added = 3;
+  repeated CollectTrendingByGenreResponse genre_results = 4;
+  int64 duration_ms = 5;
 }
-
-message ListKeywordsResponse {
-  repeated Keyword keywords = 1;
-  string next_page_token = 2;
-  int32 total_count = 3;
-}
-
-message CreateKeywordRequest {
-  string name = 1;
-  string filter_type = 2;
-  string pattern = 3;
-  string description = 4;
-}
-
-message CreateKeywordResponse {
-  Keyword keyword = 1;
-}
-
-message UpdateKeywordRequest {
-  string id = 1;
-  string name = 2;
-  string filter_type = 3;
-  string pattern = 4;
-  string description = 5;
-}
-
-message UpdateKeywordResponse {
-  Keyword keyword = 1;
-}
-
-message DeleteKeywordRequest {
-  string id = 1;
-}
-
-message DeleteKeywordResponse {}

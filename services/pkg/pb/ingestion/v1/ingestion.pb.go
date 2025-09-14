@@ -24,17 +24,22 @@ const (
 
 // Channel messages
 type Channel struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	YoutubeChannelId string                 `protobuf:"bytes,2,opt,name=youtube_channel_id,json=youtubeChannelId,proto3" json:"youtube_channel_id,omitempty"`
-	Title            string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	ThumbnailUrl     string                 `protobuf:"bytes,4,opt,name=thumbnail_url,json=thumbnailUrl,proto3" json:"thumbnail_url,omitempty"`
-	Subscribed       bool                   `protobuf:"varint,5,opt,name=subscribed,proto3" json:"subscribed,omitempty"`
-	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	DeletedAt        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	YoutubeChannelId  string                 `protobuf:"bytes,2,opt,name=youtube_channel_id,json=youtubeChannelId,proto3" json:"youtube_channel_id,omitempty"`
+	Title             string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	ThumbnailUrl      string                 `protobuf:"bytes,4,opt,name=thumbnail_url,json=thumbnailUrl,proto3" json:"thumbnail_url,omitempty"`
+	Description       string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	Country           string                 `protobuf:"bytes,6,opt,name=country,proto3" json:"country,omitempty"`
+	ViewCount         int64                  `protobuf:"varint,7,opt,name=view_count,json=viewCount,proto3" json:"view_count,omitempty"`
+	SubscriptionCount int64                  `protobuf:"varint,8,opt,name=subscription_count,json=subscriptionCount,proto3" json:"subscription_count,omitempty"`
+	VideoCount        int64                  `protobuf:"varint,9,opt,name=video_count,json=videoCount,proto3" json:"video_count,omitempty"`
+	Subscribed        bool                   `protobuf:"varint,10,opt,name=subscribed,proto3" json:"subscribed,omitempty"`
+	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt         *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Channel) Reset() {
@@ -93,6 +98,41 @@ func (x *Channel) GetThumbnailUrl() string {
 		return x.ThumbnailUrl
 	}
 	return ""
+}
+
+func (x *Channel) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Channel) GetCountry() string {
+	if x != nil {
+		return x.Country
+	}
+	return ""
+}
+
+func (x *Channel) GetViewCount() int64 {
+	if x != nil {
+		return x.ViewCount
+	}
+	return 0
+}
+
+func (x *Channel) GetSubscriptionCount() int64 {
+	if x != nil {
+		return x.SubscriptionCount
+	}
+	return 0
+}
+
+func (x *Channel) GetVideoCount() int64 {
+	if x != nil {
+		return x.VideoCount
+	}
+	return 0
 }
 
 func (x *Channel) GetSubscribed() bool {
@@ -522,12 +562,12 @@ type Video struct {
 	YoutubeVideoId   string                 `protobuf:"bytes,2,opt,name=youtube_video_id,json=youtubeVideoId,proto3" json:"youtube_video_id,omitempty"`
 	YoutubeChannelId string                 `protobuf:"bytes,3,opt,name=youtube_channel_id,json=youtubeChannelId,proto3" json:"youtube_channel_id,omitempty"`
 	Title            string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	ThumbnailUrl     string                 `protobuf:"bytes,5,opt,name=thumbnail_url,json=thumbnailUrl,proto3" json:"thumbnail_url,omitempty"`
-	PublishedAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
-	CategoryId       int32                  `protobuf:"varint,7,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
-	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	DeletedAt        *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	PublishedAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
+	CategoryId       int32                  `protobuf:"varint,6,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	GenreIds         []string               `protobuf:"bytes,10,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"` // Associated genre IDs
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -590,13 +630,6 @@ func (x *Video) GetTitle() string {
 	return ""
 }
 
-func (x *Video) GetThumbnailUrl() string {
-	if x != nil {
-		return x.ThumbnailUrl
-	}
-	return ""
-}
-
 func (x *Video) GetPublishedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.PublishedAt
@@ -628,6 +661,13 @@ func (x *Video) GetUpdatedAt() *timestamppb.Timestamp {
 func (x *Video) GetDeletedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.DeletedAt
+	}
+	return nil
+}
+
+func (x *Video) GetGenreIds() []string {
+	if x != nil {
+		return x.GenreIds
 	}
 	return nil
 }
@@ -726,6 +766,7 @@ type ListVideosRequest struct {
 	PublishedAfter *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=published_after,json=publishedAfter,proto3" json:"published_after,omitempty"`
 	PageSize       int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken      string                 `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	GenreId        string                 `protobuf:"bytes,5,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"` // Filter by genre
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -784,6 +825,13 @@ func (x *ListVideosRequest) GetPageSize() int32 {
 func (x *ListVideosRequest) GetPageToken() string {
 	if x != nil {
 		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListVideosRequest) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
 	}
 	return ""
 }
@@ -850,8 +898,7 @@ func (x *ListVideosResponse) GetTotalCount() int32 {
 
 type CollectTrendingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RegionCode    string                 `protobuf:"bytes,1,opt,name=region_code,json=regionCode,proto3" json:"region_code,omitempty"`
-	CategoryId    int32                  `protobuf:"varint,2,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	GenreId       string                 `protobuf:"bytes,1,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"` // Optional: collect for specific genre
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -886,18 +933,11 @@ func (*CollectTrendingRequest) Descriptor() ([]byte, []int) {
 	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *CollectTrendingRequest) GetRegionCode() string {
+func (x *CollectTrendingRequest) GetGenreId() string {
 	if x != nil {
-		return x.RegionCode
+		return x.GenreId
 	}
 	return ""
-}
-
-func (x *CollectTrendingRequest) GetCategoryId() int32 {
-	if x != nil {
-		return x.CategoryId
-	}
-	return 0
 }
 
 type CollectTrendingResponse struct {
@@ -905,6 +945,7 @@ type CollectTrendingResponse struct {
 	VideosProcessed int32                  `protobuf:"varint,1,opt,name=videos_processed,json=videosProcessed,proto3" json:"videos_processed,omitempty"`
 	VideosAdded     int32                  `protobuf:"varint,2,opt,name=videos_added,json=videosAdded,proto3" json:"videos_added,omitempty"`
 	DurationMs      int64                  `protobuf:"varint,3,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	GenreCode       string                 `protobuf:"bytes,4,opt,name=genre_code,json=genreCode,proto3" json:"genre_code,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -958,6 +999,13 @@ func (x *CollectTrendingResponse) GetDurationMs() int64 {
 		return x.DurationMs
 	}
 	return 0
+}
+
+func (x *CollectTrendingResponse) GetGenreCode() string {
+	if x != nil {
+		return x.GenreCode
+	}
+	return ""
 }
 
 type CollectSubscriptionsRequest struct {
@@ -1064,6 +1112,3236 @@ func (x *CollectSubscriptionsResponse) GetDurationMs() int64 {
 	return 0
 }
 
+// Genre messages
+type Genre struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Language      string                 `protobuf:"bytes,4,opt,name=language,proto3" json:"language,omitempty"`
+	RegionCode    string                 `protobuf:"bytes,5,opt,name=region_code,json=regionCode,proto3" json:"region_code,omitempty"`
+	CategoryIds   []int32                `protobuf:"varint,6,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
+	Enabled       bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Genre) Reset() {
+	*x = Genre{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Genre) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Genre) ProtoMessage() {}
+
+func (x *Genre) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Genre.ProtoReflect.Descriptor instead.
+func (*Genre) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *Genre) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Genre) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *Genre) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Genre) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *Genre) GetRegionCode() string {
+	if x != nil {
+		return x.RegionCode
+	}
+	return ""
+}
+
+func (x *Genre) GetCategoryIds() []int32 {
+	if x != nil {
+		return x.CategoryIds
+	}
+	return nil
+}
+
+func (x *Genre) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Genre) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Genre) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type ListGenresRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EnabledOnly   bool                   `protobuf:"varint,1,opt,name=enabled_only,json=enabledOnly,proto3" json:"enabled_only,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGenresRequest) Reset() {
+	*x = ListGenresRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGenresRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGenresRequest) ProtoMessage() {}
+
+func (x *ListGenresRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGenresRequest.ProtoReflect.Descriptor instead.
+func (*ListGenresRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ListGenresRequest) GetEnabledOnly() bool {
+	if x != nil {
+		return x.EnabledOnly
+	}
+	return false
+}
+
+func (x *ListGenresRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListGenresRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListGenresResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genres        []*Genre               `protobuf:"bytes,1,rep,name=genres,proto3" json:"genres,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGenresResponse) Reset() {
+	*x = ListGenresResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGenresResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGenresResponse) ProtoMessage() {}
+
+func (x *ListGenresResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGenresResponse.ProtoReflect.Descriptor instead.
+func (*ListGenresResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ListGenresResponse) GetGenres() []*Genre {
+	if x != nil {
+		return x.Genres
+	}
+	return nil
+}
+
+func (x *ListGenresResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListGenresResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type GetGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGenreRequest) Reset() {
+	*x = GetGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGenreRequest) ProtoMessage() {}
+
+func (x *GetGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGenreRequest.ProtoReflect.Descriptor instead.
+func (*GetGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetGenreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGenreResponse) Reset() {
+	*x = GetGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGenreResponse) ProtoMessage() {}
+
+func (x *GetGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGenreResponse.ProtoReflect.Descriptor instead.
+func (*GetGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetGenreResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+type GetGenreByCodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGenreByCodeRequest) Reset() {
+	*x = GetGenreByCodeRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGenreByCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGenreByCodeRequest) ProtoMessage() {}
+
+func (x *GetGenreByCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGenreByCodeRequest.ProtoReflect.Descriptor instead.
+func (*GetGenreByCodeRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetGenreByCodeRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type GetGenreByCodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGenreByCodeResponse) Reset() {
+	*x = GetGenreByCodeResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGenreByCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGenreByCodeResponse) ProtoMessage() {}
+
+func (x *GetGenreByCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGenreByCodeResponse.ProtoReflect.Descriptor instead.
+func (*GetGenreByCodeResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetGenreByCodeResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+type CreateGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
+	RegionCode    string                 `protobuf:"bytes,4,opt,name=region_code,json=regionCode,proto3" json:"region_code,omitempty"`
+	CategoryIds   []int32                `protobuf:"varint,5,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateGenreRequest) Reset() {
+	*x = CreateGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateGenreRequest) ProtoMessage() {}
+
+func (x *CreateGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateGenreRequest.ProtoReflect.Descriptor instead.
+func (*CreateGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CreateGenreRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *CreateGenreRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateGenreRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *CreateGenreRequest) GetRegionCode() string {
+	if x != nil {
+		return x.RegionCode
+	}
+	return ""
+}
+
+func (x *CreateGenreRequest) GetCategoryIds() []int32 {
+	if x != nil {
+		return x.CategoryIds
+	}
+	return nil
+}
+
+type CreateGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateGenreResponse) Reset() {
+	*x = CreateGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateGenreResponse) ProtoMessage() {}
+
+func (x *CreateGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateGenreResponse.ProtoReflect.Descriptor instead.
+func (*CreateGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CreateGenreResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+type UpdateGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Language      string                 `protobuf:"bytes,4,opt,name=language,proto3" json:"language,omitempty"`
+	RegionCode    string                 `protobuf:"bytes,5,opt,name=region_code,json=regionCode,proto3" json:"region_code,omitempty"`
+	CategoryIds   []int32                `protobuf:"varint,6,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGenreRequest) Reset() {
+	*x = UpdateGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGenreRequest) ProtoMessage() {}
+
+func (x *UpdateGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGenreRequest.ProtoReflect.Descriptor instead.
+func (*UpdateGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UpdateGenreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateGenreRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *UpdateGenreRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateGenreRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *UpdateGenreRequest) GetRegionCode() string {
+	if x != nil {
+		return x.RegionCode
+	}
+	return ""
+}
+
+func (x *UpdateGenreRequest) GetCategoryIds() []int32 {
+	if x != nil {
+		return x.CategoryIds
+	}
+	return nil
+}
+
+type UpdateGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGenreResponse) Reset() {
+	*x = UpdateGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGenreResponse) ProtoMessage() {}
+
+func (x *UpdateGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGenreResponse.ProtoReflect.Descriptor instead.
+func (*UpdateGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UpdateGenreResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+type EnableGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableGenreRequest) Reset() {
+	*x = EnableGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableGenreRequest) ProtoMessage() {}
+
+func (x *EnableGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableGenreRequest.ProtoReflect.Descriptor instead.
+func (*EnableGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *EnableGenreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type EnableGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableGenreResponse) Reset() {
+	*x = EnableGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableGenreResponse) ProtoMessage() {}
+
+func (x *EnableGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableGenreResponse.ProtoReflect.Descriptor instead.
+func (*EnableGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *EnableGenreResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+type DisableGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DisableGenreRequest) Reset() {
+	*x = DisableGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DisableGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DisableGenreRequest) ProtoMessage() {}
+
+func (x *DisableGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DisableGenreRequest.ProtoReflect.Descriptor instead.
+func (*DisableGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *DisableGenreRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DisableGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genre         *Genre                 `protobuf:"bytes,1,opt,name=genre,proto3" json:"genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DisableGenreResponse) Reset() {
+	*x = DisableGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DisableGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DisableGenreResponse) ProtoMessage() {}
+
+func (x *DisableGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DisableGenreResponse.ProtoReflect.Descriptor instead.
+func (*DisableGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *DisableGenreResponse) GetGenre() *Genre {
+	if x != nil {
+		return x.Genre
+	}
+	return nil
+}
+
+// YouTube Category messages
+type YouTubeCategory struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	ChannelId     string                 `protobuf:"bytes,3,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
+	Assignable    bool                   `protobuf:"varint,4,opt,name=assignable,proto3" json:"assignable,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *YouTubeCategory) Reset() {
+	*x = YouTubeCategory{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *YouTubeCategory) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*YouTubeCategory) ProtoMessage() {}
+
+func (x *YouTubeCategory) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use YouTubeCategory.ProtoReflect.Descriptor instead.
+func (*YouTubeCategory) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *YouTubeCategory) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *YouTubeCategory) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *YouTubeCategory) GetChannelId() string {
+	if x != nil {
+		return x.ChannelId
+	}
+	return ""
+}
+
+func (x *YouTubeCategory) GetAssignable() bool {
+	if x != nil {
+		return x.Assignable
+	}
+	return false
+}
+
+func (x *YouTubeCategory) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *YouTubeCategory) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type ListYouTubeCategoriesRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AssignableOnly bool                   `protobuf:"varint,1,opt,name=assignable_only,json=assignableOnly,proto3" json:"assignable_only,omitempty"`
+	PageSize       int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken      string                 `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ListYouTubeCategoriesRequest) Reset() {
+	*x = ListYouTubeCategoriesRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListYouTubeCategoriesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListYouTubeCategoriesRequest) ProtoMessage() {}
+
+func (x *ListYouTubeCategoriesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListYouTubeCategoriesRequest.ProtoReflect.Descriptor instead.
+func (*ListYouTubeCategoriesRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *ListYouTubeCategoriesRequest) GetAssignableOnly() bool {
+	if x != nil {
+		return x.AssignableOnly
+	}
+	return false
+}
+
+func (x *ListYouTubeCategoriesRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListYouTubeCategoriesRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListYouTubeCategoriesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Categories    []*YouTubeCategory     `protobuf:"bytes,1,rep,name=categories,proto3" json:"categories,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListYouTubeCategoriesResponse) Reset() {
+	*x = ListYouTubeCategoriesResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListYouTubeCategoriesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListYouTubeCategoriesResponse) ProtoMessage() {}
+
+func (x *ListYouTubeCategoriesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListYouTubeCategoriesResponse.ProtoReflect.Descriptor instead.
+func (*ListYouTubeCategoriesResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *ListYouTubeCategoriesResponse) GetCategories() []*YouTubeCategory {
+	if x != nil {
+		return x.Categories
+	}
+	return nil
+}
+
+func (x *ListYouTubeCategoriesResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListYouTubeCategoriesResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type GetYouTubeCategoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetYouTubeCategoryRequest) Reset() {
+	*x = GetYouTubeCategoryRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetYouTubeCategoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetYouTubeCategoryRequest) ProtoMessage() {}
+
+func (x *GetYouTubeCategoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetYouTubeCategoryRequest.ProtoReflect.Descriptor instead.
+func (*GetYouTubeCategoryRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetYouTubeCategoryRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetYouTubeCategoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Category      *YouTubeCategory       `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetYouTubeCategoryResponse) Reset() {
+	*x = GetYouTubeCategoryResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetYouTubeCategoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetYouTubeCategoryResponse) ProtoMessage() {}
+
+func (x *GetYouTubeCategoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetYouTubeCategoryResponse.ProtoReflect.Descriptor instead.
+func (*GetYouTubeCategoryResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetYouTubeCategoryResponse) GetCategory() *YouTubeCategory {
+	if x != nil {
+		return x.Category
+	}
+	return nil
+}
+
+type UpdateYouTubeCategoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	ChannelId     string                 `protobuf:"bytes,3,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
+	Assignable    bool                   `protobuf:"varint,4,opt,name=assignable,proto3" json:"assignable,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateYouTubeCategoryRequest) Reset() {
+	*x = UpdateYouTubeCategoryRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateYouTubeCategoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateYouTubeCategoryRequest) ProtoMessage() {}
+
+func (x *UpdateYouTubeCategoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateYouTubeCategoryRequest.ProtoReflect.Descriptor instead.
+func (*UpdateYouTubeCategoryRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *UpdateYouTubeCategoryRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateYouTubeCategoryRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *UpdateYouTubeCategoryRequest) GetChannelId() string {
+	if x != nil {
+		return x.ChannelId
+	}
+	return ""
+}
+
+func (x *UpdateYouTubeCategoryRequest) GetAssignable() bool {
+	if x != nil {
+		return x.Assignable
+	}
+	return false
+}
+
+type UpdateYouTubeCategoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Category      *YouTubeCategory       `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateYouTubeCategoryResponse) Reset() {
+	*x = UpdateYouTubeCategoryResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateYouTubeCategoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateYouTubeCategoryResponse) ProtoMessage() {}
+
+func (x *UpdateYouTubeCategoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateYouTubeCategoryResponse.ProtoReflect.Descriptor instead.
+func (*UpdateYouTubeCategoryResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *UpdateYouTubeCategoryResponse) GetCategory() *YouTubeCategory {
+	if x != nil {
+		return x.Category
+	}
+	return nil
+}
+
+// Keyword messages (updated)
+type Keyword struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	GenreId       string                 `protobuf:"bytes,2,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	FilterType    string                 `protobuf:"bytes,4,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
+	Pattern       string                 `protobuf:"bytes,5,opt,name=pattern,proto3" json:"pattern,omitempty"`
+	TargetField   string                 `protobuf:"bytes,6,opt,name=target_field,json=targetField,proto3" json:"target_field,omitempty"`
+	Enabled       bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Description   string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Keyword) Reset() {
+	*x = Keyword{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Keyword) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Keyword) ProtoMessage() {}
+
+func (x *Keyword) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Keyword.ProtoReflect.Descriptor instead.
+func (*Keyword) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *Keyword) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Keyword) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+func (x *Keyword) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Keyword) GetFilterType() string {
+	if x != nil {
+		return x.FilterType
+	}
+	return ""
+}
+
+func (x *Keyword) GetPattern() string {
+	if x != nil {
+		return x.Pattern
+	}
+	return ""
+}
+
+func (x *Keyword) GetTargetField() string {
+	if x != nil {
+		return x.TargetField
+	}
+	return ""
+}
+
+func (x *Keyword) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Keyword) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Keyword) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Keyword) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Keyword) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
+	}
+	return nil
+}
+
+type GetKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetKeywordRequest) Reset() {
+	*x = GetKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetKeywordRequest) ProtoMessage() {}
+
+func (x *GetKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetKeywordRequest.ProtoReflect.Descriptor instead.
+func (*GetKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *GetKeywordRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetKeywordResponse) Reset() {
+	*x = GetKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetKeywordResponse) ProtoMessage() {}
+
+func (x *GetKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetKeywordResponse.ProtoReflect.Descriptor instead.
+func (*GetKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *GetKeywordResponse) GetKeyword() *Keyword {
+	if x != nil {
+		return x.Keyword
+	}
+	return nil
+}
+
+type ListKeywordsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	EnabledOnly   bool                   `protobuf:"varint,4,opt,name=enabled_only,json=enabledOnly,proto3" json:"enabled_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListKeywordsRequest) Reset() {
+	*x = ListKeywordsRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListKeywordsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListKeywordsRequest) ProtoMessage() {}
+
+func (x *ListKeywordsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListKeywordsRequest.ProtoReflect.Descriptor instead.
+func (*ListKeywordsRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *ListKeywordsRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *ListKeywordsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListKeywordsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListKeywordsRequest) GetEnabledOnly() bool {
+	if x != nil {
+		return x.EnabledOnly
+	}
+	return false
+}
+
+type ListKeywordsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keywords      []*Keyword             `protobuf:"bytes,1,rep,name=keywords,proto3" json:"keywords,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListKeywordsResponse) Reset() {
+	*x = ListKeywordsResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListKeywordsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListKeywordsResponse) ProtoMessage() {}
+
+func (x *ListKeywordsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListKeywordsResponse.ProtoReflect.Descriptor instead.
+func (*ListKeywordsResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *ListKeywordsResponse) GetKeywords() []*Keyword {
+	if x != nil {
+		return x.Keywords
+	}
+	return nil
+}
+
+func (x *ListKeywordsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListKeywordsResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type ListKeywordsByGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GenreId       string                 `protobuf:"bytes,1,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	EnabledOnly   bool                   `protobuf:"varint,2,opt,name=enabled_only,json=enabledOnly,proto3" json:"enabled_only,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListKeywordsByGenreRequest) Reset() {
+	*x = ListKeywordsByGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListKeywordsByGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListKeywordsByGenreRequest) ProtoMessage() {}
+
+func (x *ListKeywordsByGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListKeywordsByGenreRequest.ProtoReflect.Descriptor instead.
+func (*ListKeywordsByGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *ListKeywordsByGenreRequest) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+func (x *ListKeywordsByGenreRequest) GetEnabledOnly() bool {
+	if x != nil {
+		return x.EnabledOnly
+	}
+	return false
+}
+
+func (x *ListKeywordsByGenreRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListKeywordsByGenreRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListKeywordsByGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keywords      []*Keyword             `protobuf:"bytes,1,rep,name=keywords,proto3" json:"keywords,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListKeywordsByGenreResponse) Reset() {
+	*x = ListKeywordsByGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListKeywordsByGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListKeywordsByGenreResponse) ProtoMessage() {}
+
+func (x *ListKeywordsByGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListKeywordsByGenreResponse.ProtoReflect.Descriptor instead.
+func (*ListKeywordsByGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *ListKeywordsByGenreResponse) GetKeywords() []*Keyword {
+	if x != nil {
+		return x.Keywords
+	}
+	return nil
+}
+
+func (x *ListKeywordsByGenreResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListKeywordsByGenreResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type CreateKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GenreId       string                 `protobuf:"bytes,1,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	FilterType    string                 `protobuf:"bytes,3,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
+	Pattern       string                 `protobuf:"bytes,4,opt,name=pattern,proto3" json:"pattern,omitempty"`
+	TargetField   string                 `protobuf:"bytes,5,opt,name=target_field,json=targetField,proto3" json:"target_field,omitempty"`
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateKeywordRequest) Reset() {
+	*x = CreateKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateKeywordRequest) ProtoMessage() {}
+
+func (x *CreateKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateKeywordRequest.ProtoReflect.Descriptor instead.
+func (*CreateKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *CreateKeywordRequest) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+func (x *CreateKeywordRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateKeywordRequest) GetFilterType() string {
+	if x != nil {
+		return x.FilterType
+	}
+	return ""
+}
+
+func (x *CreateKeywordRequest) GetPattern() string {
+	if x != nil {
+		return x.Pattern
+	}
+	return ""
+}
+
+func (x *CreateKeywordRequest) GetTargetField() string {
+	if x != nil {
+		return x.TargetField
+	}
+	return ""
+}
+
+func (x *CreateKeywordRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type CreateKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateKeywordResponse) Reset() {
+	*x = CreateKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateKeywordResponse) ProtoMessage() {}
+
+func (x *CreateKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateKeywordResponse.ProtoReflect.Descriptor instead.
+func (*CreateKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *CreateKeywordResponse) GetKeyword() *Keyword {
+	if x != nil {
+		return x.Keyword
+	}
+	return nil
+}
+
+type UpdateKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	FilterType    string                 `protobuf:"bytes,3,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
+	Pattern       string                 `protobuf:"bytes,4,opt,name=pattern,proto3" json:"pattern,omitempty"`
+	TargetField   string                 `protobuf:"bytes,5,opt,name=target_field,json=targetField,proto3" json:"target_field,omitempty"`
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
+	Enabled       bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateKeywordRequest) Reset() {
+	*x = UpdateKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateKeywordRequest) ProtoMessage() {}
+
+func (x *UpdateKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateKeywordRequest.ProtoReflect.Descriptor instead.
+func (*UpdateKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *UpdateKeywordRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetFilterType() string {
+	if x != nil {
+		return x.FilterType
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetPattern() string {
+	if x != nil {
+		return x.Pattern
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetTargetField() string {
+	if x != nil {
+		return x.TargetField
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateKeywordRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type UpdateKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateKeywordResponse) Reset() {
+	*x = UpdateKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateKeywordResponse) ProtoMessage() {}
+
+func (x *UpdateKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateKeywordResponse.ProtoReflect.Descriptor instead.
+func (*UpdateKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *UpdateKeywordResponse) GetKeyword() *Keyword {
+	if x != nil {
+		return x.Keyword
+	}
+	return nil
+}
+
+type EnableKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableKeywordRequest) Reset() {
+	*x = EnableKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableKeywordRequest) ProtoMessage() {}
+
+func (x *EnableKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableKeywordRequest.ProtoReflect.Descriptor instead.
+func (*EnableKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *EnableKeywordRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type EnableKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableKeywordResponse) Reset() {
+	*x = EnableKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableKeywordResponse) ProtoMessage() {}
+
+func (x *EnableKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableKeywordResponse.ProtoReflect.Descriptor instead.
+func (*EnableKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *EnableKeywordResponse) GetKeyword() *Keyword {
+	if x != nil {
+		return x.Keyword
+	}
+	return nil
+}
+
+type DisableKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DisableKeywordRequest) Reset() {
+	*x = DisableKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DisableKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DisableKeywordRequest) ProtoMessage() {}
+
+func (x *DisableKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DisableKeywordRequest.ProtoReflect.Descriptor instead.
+func (*DisableKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *DisableKeywordRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DisableKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DisableKeywordResponse) Reset() {
+	*x = DisableKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DisableKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DisableKeywordResponse) ProtoMessage() {}
+
+func (x *DisableKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DisableKeywordResponse.ProtoReflect.Descriptor instead.
+func (*DisableKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *DisableKeywordResponse) GetKeyword() *Keyword {
+	if x != nil {
+		return x.Keyword
+	}
+	return nil
+}
+
+type DeleteKeywordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteKeywordRequest) Reset() {
+	*x = DeleteKeywordRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteKeywordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteKeywordRequest) ProtoMessage() {}
+
+func (x *DeleteKeywordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteKeywordRequest.ProtoReflect.Descriptor instead.
+func (*DeleteKeywordRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *DeleteKeywordRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteKeywordResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteKeywordResponse) Reset() {
+	*x = DeleteKeywordResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteKeywordResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteKeywordResponse) ProtoMessage() {}
+
+func (x *DeleteKeywordResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteKeywordResponse.ProtoReflect.Descriptor instead.
+func (*DeleteKeywordResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{56}
+}
+
+// Video-Genre relationship messages
+type VideoGenre struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	GenreId       string                 `protobuf:"bytes,2,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VideoGenre) Reset() {
+	*x = VideoGenre{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VideoGenre) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoGenre) ProtoMessage() {}
+
+func (x *VideoGenre) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoGenre.ProtoReflect.Descriptor instead.
+func (*VideoGenre) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *VideoGenre) GetVideoId() string {
+	if x != nil {
+		return x.VideoId
+	}
+	return ""
+}
+
+func (x *VideoGenre) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+func (x *VideoGenre) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type ListVideoGenresRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListVideoGenresRequest) Reset() {
+	*x = ListVideoGenresRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListVideoGenresRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListVideoGenresRequest) ProtoMessage() {}
+
+func (x *ListVideoGenresRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListVideoGenresRequest.ProtoReflect.Descriptor instead.
+func (*ListVideoGenresRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *ListVideoGenresRequest) GetVideoId() string {
+	if x != nil {
+		return x.VideoId
+	}
+	return ""
+}
+
+type ListVideoGenresResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoGenres   []*VideoGenre          `protobuf:"bytes,1,rep,name=video_genres,json=videoGenres,proto3" json:"video_genres,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListVideoGenresResponse) Reset() {
+	*x = ListVideoGenresResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListVideoGenresResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListVideoGenresResponse) ProtoMessage() {}
+
+func (x *ListVideoGenresResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListVideoGenresResponse.ProtoReflect.Descriptor instead.
+func (*ListVideoGenresResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *ListVideoGenresResponse) GetVideoGenres() []*VideoGenre {
+	if x != nil {
+		return x.VideoGenres
+	}
+	return nil
+}
+
+type AssignVideoToGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	GenreId       string                 `protobuf:"bytes,2,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignVideoToGenreRequest) Reset() {
+	*x = AssignVideoToGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignVideoToGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignVideoToGenreRequest) ProtoMessage() {}
+
+func (x *AssignVideoToGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignVideoToGenreRequest.ProtoReflect.Descriptor instead.
+func (*AssignVideoToGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *AssignVideoToGenreRequest) GetVideoId() string {
+	if x != nil {
+		return x.VideoId
+	}
+	return ""
+}
+
+func (x *AssignVideoToGenreRequest) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+type AssignVideoToGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoGenre    *VideoGenre            `protobuf:"bytes,1,opt,name=video_genre,json=videoGenre,proto3" json:"video_genre,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignVideoToGenreResponse) Reset() {
+	*x = AssignVideoToGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignVideoToGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignVideoToGenreResponse) ProtoMessage() {}
+
+func (x *AssignVideoToGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignVideoToGenreResponse.ProtoReflect.Descriptor instead.
+func (*AssignVideoToGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *AssignVideoToGenreResponse) GetVideoGenre() *VideoGenre {
+	if x != nil {
+		return x.VideoGenre
+	}
+	return nil
+}
+
+type RemoveVideoFromGenreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	GenreId       string                 `protobuf:"bytes,2,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveVideoFromGenreRequest) Reset() {
+	*x = RemoveVideoFromGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveVideoFromGenreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveVideoFromGenreRequest) ProtoMessage() {}
+
+func (x *RemoveVideoFromGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveVideoFromGenreRequest.ProtoReflect.Descriptor instead.
+func (*RemoveVideoFromGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *RemoveVideoFromGenreRequest) GetVideoId() string {
+	if x != nil {
+		return x.VideoId
+	}
+	return ""
+}
+
+func (x *RemoveVideoFromGenreRequest) GetGenreId() string {
+	if x != nil {
+		return x.GenreId
+	}
+	return ""
+}
+
+type RemoveVideoFromGenreResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveVideoFromGenreResponse) Reset() {
+	*x = RemoveVideoFromGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveVideoFromGenreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveVideoFromGenreResponse) ProtoMessage() {}
+
+func (x *RemoveVideoFromGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveVideoFromGenreResponse.ProtoReflect.Descriptor instead.
+func (*RemoveVideoFromGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{63}
+}
+
+// Audit log messages
+type AuditLog struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ActorId       string                 `protobuf:"bytes,2,opt,name=actor_id,json=actorId,proto3" json:"actor_id,omitempty"`
+	ActorEmail    string                 `protobuf:"bytes,3,opt,name=actor_email,json=actorEmail,proto3" json:"actor_email,omitempty"`
+	Action        string                 `protobuf:"bytes,4,opt,name=action,proto3" json:"action,omitempty"`
+	ResourceType  string                 `protobuf:"bytes,5,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
+	ResourceId    string                 `protobuf:"bytes,6,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	OldValues     map[string]string      `protobuf:"bytes,7,rep,name=old_values,json=oldValues,proto3" json:"old_values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	NewValues     map[string]string      `protobuf:"bytes,8,rep,name=new_values,json=newValues,proto3" json:"new_values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	IpAddress     string                 `protobuf:"bytes,9,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,10,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuditLog) Reset() {
+	*x = AuditLog{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuditLog) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuditLog) ProtoMessage() {}
+
+func (x *AuditLog) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuditLog.ProtoReflect.Descriptor instead.
+func (*AuditLog) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *AuditLog) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AuditLog) GetActorId() string {
+	if x != nil {
+		return x.ActorId
+	}
+	return ""
+}
+
+func (x *AuditLog) GetActorEmail() string {
+	if x != nil {
+		return x.ActorEmail
+	}
+	return ""
+}
+
+func (x *AuditLog) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *AuditLog) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *AuditLog) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *AuditLog) GetOldValues() map[string]string {
+	if x != nil {
+		return x.OldValues
+	}
+	return nil
+}
+
+func (x *AuditLog) GetNewValues() map[string]string {
+	if x != nil {
+		return x.NewValues
+	}
+	return nil
+}
+
+func (x *AuditLog) GetIpAddress() string {
+	if x != nil {
+		return x.IpAddress
+	}
+	return ""
+}
+
+func (x *AuditLog) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
+	}
+	return ""
+}
+
+func (x *AuditLog) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type ListAuditLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ActorId       string                 `protobuf:"bytes,1,opt,name=actor_id,json=actorId,proto3" json:"actor_id,omitempty"`
+	ResourceType  string                 `protobuf:"bytes,2,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
+	ResourceId    string                 `protobuf:"bytes,3,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,5,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditLogsRequest) Reset() {
+	*x = ListAuditLogsRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditLogsRequest) ProtoMessage() {}
+
+func (x *ListAuditLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditLogsRequest.ProtoReflect.Descriptor instead.
+func (*ListAuditLogsRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *ListAuditLogsRequest) GetActorId() string {
+	if x != nil {
+		return x.ActorId
+	}
+	return ""
+}
+
+func (x *ListAuditLogsRequest) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *ListAuditLogsRequest) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *ListAuditLogsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListAuditLogsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListAuditLogsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AuditLogs     []*AuditLog            `protobuf:"bytes,1,rep,name=audit_logs,json=auditLogs,proto3" json:"audit_logs,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditLogsResponse) Reset() {
+	*x = ListAuditLogsResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditLogsResponse) ProtoMessage() {}
+
+func (x *ListAuditLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditLogsResponse.ProtoReflect.Descriptor instead.
+func (*ListAuditLogsResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *ListAuditLogsResponse) GetAuditLogs() []*AuditLog {
+	if x != nil {
+		return x.AuditLogs
+	}
+	return nil
+}
+
+func (x *ListAuditLogsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListAuditLogsResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type GetAuditLogRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAuditLogRequest) Reset() {
+	*x = GetAuditLogRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAuditLogRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAuditLogRequest) ProtoMessage() {}
+
+func (x *GetAuditLogRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAuditLogRequest.ProtoReflect.Descriptor instead.
+func (*GetAuditLogRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *GetAuditLogRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetAuditLogResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AuditLog      *AuditLog              `protobuf:"bytes,1,opt,name=audit_log,json=auditLog,proto3" json:"audit_log,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAuditLogResponse) Reset() {
+	*x = GetAuditLogResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAuditLogResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAuditLogResponse) ProtoMessage() {}
+
+func (x *GetAuditLogResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAuditLogResponse.ProtoReflect.Descriptor instead.
+func (*GetAuditLogResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *GetAuditLogResponse) GetAuditLog() *AuditLog {
+	if x != nil {
+		return x.AuditLog
+	}
+	return nil
+}
+
+// Batch job messages
+type BatchJob struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	JobType       string                 `protobuf:"bytes,2,opt,name=job_type,json=jobType,proto3" json:"job_type,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Parameters    map[string]string      `protobuf:"bytes,4,rep,name=parameters,proto3" json:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	StartedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	CompletedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,7,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	Statistics    map[string]string      `protobuf:"bytes,8,rep,name=statistics,proto3" json:"statistics,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchJob) Reset() {
+	*x = BatchJob{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchJob) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchJob) ProtoMessage() {}
+
+func (x *BatchJob) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchJob.ProtoReflect.Descriptor instead.
+func (*BatchJob) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *BatchJob) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *BatchJob) GetJobType() string {
+	if x != nil {
+		return x.JobType
+	}
+	return ""
+}
+
+func (x *BatchJob) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *BatchJob) GetParameters() map[string]string {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
+func (x *BatchJob) GetStartedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartedAt
+	}
+	return nil
+}
+
+func (x *BatchJob) GetCompletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletedAt
+	}
+	return nil
+}
+
+func (x *BatchJob) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *BatchJob) GetStatistics() map[string]string {
+	if x != nil {
+		return x.Statistics
+	}
+	return nil
+}
+
+func (x *BatchJob) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type ListBatchJobsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobType       string                 `protobuf:"bytes,1,opt,name=job_type,json=jobType,proto3" json:"job_type,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListBatchJobsRequest) Reset() {
+	*x = ListBatchJobsRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListBatchJobsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListBatchJobsRequest) ProtoMessage() {}
+
+func (x *ListBatchJobsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListBatchJobsRequest.ProtoReflect.Descriptor instead.
+func (*ListBatchJobsRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *ListBatchJobsRequest) GetJobType() string {
+	if x != nil {
+		return x.JobType
+	}
+	return ""
+}
+
+func (x *ListBatchJobsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ListBatchJobsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListBatchJobsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+type ListBatchJobsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BatchJobs     []*BatchJob            `protobuf:"bytes,1,rep,name=batch_jobs,json=batchJobs,proto3" json:"batch_jobs,omitempty"`
+	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListBatchJobsResponse) Reset() {
+	*x = ListBatchJobsResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListBatchJobsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListBatchJobsResponse) ProtoMessage() {}
+
+func (x *ListBatchJobsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListBatchJobsResponse.ProtoReflect.Descriptor instead.
+func (*ListBatchJobsResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *ListBatchJobsResponse) GetBatchJobs() []*BatchJob {
+	if x != nil {
+		return x.BatchJobs
+	}
+	return nil
+}
+
+func (x *ListBatchJobsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+func (x *ListBatchJobsResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+type GetBatchJobRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBatchJobRequest) Reset() {
+	*x = GetBatchJobRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBatchJobRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBatchJobRequest) ProtoMessage() {}
+
+func (x *GetBatchJobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBatchJobRequest.ProtoReflect.Descriptor instead.
+func (*GetBatchJobRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *GetBatchJobRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetBatchJobResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BatchJob      *BatchJob              `protobuf:"bytes,1,opt,name=batch_job,json=batchJob,proto3" json:"batch_job,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBatchJobResponse) Reset() {
+	*x = GetBatchJobResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBatchJobResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBatchJobResponse) ProtoMessage() {}
+
+func (x *GetBatchJobResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBatchJobResponse.ProtoReflect.Descriptor instead.
+func (*GetBatchJobResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *GetBatchJobResponse) GetBatchJob() *BatchJob {
+	if x != nil {
+		return x.BatchJob
+	}
+	return nil
+}
+
 // Snapshot messages
 type VideoSnapshot struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
@@ -1082,7 +4360,7 @@ type VideoSnapshot struct {
 
 func (x *VideoSnapshot) Reset() {
 	*x = VideoSnapshot{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[18]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1094,7 +4372,7 @@ func (x *VideoSnapshot) String() string {
 func (*VideoSnapshot) ProtoMessage() {}
 
 func (x *VideoSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[18]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1107,7 +4385,7 @@ func (x *VideoSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoSnapshot.ProtoReflect.Descriptor instead.
 func (*VideoSnapshot) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{18}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *VideoSnapshot) GetId() string {
@@ -1183,7 +4461,7 @@ type CreateSnapshotRequest struct {
 
 func (x *CreateSnapshotRequest) Reset() {
 	*x = CreateSnapshotRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[19]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1195,7 +4473,7 @@ func (x *CreateSnapshotRequest) String() string {
 func (*CreateSnapshotRequest) ProtoMessage() {}
 
 func (x *CreateSnapshotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[19]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1208,7 +4486,7 @@ func (x *CreateSnapshotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSnapshotRequest.ProtoReflect.Descriptor instead.
 func (*CreateSnapshotRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{19}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *CreateSnapshotRequest) GetVideoId() string {
@@ -1234,7 +4512,7 @@ type CreateSnapshotResponse struct {
 
 func (x *CreateSnapshotResponse) Reset() {
 	*x = CreateSnapshotResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[20]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1246,7 +4524,7 @@ func (x *CreateSnapshotResponse) String() string {
 func (*CreateSnapshotResponse) ProtoMessage() {}
 
 func (x *CreateSnapshotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[20]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1259,7 +4537,7 @@ func (x *CreateSnapshotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSnapshotResponse.ProtoReflect.Descriptor instead.
 func (*CreateSnapshotResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{20}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *CreateSnapshotResponse) GetSnapshot() *VideoSnapshot {
@@ -1279,7 +4557,7 @@ type GetSnapshotRequest struct {
 
 func (x *GetSnapshotRequest) Reset() {
 	*x = GetSnapshotRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[21]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1291,7 +4569,7 @@ func (x *GetSnapshotRequest) String() string {
 func (*GetSnapshotRequest) ProtoMessage() {}
 
 func (x *GetSnapshotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[21]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1304,7 +4582,7 @@ func (x *GetSnapshotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSnapshotRequest.ProtoReflect.Descriptor instead.
 func (*GetSnapshotRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{21}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *GetSnapshotRequest) GetVideoId() string {
@@ -1330,7 +4608,7 @@ type GetSnapshotResponse struct {
 
 func (x *GetSnapshotResponse) Reset() {
 	*x = GetSnapshotResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[22]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1342,7 +4620,7 @@ func (x *GetSnapshotResponse) String() string {
 func (*GetSnapshotResponse) ProtoMessage() {}
 
 func (x *GetSnapshotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[22]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1355,7 +4633,7 @@ func (x *GetSnapshotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSnapshotResponse.ProtoReflect.Descriptor instead.
 func (*GetSnapshotResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{22}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *GetSnapshotResponse) GetSnapshot() *VideoSnapshot {
@@ -1374,7 +4652,7 @@ type ListSnapshotsRequest struct {
 
 func (x *ListSnapshotsRequest) Reset() {
 	*x = ListSnapshotsRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[23]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1386,7 +4664,7 @@ func (x *ListSnapshotsRequest) String() string {
 func (*ListSnapshotsRequest) ProtoMessage() {}
 
 func (x *ListSnapshotsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[23]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1399,7 +4677,7 @@ func (x *ListSnapshotsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSnapshotsRequest.ProtoReflect.Descriptor instead.
 func (*ListSnapshotsRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{23}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *ListSnapshotsRequest) GetVideoId() string {
@@ -1418,7 +4696,7 @@ type ListSnapshotsResponse struct {
 
 func (x *ListSnapshotsResponse) Reset() {
 	*x = ListSnapshotsResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[24]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1430,7 +4708,7 @@ func (x *ListSnapshotsResponse) String() string {
 func (*ListSnapshotsResponse) ProtoMessage() {}
 
 func (x *ListSnapshotsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[24]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1443,7 +4721,7 @@ func (x *ListSnapshotsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSnapshotsResponse.ProtoReflect.Descriptor instead.
 func (*ListSnapshotsResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{24}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *ListSnapshotsResponse) GetSnapshots() []*VideoSnapshot {
@@ -1462,7 +4740,7 @@ type ScheduleSnapshotsRequest struct {
 
 func (x *ScheduleSnapshotsRequest) Reset() {
 	*x = ScheduleSnapshotsRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[25]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1474,7 +4752,7 @@ func (x *ScheduleSnapshotsRequest) String() string {
 func (*ScheduleSnapshotsRequest) ProtoMessage() {}
 
 func (x *ScheduleSnapshotsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[25]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +4765,7 @@ func (x *ScheduleSnapshotsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScheduleSnapshotsRequest.ProtoReflect.Descriptor instead.
 func (*ScheduleSnapshotsRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{25}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{81}
 }
 
 type ScheduleSnapshotsResponse struct {
@@ -1501,7 +4779,7 @@ type ScheduleSnapshotsResponse struct {
 
 func (x *ScheduleSnapshotsResponse) Reset() {
 	*x = ScheduleSnapshotsResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[26]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1513,7 +4791,7 @@ func (x *ScheduleSnapshotsResponse) String() string {
 func (*ScheduleSnapshotsResponse) ProtoMessage() {}
 
 func (x *ScheduleSnapshotsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[26]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1526,7 +4804,7 @@ func (x *ScheduleSnapshotsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScheduleSnapshotsResponse.ProtoReflect.Descriptor instead.
 func (*ScheduleSnapshotsResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{26}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *ScheduleSnapshotsResponse) GetVideosProcessed() int32 {
@@ -1558,7 +4836,7 @@ type UpdateChannelsRequest struct {
 
 func (x *UpdateChannelsRequest) Reset() {
 	*x = UpdateChannelsRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[27]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1570,7 +4848,7 @@ func (x *UpdateChannelsRequest) String() string {
 func (*UpdateChannelsRequest) ProtoMessage() {}
 
 func (x *UpdateChannelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[27]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1583,7 +4861,7 @@ func (x *UpdateChannelsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateChannelsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateChannelsRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{27}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{83}
 }
 
 type UpdateChannelsResponse struct {
@@ -1597,7 +4875,7 @@ type UpdateChannelsResponse struct {
 
 func (x *UpdateChannelsResponse) Reset() {
 	*x = UpdateChannelsResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[28]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1609,7 +4887,7 @@ func (x *UpdateChannelsResponse) String() string {
 func (*UpdateChannelsResponse) ProtoMessage() {}
 
 func (x *UpdateChannelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[28]
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1622,7 +4900,7 @@ func (x *UpdateChannelsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateChannelsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateChannelsResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{28}
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *UpdateChannelsResponse) GetChannelsProcessed() int32 {
@@ -1646,35 +4924,28 @@ func (x *UpdateChannelsResponse) GetDurationMs() int64 {
 	return 0
 }
 
-// Keyword messages
-type Keyword struct {
+type CollectTrendingByGenreRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	FilterType    string                 `protobuf:"bytes,3,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
-	Pattern       string                 `protobuf:"bytes,4,opt,name=pattern,proto3" json:"pattern,omitempty"`
-	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	GenreId       string                 `protobuf:"bytes,1,opt,name=genre_id,json=genreId,proto3" json:"genre_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Keyword) Reset() {
-	*x = Keyword{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[29]
+func (x *CollectTrendingByGenreRequest) Reset() {
+	*x = CollectTrendingByGenreRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Keyword) String() string {
+func (x *CollectTrendingByGenreRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Keyword) ProtoMessage() {}
+func (*CollectTrendingByGenreRequest) ProtoMessage() {}
 
-func (x *Keyword) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[29]
+func (x *CollectTrendingByGenreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1685,82 +4956,43 @@ func (x *Keyword) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Keyword.ProtoReflect.Descriptor instead.
-func (*Keyword) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{29}
+// Deprecated: Use CollectTrendingByGenreRequest.ProtoReflect.Descriptor instead.
+func (*CollectTrendingByGenreRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{85}
 }
 
-func (x *Keyword) GetId() string {
+func (x *CollectTrendingByGenreRequest) GetGenreId() string {
 	if x != nil {
-		return x.Id
+		return x.GenreId
 	}
 	return ""
 }
 
-func (x *Keyword) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
+type CollectTrendingByGenreResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	GenreCode       string                 `protobuf:"bytes,1,opt,name=genre_code,json=genreCode,proto3" json:"genre_code,omitempty"`
+	VideosProcessed int32                  `protobuf:"varint,2,opt,name=videos_processed,json=videosProcessed,proto3" json:"videos_processed,omitempty"`
+	VideosAdded     int32                  `protobuf:"varint,3,opt,name=videos_added,json=videosAdded,proto3" json:"videos_added,omitempty"`
+	DurationMs      int64                  `protobuf:"varint,4,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
-func (x *Keyword) GetFilterType() string {
-	if x != nil {
-		return x.FilterType
-	}
-	return ""
-}
-
-func (x *Keyword) GetPattern() string {
-	if x != nil {
-		return x.Pattern
-	}
-	return ""
-}
-
-func (x *Keyword) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *Keyword) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *Keyword) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
-type GetKeywordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetKeywordRequest) Reset() {
-	*x = GetKeywordRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[30]
+func (x *CollectTrendingByGenreResponse) Reset() {
+	*x = CollectTrendingByGenreResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetKeywordRequest) String() string {
+func (x *CollectTrendingByGenreResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetKeywordRequest) ProtoMessage() {}
+func (*CollectTrendingByGenreResponse) ProtoMessage() {}
 
-func (x *GetKeywordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[30]
+func (x *CollectTrendingByGenreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1771,207 +5003,60 @@ func (x *GetKeywordRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetKeywordRequest.ProtoReflect.Descriptor instead.
-func (*GetKeywordRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{30}
+// Deprecated: Use CollectTrendingByGenreResponse.ProtoReflect.Descriptor instead.
+func (*CollectTrendingByGenreResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{86}
 }
 
-func (x *GetKeywordRequest) GetId() string {
+func (x *CollectTrendingByGenreResponse) GetGenreCode() string {
 	if x != nil {
-		return x.Id
+		return x.GenreCode
 	}
 	return ""
 }
 
-type GetKeywordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetKeywordResponse) Reset() {
-	*x = GetKeywordResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[31]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetKeywordResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetKeywordResponse) ProtoMessage() {}
-
-func (x *GetKeywordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[31]
+func (x *CollectTrendingByGenreResponse) GetVideosProcessed() int32 {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetKeywordResponse.ProtoReflect.Descriptor instead.
-func (*GetKeywordResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{31}
-}
-
-func (x *GetKeywordResponse) GetKeyword() *Keyword {
-	if x != nil {
-		return x.Keyword
-	}
-	return nil
-}
-
-type ListKeywordsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	PageToken     string                 `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListKeywordsRequest) Reset() {
-	*x = ListKeywordsRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[32]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListKeywordsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListKeywordsRequest) ProtoMessage() {}
-
-func (x *ListKeywordsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[32]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListKeywordsRequest.ProtoReflect.Descriptor instead.
-func (*ListKeywordsRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{32}
-}
-
-func (x *ListKeywordsRequest) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
-
-func (x *ListKeywordsRequest) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
+		return x.VideosProcessed
 	}
 	return 0
 }
 
-func (x *ListKeywordsRequest) GetPageToken() string {
+func (x *CollectTrendingByGenreResponse) GetVideosAdded() int32 {
 	if x != nil {
-		return x.PageToken
-	}
-	return ""
-}
-
-type ListKeywordsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keywords      []*Keyword             `protobuf:"bytes,1,rep,name=keywords,proto3" json:"keywords,omitempty"`
-	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
-	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListKeywordsResponse) Reset() {
-	*x = ListKeywordsResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[33]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListKeywordsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListKeywordsResponse) ProtoMessage() {}
-
-func (x *ListKeywordsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[33]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListKeywordsResponse.ProtoReflect.Descriptor instead.
-func (*ListKeywordsResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{33}
-}
-
-func (x *ListKeywordsResponse) GetKeywords() []*Keyword {
-	if x != nil {
-		return x.Keywords
-	}
-	return nil
-}
-
-func (x *ListKeywordsResponse) GetNextPageToken() string {
-	if x != nil {
-		return x.NextPageToken
-	}
-	return ""
-}
-
-func (x *ListKeywordsResponse) GetTotalCount() int32 {
-	if x != nil {
-		return x.TotalCount
+		return x.VideosAdded
 	}
 	return 0
 }
 
-type CreateKeywordRequest struct {
+func (x *CollectTrendingByGenreResponse) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+type CollectAllTrendingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	FilterType    string                 `protobuf:"bytes,2,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
-	Pattern       string                 `protobuf:"bytes,3,opt,name=pattern,proto3" json:"pattern,omitempty"`
-	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateKeywordRequest) Reset() {
-	*x = CreateKeywordRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[34]
+func (x *CollectAllTrendingRequest) Reset() {
+	*x = CollectAllTrendingRequest{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateKeywordRequest) String() string {
+func (x *CollectAllTrendingRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateKeywordRequest) ProtoMessage() {}
+func (*CollectAllTrendingRequest) ProtoMessage() {}
 
-func (x *CreateKeywordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[34]
+func (x *CollectAllTrendingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1982,61 +5067,37 @@ func (x *CreateKeywordRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateKeywordRequest.ProtoReflect.Descriptor instead.
-func (*CreateKeywordRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{34}
+// Deprecated: Use CollectAllTrendingRequest.ProtoReflect.Descriptor instead.
+func (*CollectAllTrendingRequest) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{87}
 }
 
-func (x *CreateKeywordRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
+type CollectAllTrendingResponse struct {
+	state           protoimpl.MessageState            `protogen:"open.v1"`
+	GenresProcessed int32                             `protobuf:"varint,1,opt,name=genres_processed,json=genresProcessed,proto3" json:"genres_processed,omitempty"`
+	TotalVideos     int32                             `protobuf:"varint,2,opt,name=total_videos,json=totalVideos,proto3" json:"total_videos,omitempty"`
+	TotalAdded      int32                             `protobuf:"varint,3,opt,name=total_added,json=totalAdded,proto3" json:"total_added,omitempty"`
+	GenreResults    []*CollectTrendingByGenreResponse `protobuf:"bytes,4,rep,name=genre_results,json=genreResults,proto3" json:"genre_results,omitempty"`
+	DurationMs      int64                             `protobuf:"varint,5,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
-func (x *CreateKeywordRequest) GetFilterType() string {
-	if x != nil {
-		return x.FilterType
-	}
-	return ""
-}
-
-func (x *CreateKeywordRequest) GetPattern() string {
-	if x != nil {
-		return x.Pattern
-	}
-	return ""
-}
-
-func (x *CreateKeywordRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-type CreateKeywordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateKeywordResponse) Reset() {
-	*x = CreateKeywordResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[35]
+func (x *CollectAllTrendingResponse) Reset() {
+	*x = CollectAllTrendingResponse{}
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateKeywordResponse) String() string {
+func (x *CollectAllTrendingResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateKeywordResponse) ProtoMessage() {}
+func (*CollectAllTrendingResponse) ProtoMessage() {}
 
-func (x *CreateKeywordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[35]
+func (x *CollectAllTrendingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ingestion_v1_ingestion_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2047,237 +5108,73 @@ func (x *CreateKeywordResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateKeywordResponse.ProtoReflect.Descriptor instead.
-func (*CreateKeywordResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{35}
+// Deprecated: Use CollectAllTrendingResponse.ProtoReflect.Descriptor instead.
+func (*CollectAllTrendingResponse) Descriptor() ([]byte, []int) {
+	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{88}
 }
 
-func (x *CreateKeywordResponse) GetKeyword() *Keyword {
+func (x *CollectAllTrendingResponse) GetGenresProcessed() int32 {
 	if x != nil {
-		return x.Keyword
+		return x.GenresProcessed
+	}
+	return 0
+}
+
+func (x *CollectAllTrendingResponse) GetTotalVideos() int32 {
+	if x != nil {
+		return x.TotalVideos
+	}
+	return 0
+}
+
+func (x *CollectAllTrendingResponse) GetTotalAdded() int32 {
+	if x != nil {
+		return x.TotalAdded
+	}
+	return 0
+}
+
+func (x *CollectAllTrendingResponse) GetGenreResults() []*CollectTrendingByGenreResponse {
+	if x != nil {
+		return x.GenreResults
 	}
 	return nil
 }
 
-type UpdateKeywordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	FilterType    string                 `protobuf:"bytes,3,opt,name=filter_type,json=filterType,proto3" json:"filter_type,omitempty"`
-	Pattern       string                 `protobuf:"bytes,4,opt,name=pattern,proto3" json:"pattern,omitempty"`
-	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateKeywordRequest) Reset() {
-	*x = UpdateKeywordRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[36]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateKeywordRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateKeywordRequest) ProtoMessage() {}
-
-func (x *UpdateKeywordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[36]
+func (x *CollectAllTrendingResponse) GetDurationMs() int64 {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.DurationMs
 	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateKeywordRequest.ProtoReflect.Descriptor instead.
-func (*UpdateKeywordRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{36}
-}
-
-func (x *UpdateKeywordRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *UpdateKeywordRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UpdateKeywordRequest) GetFilterType() string {
-	if x != nil {
-		return x.FilterType
-	}
-	return ""
-}
-
-func (x *UpdateKeywordRequest) GetPattern() string {
-	if x != nil {
-		return x.Pattern
-	}
-	return ""
-}
-
-func (x *UpdateKeywordRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-type UpdateKeywordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keyword       *Keyword               `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateKeywordResponse) Reset() {
-	*x = UpdateKeywordResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[37]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateKeywordResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateKeywordResponse) ProtoMessage() {}
-
-func (x *UpdateKeywordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[37]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateKeywordResponse.ProtoReflect.Descriptor instead.
-func (*UpdateKeywordResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{37}
-}
-
-func (x *UpdateKeywordResponse) GetKeyword() *Keyword {
-	if x != nil {
-		return x.Keyword
-	}
-	return nil
-}
-
-type DeleteKeywordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteKeywordRequest) Reset() {
-	*x = DeleteKeywordRequest{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[38]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteKeywordRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteKeywordRequest) ProtoMessage() {}
-
-func (x *DeleteKeywordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[38]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteKeywordRequest.ProtoReflect.Descriptor instead.
-func (*DeleteKeywordRequest) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{38}
-}
-
-func (x *DeleteKeywordRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type DeleteKeywordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteKeywordResponse) Reset() {
-	*x = DeleteKeywordResponse{}
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[39]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteKeywordResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteKeywordResponse) ProtoMessage() {}
-
-func (x *DeleteKeywordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ingestion_v1_ingestion_proto_msgTypes[39]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteKeywordResponse.ProtoReflect.Descriptor instead.
-func (*DeleteKeywordResponse) Descriptor() ([]byte, []int) {
-	return file_ingestion_v1_ingestion_proto_rawDescGZIP(), []int{39}
+	return 0
 }
 
 var File_ingestion_v1_ingestion_proto protoreflect.FileDescriptor
 
 const file_ingestion_v1_ingestion_proto_rawDesc = "" +
 	"\n" +
-	"\x1cingestion/v1/ingestion.proto\x12\fingestion.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd3\x02\n" +
+	"\x1cingestion/v1/ingestion.proto\x12\fingestion.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfe\x03\n" +
 	"\aChannel\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
 	"\x12youtube_channel_id\x18\x02 \x01(\tR\x10youtubeChannelId\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12#\n" +
-	"\rthumbnail_url\x18\x04 \x01(\tR\fthumbnailUrl\x12\x1e\n" +
+	"\rthumbnail_url\x18\x04 \x01(\tR\fthumbnailUrl\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x18\n" +
+	"\acountry\x18\x06 \x01(\tR\acountry\x12\x1d\n" +
 	"\n" +
-	"subscribed\x18\x05 \x01(\bR\n" +
+	"view_count\x18\a \x01(\x03R\tviewCount\x12-\n" +
+	"\x12subscription_count\x18\b \x01(\x03R\x11subscriptionCount\x12\x1f\n" +
+	"\vvideo_count\x18\t \x01(\x03R\n" +
+	"videoCount\x12\x1e\n" +
+	"\n" +
+	"subscribed\x18\n" +
+	" \x01(\bR\n" +
 	"subscribed\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"deleted_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"#\n" +
+	"deleted_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"#\n" +
 	"\x11GetChannelRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"E\n" +
 	"\x12GetChannelResponse\x12/\n" +
@@ -2301,56 +5198,329 @@ const file_ingestion_v1_ingestion_proto_rawDesc = "" +
 	"\n" +
 	"channel_id\x18\x01 \x01(\tR\tchannelId\"M\n" +
 	"\x1aUnsubscribeChannelResponse\x12/\n" +
-	"\achannel\x18\x01 \x01(\v2\x15.ingestion.v1.ChannelR\achannel\"\xbb\x03\n" +
+	"\achannel\x18\x01 \x01(\v2\x15.ingestion.v1.ChannelR\achannel\"\xb3\x03\n" +
 	"\x05Video\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
 	"\x10youtube_video_id\x18\x02 \x01(\tR\x0eyoutubeVideoId\x12,\n" +
 	"\x12youtube_channel_id\x18\x03 \x01(\tR\x10youtubeChannelId\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\x12#\n" +
-	"\rthumbnail_url\x18\x05 \x01(\tR\fthumbnailUrl\x12=\n" +
-	"\fpublished_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\vpublishedAt\x12\x1f\n" +
-	"\vcategory_id\x18\a \x01(\x05R\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12=\n" +
+	"\fpublished_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vpublishedAt\x12\x1f\n" +
+	"\vcategory_id\x18\x06 \x01(\x05R\n" +
 	"categoryId\x129\n" +
 	"\n" +
-	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"deleted_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"!\n" +
+	"deleted_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\x12\x1b\n" +
+	"\tgenre_ids\x18\n" +
+	" \x03(\tR\bgenreIds\"!\n" +
 	"\x0fGetVideoRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"=\n" +
 	"\x10GetVideoResponse\x12)\n" +
-	"\x05video\x18\x01 \x01(\v2\x13.ingestion.v1.VideoR\x05video\"\xb3\x01\n" +
+	"\x05video\x18\x01 \x01(\v2\x13.ingestion.v1.VideoR\x05video\"\xce\x01\n" +
 	"\x11ListVideosRequest\x12\x1d\n" +
 	"\n" +
 	"channel_id\x18\x01 \x01(\tR\tchannelId\x12C\n" +
 	"\x0fpublished_after\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x0epublishedAfter\x12\x1b\n" +
 	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x04 \x01(\tR\tpageToken\"\x8a\x01\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken\x12\x19\n" +
+	"\bgenre_id\x18\x05 \x01(\tR\agenreId\"\x8a\x01\n" +
 	"\x12ListVideosResponse\x12+\n" +
 	"\x06videos\x18\x01 \x03(\v2\x13.ingestion.v1.VideoR\x06videos\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\"Z\n" +
-	"\x16CollectTrendingRequest\x12\x1f\n" +
-	"\vregion_code\x18\x01 \x01(\tR\n" +
-	"regionCode\x12\x1f\n" +
-	"\vcategory_id\x18\x02 \x01(\x05R\n" +
-	"categoryId\"\x88\x01\n" +
+	"totalCount\"3\n" +
+	"\x16CollectTrendingRequest\x12\x19\n" +
+	"\bgenre_id\x18\x01 \x01(\tR\agenreId\"\xa7\x01\n" +
 	"\x17CollectTrendingResponse\x12)\n" +
 	"\x10videos_processed\x18\x01 \x01(\x05R\x0fvideosProcessed\x12!\n" +
 	"\fvideos_added\x18\x02 \x01(\x05R\vvideosAdded\x12\x1f\n" +
 	"\vduration_ms\x18\x03 \x01(\x03R\n" +
-	"durationMs\"\x1d\n" +
+	"durationMs\x12\x1d\n" +
+	"\n" +
+	"genre_code\x18\x04 \x01(\tR\tgenreCode\"\x1d\n" +
 	"\x1bCollectSubscriptionsRequest\"\xbc\x01\n" +
 	"\x1cCollectSubscriptionsResponse\x12-\n" +
 	"\x12channels_processed\x18\x01 \x01(\x05R\x11channelsProcessed\x12)\n" +
 	"\x10videos_processed\x18\x02 \x01(\x05R\x0fvideosProcessed\x12!\n" +
 	"\fvideos_added\x18\x03 \x01(\x05R\vvideosAdded\x12\x1f\n" +
 	"\vduration_ms\x18\x04 \x01(\x03R\n" +
-	"durationMs\"\xe4\x02\n" +
+	"durationMs\"\xaf\x02\n" +
+	"\x05Genre\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
+	"\blanguage\x18\x04 \x01(\tR\blanguage\x12\x1f\n" +
+	"\vregion_code\x18\x05 \x01(\tR\n" +
+	"regionCode\x12!\n" +
+	"\fcategory_ids\x18\x06 \x03(\x05R\vcategoryIds\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\x129\n" +
+	"\n" +
+	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"r\n" +
+	"\x11ListGenresRequest\x12!\n" +
+	"\fenabled_only\x18\x01 \x01(\bR\venabledOnly\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\"\x8a\x01\n" +
+	"\x12ListGenresResponse\x12+\n" +
+	"\x06genres\x18\x01 \x03(\v2\x13.ingestion.v1.GenreR\x06genres\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"!\n" +
+	"\x0fGetGenreRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"=\n" +
+	"\x10GetGenreResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"+\n" +
+	"\x15GetGenreByCodeRequest\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\"C\n" +
+	"\x16GetGenreByCodeResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"\x9c\x01\n" +
+	"\x12CreateGenreRequest\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1f\n" +
+	"\vregion_code\x18\x04 \x01(\tR\n" +
+	"regionCode\x12!\n" +
+	"\fcategory_ids\x18\x05 \x03(\x05R\vcategoryIds\"@\n" +
+	"\x13CreateGenreResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"\xac\x01\n" +
+	"\x12UpdateGenreRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
+	"\blanguage\x18\x04 \x01(\tR\blanguage\x12\x1f\n" +
+	"\vregion_code\x18\x05 \x01(\tR\n" +
+	"regionCode\x12!\n" +
+	"\fcategory_ids\x18\x06 \x03(\x05R\vcategoryIds\"@\n" +
+	"\x13UpdateGenreResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"$\n" +
+	"\x12EnableGenreRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"@\n" +
+	"\x13EnableGenreResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"%\n" +
+	"\x13DisableGenreRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"A\n" +
+	"\x14DisableGenreResponse\x12)\n" +
+	"\x05genre\x18\x01 \x01(\v2\x13.ingestion.v1.GenreR\x05genre\"\xec\x01\n" +
+	"\x0fYouTubeCategory\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
+	"\n" +
+	"channel_id\x18\x03 \x01(\tR\tchannelId\x12\x1e\n" +
+	"\n" +
+	"assignable\x18\x04 \x01(\bR\n" +
+	"assignable\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x83\x01\n" +
+	"\x1cListYouTubeCategoriesRequest\x12'\n" +
+	"\x0fassignable_only\x18\x01 \x01(\bR\x0eassignableOnly\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\"\xa7\x01\n" +
+	"\x1dListYouTubeCategoriesResponse\x12=\n" +
+	"\n" +
+	"categories\x18\x01 \x03(\v2\x1d.ingestion.v1.YouTubeCategoryR\n" +
+	"categories\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"+\n" +
+	"\x19GetYouTubeCategoryRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"W\n" +
+	"\x1aGetYouTubeCategoryResponse\x129\n" +
+	"\bcategory\x18\x01 \x01(\v2\x1d.ingestion.v1.YouTubeCategoryR\bcategory\"\x83\x01\n" +
+	"\x1cUpdateYouTubeCategoryRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
+	"\n" +
+	"channel_id\x18\x03 \x01(\tR\tchannelId\x12\x1e\n" +
+	"\n" +
+	"assignable\x18\x04 \x01(\bR\n" +
+	"assignable\"Z\n" +
+	"\x1dUpdateYouTubeCategoryResponse\x129\n" +
+	"\bcategory\x18\x01 \x01(\v2\x1d.ingestion.v1.YouTubeCategoryR\bcategory\"\x93\x03\n" +
+	"\aKeyword\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bgenre_id\x18\x02 \x01(\tR\agenreId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1f\n" +
+	"\vfilter_type\x18\x04 \x01(\tR\n" +
+	"filterType\x12\x18\n" +
+	"\apattern\x18\x05 \x01(\tR\apattern\x12!\n" +
+	"\ftarget_field\x18\x06 \x01(\tR\vtargetField\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\x12 \n" +
+	"\vdescription\x18\b \x01(\tR\vdescription\x129\n" +
+	"\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"\n" +
+	"deleted_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"#\n" +
+	"\x11GetKeywordRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"E\n" +
+	"\x12GetKeywordResponse\x12/\n" +
+	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"\x8a\x01\n" +
+	"\x13ListKeywordsRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\x12!\n" +
+	"\fenabled_only\x18\x04 \x01(\bR\venabledOnly\"\x92\x01\n" +
+	"\x14ListKeywordsResponse\x121\n" +
+	"\bkeywords\x18\x01 \x03(\v2\x15.ingestion.v1.KeywordR\bkeywords\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"\x96\x01\n" +
+	"\x1aListKeywordsByGenreRequest\x12\x19\n" +
+	"\bgenre_id\x18\x01 \x01(\tR\agenreId\x12!\n" +
+	"\fenabled_only\x18\x02 \x01(\bR\venabledOnly\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken\"\x99\x01\n" +
+	"\x1bListKeywordsByGenreResponse\x121\n" +
+	"\bkeywords\x18\x01 \x03(\v2\x15.ingestion.v1.KeywordR\bkeywords\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"\xc5\x01\n" +
+	"\x14CreateKeywordRequest\x12\x19\n" +
+	"\bgenre_id\x18\x01 \x01(\tR\agenreId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
+	"\vfilter_type\x18\x03 \x01(\tR\n" +
+	"filterType\x12\x18\n" +
+	"\apattern\x18\x04 \x01(\tR\apattern\x12!\n" +
+	"\ftarget_field\x18\x05 \x01(\tR\vtargetField\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\"H\n" +
+	"\x15CreateKeywordResponse\x12/\n" +
+	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"\xd4\x01\n" +
+	"\x14UpdateKeywordRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
+	"\vfilter_type\x18\x03 \x01(\tR\n" +
+	"filterType\x12\x18\n" +
+	"\apattern\x18\x04 \x01(\tR\apattern\x12!\n" +
+	"\ftarget_field\x18\x05 \x01(\tR\vtargetField\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\"H\n" +
+	"\x15UpdateKeywordResponse\x12/\n" +
+	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"&\n" +
+	"\x14EnableKeywordRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"H\n" +
+	"\x15EnableKeywordResponse\x12/\n" +
+	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"'\n" +
+	"\x15DisableKeywordRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"I\n" +
+	"\x16DisableKeywordResponse\x12/\n" +
+	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"&\n" +
+	"\x14DeleteKeywordRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x17\n" +
+	"\x15DeleteKeywordResponse\"}\n" +
+	"\n" +
+	"VideoGenre\x12\x19\n" +
+	"\bvideo_id\x18\x01 \x01(\tR\avideoId\x12\x19\n" +
+	"\bgenre_id\x18\x02 \x01(\tR\agenreId\x129\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"3\n" +
+	"\x16ListVideoGenresRequest\x12\x19\n" +
+	"\bvideo_id\x18\x01 \x01(\tR\avideoId\"V\n" +
+	"\x17ListVideoGenresResponse\x12;\n" +
+	"\fvideo_genres\x18\x01 \x03(\v2\x18.ingestion.v1.VideoGenreR\vvideoGenres\"Q\n" +
+	"\x19AssignVideoToGenreRequest\x12\x19\n" +
+	"\bvideo_id\x18\x01 \x01(\tR\avideoId\x12\x19\n" +
+	"\bgenre_id\x18\x02 \x01(\tR\agenreId\"W\n" +
+	"\x1aAssignVideoToGenreResponse\x129\n" +
+	"\vvideo_genre\x18\x01 \x01(\v2\x18.ingestion.v1.VideoGenreR\n" +
+	"videoGenre\"S\n" +
+	"\x1bRemoveVideoFromGenreRequest\x12\x19\n" +
+	"\bvideo_id\x18\x01 \x01(\tR\avideoId\x12\x19\n" +
+	"\bgenre_id\x18\x02 \x01(\tR\agenreId\"\x1e\n" +
+	"\x1cRemoveVideoFromGenreResponse\"\xb5\x04\n" +
+	"\bAuditLog\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bactor_id\x18\x02 \x01(\tR\aactorId\x12\x1f\n" +
+	"\vactor_email\x18\x03 \x01(\tR\n" +
+	"actorEmail\x12\x16\n" +
+	"\x06action\x18\x04 \x01(\tR\x06action\x12#\n" +
+	"\rresource_type\x18\x05 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x06 \x01(\tR\n" +
+	"resourceId\x12D\n" +
+	"\n" +
+	"old_values\x18\a \x03(\v2%.ingestion.v1.AuditLog.OldValuesEntryR\toldValues\x12D\n" +
+	"\n" +
+	"new_values\x18\b \x03(\v2%.ingestion.v1.AuditLog.NewValuesEntryR\tnewValues\x12\x1d\n" +
+	"\n" +
+	"ip_address\x18\t \x01(\tR\tipAddress\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\n" +
+	" \x01(\tR\tuserAgent\x129\n" +
+	"\n" +
+	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x1a<\n" +
+	"\x0eOldValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a<\n" +
+	"\x0eNewValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb3\x01\n" +
+	"\x14ListAuditLogsRequest\x12\x19\n" +
+	"\bactor_id\x18\x01 \x01(\tR\aactorId\x12#\n" +
+	"\rresource_type\x18\x02 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x03 \x01(\tR\n" +
+	"resourceId\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x05 \x01(\tR\tpageToken\"\x97\x01\n" +
+	"\x15ListAuditLogsResponse\x125\n" +
+	"\n" +
+	"audit_logs\x18\x01 \x03(\v2\x16.ingestion.v1.AuditLogR\tauditLogs\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"$\n" +
+	"\x12GetAuditLogRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"J\n" +
+	"\x13GetAuditLogResponse\x123\n" +
+	"\taudit_log\x18\x01 \x01(\v2\x16.ingestion.v1.AuditLogR\bauditLog\"\xb5\x04\n" +
+	"\bBatchJob\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bjob_type\x18\x02 \x01(\tR\ajobType\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12F\n" +
+	"\n" +
+	"parameters\x18\x04 \x03(\v2&.ingestion.v1.BatchJob.ParametersEntryR\n" +
+	"parameters\x129\n" +
+	"\n" +
+	"started_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12=\n" +
+	"\fcompleted_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\x12#\n" +
+	"\rerror_message\x18\a \x01(\tR\ferrorMessage\x12F\n" +
+	"\n" +
+	"statistics\x18\b \x03(\v2&.ingestion.v1.BatchJob.StatisticsEntryR\n" +
+	"statistics\x129\n" +
+	"\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x1a=\n" +
+	"\x0fParametersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a=\n" +
+	"\x0fStatisticsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x85\x01\n" +
+	"\x14ListBatchJobsRequest\x12\x19\n" +
+	"\bjob_type\x18\x01 \x01(\tR\ajobType\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken\"\x97\x01\n" +
+	"\x15ListBatchJobsResponse\x125\n" +
+	"\n" +
+	"batch_jobs\x18\x01 \x03(\v2\x16.ingestion.v1.BatchJobR\tbatchJobs\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\"$\n" +
+	"\x12GetBatchJobRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"J\n" +
+	"\x13GetBatchJobResponse\x123\n" +
+	"\tbatch_job\x18\x01 \x01(\v2\x16.ingestion.v1.BatchJobR\bbatchJob\"\xe4\x02\n" +
 	"\rVideoSnapshot\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\bvideo_id\x18\x02 \x01(\tR\avideoId\x12'\n" +
@@ -2390,52 +5560,25 @@ const file_ingestion_v1_ingestion_proto_rawDesc = "" +
 	"\x12channels_processed\x18\x01 \x01(\x05R\x11channelsProcessed\x12)\n" +
 	"\x10channels_updated\x18\x02 \x01(\x05R\x0fchannelsUpdated\x12\x1f\n" +
 	"\vduration_ms\x18\x03 \x01(\x03R\n" +
-	"durationMs\"\x80\x02\n" +
-	"\aKeyword\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
-	"\vfilter_type\x18\x03 \x01(\tR\n" +
-	"filterType\x12\x18\n" +
-	"\apattern\x18\x04 \x01(\tR\apattern\x12 \n" +
-	"\vdescription\x18\x05 \x01(\tR\vdescription\x129\n" +
+	"durationMs\":\n" +
+	"\x1dCollectTrendingByGenreRequest\x12\x19\n" +
+	"\bgenre_id\x18\x01 \x01(\tR\agenreId\"\xae\x01\n" +
+	"\x1eCollectTrendingByGenreResponse\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"#\n" +
-	"\x11GetKeywordRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"E\n" +
-	"\x12GetKeywordResponse\x12/\n" +
-	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"g\n" +
-	"\x13ListKeywordsRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1d\n" +
-	"\n" +
-	"page_token\x18\x03 \x01(\tR\tpageToken\"\x92\x01\n" +
-	"\x14ListKeywordsResponse\x121\n" +
-	"\bkeywords\x18\x01 \x03(\v2\x15.ingestion.v1.KeywordR\bkeywords\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
-	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\"\x87\x01\n" +
-	"\x14CreateKeywordRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
-	"\vfilter_type\x18\x02 \x01(\tR\n" +
-	"filterType\x12\x18\n" +
-	"\apattern\x18\x03 \x01(\tR\apattern\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\"H\n" +
-	"\x15CreateKeywordResponse\x12/\n" +
-	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"\x97\x01\n" +
-	"\x14UpdateKeywordRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
-	"\vfilter_type\x18\x03 \x01(\tR\n" +
-	"filterType\x12\x18\n" +
-	"\apattern\x18\x04 \x01(\tR\apattern\x12 \n" +
-	"\vdescription\x18\x05 \x01(\tR\vdescription\"H\n" +
-	"\x15UpdateKeywordResponse\x12/\n" +
-	"\akeyword\x18\x01 \x01(\v2\x15.ingestion.v1.KeywordR\akeyword\"&\n" +
-	"\x14DeleteKeywordRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x17\n" +
-	"\x15DeleteKeywordResponse2\xf5\f\n" +
+	"genre_code\x18\x01 \x01(\tR\tgenreCode\x12)\n" +
+	"\x10videos_processed\x18\x02 \x01(\x05R\x0fvideosProcessed\x12!\n" +
+	"\fvideos_added\x18\x03 \x01(\x05R\vvideosAdded\x12\x1f\n" +
+	"\vduration_ms\x18\x04 \x01(\x03R\n" +
+	"durationMs\"\x1b\n" +
+	"\x19CollectAllTrendingRequest\"\xff\x01\n" +
+	"\x1aCollectAllTrendingResponse\x12)\n" +
+	"\x10genres_processed\x18\x01 \x01(\x05R\x0fgenresProcessed\x12!\n" +
+	"\ftotal_videos\x18\x02 \x01(\x05R\vtotalVideos\x12\x1f\n" +
+	"\vtotal_added\x18\x03 \x01(\x05R\n" +
+	"totalAdded\x12Q\n" +
+	"\rgenre_results\x18\x04 \x03(\v2,.ingestion.v1.CollectTrendingByGenreResponseR\fgenreResults\x12\x1f\n" +
+	"\vduration_ms\x18\x05 \x01(\x03R\n" +
+	"durationMs2\xa3\x1d\n" +
 	"\x10IngestionService\x12O\n" +
 	"\n" +
 	"GetChannel\x12\x1f.ingestion.v1.GetChannelRequest\x1a .ingestion.v1.GetChannelResponse\x12U\n" +
@@ -2451,13 +5594,36 @@ const file_ingestion_v1_ingestion_proto_rawDesc = "" +
 	"\vGetSnapshot\x12 .ingestion.v1.GetSnapshotRequest\x1a!.ingestion.v1.GetSnapshotResponse\x12X\n" +
 	"\rListSnapshots\x12\".ingestion.v1.ListSnapshotsRequest\x1a#.ingestion.v1.ListSnapshotsResponse\x12O\n" +
 	"\n" +
+	"ListGenres\x12\x1f.ingestion.v1.ListGenresRequest\x1a .ingestion.v1.ListGenresResponse\x12I\n" +
+	"\bGetGenre\x12\x1d.ingestion.v1.GetGenreRequest\x1a\x1e.ingestion.v1.GetGenreResponse\x12[\n" +
+	"\x0eGetGenreByCode\x12#.ingestion.v1.GetGenreByCodeRequest\x1a$.ingestion.v1.GetGenreByCodeResponse\x12R\n" +
+	"\vCreateGenre\x12 .ingestion.v1.CreateGenreRequest\x1a!.ingestion.v1.CreateGenreResponse\x12R\n" +
+	"\vUpdateGenre\x12 .ingestion.v1.UpdateGenreRequest\x1a!.ingestion.v1.UpdateGenreResponse\x12R\n" +
+	"\vEnableGenre\x12 .ingestion.v1.EnableGenreRequest\x1a!.ingestion.v1.EnableGenreResponse\x12U\n" +
+	"\fDisableGenre\x12!.ingestion.v1.DisableGenreRequest\x1a\".ingestion.v1.DisableGenreResponse\x12p\n" +
+	"\x15ListYouTubeCategories\x12*.ingestion.v1.ListYouTubeCategoriesRequest\x1a+.ingestion.v1.ListYouTubeCategoriesResponse\x12g\n" +
+	"\x12GetYouTubeCategory\x12'.ingestion.v1.GetYouTubeCategoryRequest\x1a(.ingestion.v1.GetYouTubeCategoryResponse\x12p\n" +
+	"\x15UpdateYouTubeCategory\x12*.ingestion.v1.UpdateYouTubeCategoryRequest\x1a+.ingestion.v1.UpdateYouTubeCategoryResponse\x12O\n" +
+	"\n" +
 	"GetKeyword\x12\x1f.ingestion.v1.GetKeywordRequest\x1a .ingestion.v1.GetKeywordResponse\x12U\n" +
-	"\fListKeywords\x12!.ingestion.v1.ListKeywordsRequest\x1a\".ingestion.v1.ListKeywordsResponse\x12X\n" +
+	"\fListKeywords\x12!.ingestion.v1.ListKeywordsRequest\x1a\".ingestion.v1.ListKeywordsResponse\x12j\n" +
+	"\x13ListKeywordsByGenre\x12(.ingestion.v1.ListKeywordsByGenreRequest\x1a).ingestion.v1.ListKeywordsByGenreResponse\x12X\n" +
 	"\rCreateKeyword\x12\".ingestion.v1.CreateKeywordRequest\x1a#.ingestion.v1.CreateKeywordResponse\x12X\n" +
 	"\rUpdateKeyword\x12\".ingestion.v1.UpdateKeywordRequest\x1a#.ingestion.v1.UpdateKeywordResponse\x12X\n" +
-	"\rDeleteKeyword\x12\".ingestion.v1.DeleteKeywordRequest\x1a#.ingestion.v1.DeleteKeywordResponse\x12d\n" +
+	"\rEnableKeyword\x12\".ingestion.v1.EnableKeywordRequest\x1a#.ingestion.v1.EnableKeywordResponse\x12[\n" +
+	"\x0eDisableKeyword\x12#.ingestion.v1.DisableKeywordRequest\x1a$.ingestion.v1.DisableKeywordResponse\x12X\n" +
+	"\rDeleteKeyword\x12\".ingestion.v1.DeleteKeywordRequest\x1a#.ingestion.v1.DeleteKeywordResponse\x12^\n" +
+	"\x0fListVideoGenres\x12$.ingestion.v1.ListVideoGenresRequest\x1a%.ingestion.v1.ListVideoGenresResponse\x12g\n" +
+	"\x12AssignVideoToGenre\x12'.ingestion.v1.AssignVideoToGenreRequest\x1a(.ingestion.v1.AssignVideoToGenreResponse\x12m\n" +
+	"\x14RemoveVideoFromGenre\x12).ingestion.v1.RemoveVideoFromGenreRequest\x1a*.ingestion.v1.RemoveVideoFromGenreResponse\x12X\n" +
+	"\rListAuditLogs\x12\".ingestion.v1.ListAuditLogsRequest\x1a#.ingestion.v1.ListAuditLogsResponse\x12R\n" +
+	"\vGetAuditLog\x12 .ingestion.v1.GetAuditLogRequest\x1a!.ingestion.v1.GetAuditLogResponse\x12X\n" +
+	"\rListBatchJobs\x12\".ingestion.v1.ListBatchJobsRequest\x1a#.ingestion.v1.ListBatchJobsResponse\x12R\n" +
+	"\vGetBatchJob\x12 .ingestion.v1.GetBatchJobRequest\x1a!.ingestion.v1.GetBatchJobResponse\x12d\n" +
 	"\x11ScheduleSnapshots\x12&.ingestion.v1.ScheduleSnapshotsRequest\x1a'.ingestion.v1.ScheduleSnapshotsResponse\x12[\n" +
-	"\x0eUpdateChannels\x12#.ingestion.v1.UpdateChannelsRequest\x1a$.ingestion.v1.UpdateChannelsResponseBLZJgithub.com/YukiOnishi1129/youtube-analytics/proto/ingestion/v1;ingestionv1b\x06proto3"
+	"\x0eUpdateChannels\x12#.ingestion.v1.UpdateChannelsRequest\x1a$.ingestion.v1.UpdateChannelsResponse\x12s\n" +
+	"\x16CollectTrendingByGenre\x12+.ingestion.v1.CollectTrendingByGenreRequest\x1a,.ingestion.v1.CollectTrendingByGenreResponse\x12g\n" +
+	"\x12CollectAllTrending\x12'.ingestion.v1.CollectAllTrendingRequest\x1a(.ingestion.v1.CollectAllTrendingResponseBLZJgithub.com/YukiOnishi1129/youtube-analytics/proto/ingestion/v1;ingestionv1b\x06proto3"
 
 var (
 	file_ingestion_v1_ingestion_proto_rawDescOnce sync.Once
@@ -2471,117 +5637,248 @@ func file_ingestion_v1_ingestion_proto_rawDescGZIP() []byte {
 	return file_ingestion_v1_ingestion_proto_rawDescData
 }
 
-var file_ingestion_v1_ingestion_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
+var file_ingestion_v1_ingestion_proto_msgTypes = make([]protoimpl.MessageInfo, 93)
 var file_ingestion_v1_ingestion_proto_goTypes = []any{
-	(*Channel)(nil),                      // 0: ingestion.v1.Channel
-	(*GetChannelRequest)(nil),            // 1: ingestion.v1.GetChannelRequest
-	(*GetChannelResponse)(nil),           // 2: ingestion.v1.GetChannelResponse
-	(*ListChannelsRequest)(nil),          // 3: ingestion.v1.ListChannelsRequest
-	(*ListChannelsResponse)(nil),         // 4: ingestion.v1.ListChannelsResponse
-	(*SubscribeChannelRequest)(nil),      // 5: ingestion.v1.SubscribeChannelRequest
-	(*SubscribeChannelResponse)(nil),     // 6: ingestion.v1.SubscribeChannelResponse
-	(*UnsubscribeChannelRequest)(nil),    // 7: ingestion.v1.UnsubscribeChannelRequest
-	(*UnsubscribeChannelResponse)(nil),   // 8: ingestion.v1.UnsubscribeChannelResponse
-	(*Video)(nil),                        // 9: ingestion.v1.Video
-	(*GetVideoRequest)(nil),              // 10: ingestion.v1.GetVideoRequest
-	(*GetVideoResponse)(nil),             // 11: ingestion.v1.GetVideoResponse
-	(*ListVideosRequest)(nil),            // 12: ingestion.v1.ListVideosRequest
-	(*ListVideosResponse)(nil),           // 13: ingestion.v1.ListVideosResponse
-	(*CollectTrendingRequest)(nil),       // 14: ingestion.v1.CollectTrendingRequest
-	(*CollectTrendingResponse)(nil),      // 15: ingestion.v1.CollectTrendingResponse
-	(*CollectSubscriptionsRequest)(nil),  // 16: ingestion.v1.CollectSubscriptionsRequest
-	(*CollectSubscriptionsResponse)(nil), // 17: ingestion.v1.CollectSubscriptionsResponse
-	(*VideoSnapshot)(nil),                // 18: ingestion.v1.VideoSnapshot
-	(*CreateSnapshotRequest)(nil),        // 19: ingestion.v1.CreateSnapshotRequest
-	(*CreateSnapshotResponse)(nil),       // 20: ingestion.v1.CreateSnapshotResponse
-	(*GetSnapshotRequest)(nil),           // 21: ingestion.v1.GetSnapshotRequest
-	(*GetSnapshotResponse)(nil),          // 22: ingestion.v1.GetSnapshotResponse
-	(*ListSnapshotsRequest)(nil),         // 23: ingestion.v1.ListSnapshotsRequest
-	(*ListSnapshotsResponse)(nil),        // 24: ingestion.v1.ListSnapshotsResponse
-	(*ScheduleSnapshotsRequest)(nil),     // 25: ingestion.v1.ScheduleSnapshotsRequest
-	(*ScheduleSnapshotsResponse)(nil),    // 26: ingestion.v1.ScheduleSnapshotsResponse
-	(*UpdateChannelsRequest)(nil),        // 27: ingestion.v1.UpdateChannelsRequest
-	(*UpdateChannelsResponse)(nil),       // 28: ingestion.v1.UpdateChannelsResponse
-	(*Keyword)(nil),                      // 29: ingestion.v1.Keyword
-	(*GetKeywordRequest)(nil),            // 30: ingestion.v1.GetKeywordRequest
-	(*GetKeywordResponse)(nil),           // 31: ingestion.v1.GetKeywordResponse
-	(*ListKeywordsRequest)(nil),          // 32: ingestion.v1.ListKeywordsRequest
-	(*ListKeywordsResponse)(nil),         // 33: ingestion.v1.ListKeywordsResponse
-	(*CreateKeywordRequest)(nil),         // 34: ingestion.v1.CreateKeywordRequest
-	(*CreateKeywordResponse)(nil),        // 35: ingestion.v1.CreateKeywordResponse
-	(*UpdateKeywordRequest)(nil),         // 36: ingestion.v1.UpdateKeywordRequest
-	(*UpdateKeywordResponse)(nil),        // 37: ingestion.v1.UpdateKeywordResponse
-	(*DeleteKeywordRequest)(nil),         // 38: ingestion.v1.DeleteKeywordRequest
-	(*DeleteKeywordResponse)(nil),        // 39: ingestion.v1.DeleteKeywordResponse
-	(*timestamppb.Timestamp)(nil),        // 40: google.protobuf.Timestamp
+	(*Channel)(nil),                        // 0: ingestion.v1.Channel
+	(*GetChannelRequest)(nil),              // 1: ingestion.v1.GetChannelRequest
+	(*GetChannelResponse)(nil),             // 2: ingestion.v1.GetChannelResponse
+	(*ListChannelsRequest)(nil),            // 3: ingestion.v1.ListChannelsRequest
+	(*ListChannelsResponse)(nil),           // 4: ingestion.v1.ListChannelsResponse
+	(*SubscribeChannelRequest)(nil),        // 5: ingestion.v1.SubscribeChannelRequest
+	(*SubscribeChannelResponse)(nil),       // 6: ingestion.v1.SubscribeChannelResponse
+	(*UnsubscribeChannelRequest)(nil),      // 7: ingestion.v1.UnsubscribeChannelRequest
+	(*UnsubscribeChannelResponse)(nil),     // 8: ingestion.v1.UnsubscribeChannelResponse
+	(*Video)(nil),                          // 9: ingestion.v1.Video
+	(*GetVideoRequest)(nil),                // 10: ingestion.v1.GetVideoRequest
+	(*GetVideoResponse)(nil),               // 11: ingestion.v1.GetVideoResponse
+	(*ListVideosRequest)(nil),              // 12: ingestion.v1.ListVideosRequest
+	(*ListVideosResponse)(nil),             // 13: ingestion.v1.ListVideosResponse
+	(*CollectTrendingRequest)(nil),         // 14: ingestion.v1.CollectTrendingRequest
+	(*CollectTrendingResponse)(nil),        // 15: ingestion.v1.CollectTrendingResponse
+	(*CollectSubscriptionsRequest)(nil),    // 16: ingestion.v1.CollectSubscriptionsRequest
+	(*CollectSubscriptionsResponse)(nil),   // 17: ingestion.v1.CollectSubscriptionsResponse
+	(*Genre)(nil),                          // 18: ingestion.v1.Genre
+	(*ListGenresRequest)(nil),              // 19: ingestion.v1.ListGenresRequest
+	(*ListGenresResponse)(nil),             // 20: ingestion.v1.ListGenresResponse
+	(*GetGenreRequest)(nil),                // 21: ingestion.v1.GetGenreRequest
+	(*GetGenreResponse)(nil),               // 22: ingestion.v1.GetGenreResponse
+	(*GetGenreByCodeRequest)(nil),          // 23: ingestion.v1.GetGenreByCodeRequest
+	(*GetGenreByCodeResponse)(nil),         // 24: ingestion.v1.GetGenreByCodeResponse
+	(*CreateGenreRequest)(nil),             // 25: ingestion.v1.CreateGenreRequest
+	(*CreateGenreResponse)(nil),            // 26: ingestion.v1.CreateGenreResponse
+	(*UpdateGenreRequest)(nil),             // 27: ingestion.v1.UpdateGenreRequest
+	(*UpdateGenreResponse)(nil),            // 28: ingestion.v1.UpdateGenreResponse
+	(*EnableGenreRequest)(nil),             // 29: ingestion.v1.EnableGenreRequest
+	(*EnableGenreResponse)(nil),            // 30: ingestion.v1.EnableGenreResponse
+	(*DisableGenreRequest)(nil),            // 31: ingestion.v1.DisableGenreRequest
+	(*DisableGenreResponse)(nil),           // 32: ingestion.v1.DisableGenreResponse
+	(*YouTubeCategory)(nil),                // 33: ingestion.v1.YouTubeCategory
+	(*ListYouTubeCategoriesRequest)(nil),   // 34: ingestion.v1.ListYouTubeCategoriesRequest
+	(*ListYouTubeCategoriesResponse)(nil),  // 35: ingestion.v1.ListYouTubeCategoriesResponse
+	(*GetYouTubeCategoryRequest)(nil),      // 36: ingestion.v1.GetYouTubeCategoryRequest
+	(*GetYouTubeCategoryResponse)(nil),     // 37: ingestion.v1.GetYouTubeCategoryResponse
+	(*UpdateYouTubeCategoryRequest)(nil),   // 38: ingestion.v1.UpdateYouTubeCategoryRequest
+	(*UpdateYouTubeCategoryResponse)(nil),  // 39: ingestion.v1.UpdateYouTubeCategoryResponse
+	(*Keyword)(nil),                        // 40: ingestion.v1.Keyword
+	(*GetKeywordRequest)(nil),              // 41: ingestion.v1.GetKeywordRequest
+	(*GetKeywordResponse)(nil),             // 42: ingestion.v1.GetKeywordResponse
+	(*ListKeywordsRequest)(nil),            // 43: ingestion.v1.ListKeywordsRequest
+	(*ListKeywordsResponse)(nil),           // 44: ingestion.v1.ListKeywordsResponse
+	(*ListKeywordsByGenreRequest)(nil),     // 45: ingestion.v1.ListKeywordsByGenreRequest
+	(*ListKeywordsByGenreResponse)(nil),    // 46: ingestion.v1.ListKeywordsByGenreResponse
+	(*CreateKeywordRequest)(nil),           // 47: ingestion.v1.CreateKeywordRequest
+	(*CreateKeywordResponse)(nil),          // 48: ingestion.v1.CreateKeywordResponse
+	(*UpdateKeywordRequest)(nil),           // 49: ingestion.v1.UpdateKeywordRequest
+	(*UpdateKeywordResponse)(nil),          // 50: ingestion.v1.UpdateKeywordResponse
+	(*EnableKeywordRequest)(nil),           // 51: ingestion.v1.EnableKeywordRequest
+	(*EnableKeywordResponse)(nil),          // 52: ingestion.v1.EnableKeywordResponse
+	(*DisableKeywordRequest)(nil),          // 53: ingestion.v1.DisableKeywordRequest
+	(*DisableKeywordResponse)(nil),         // 54: ingestion.v1.DisableKeywordResponse
+	(*DeleteKeywordRequest)(nil),           // 55: ingestion.v1.DeleteKeywordRequest
+	(*DeleteKeywordResponse)(nil),          // 56: ingestion.v1.DeleteKeywordResponse
+	(*VideoGenre)(nil),                     // 57: ingestion.v1.VideoGenre
+	(*ListVideoGenresRequest)(nil),         // 58: ingestion.v1.ListVideoGenresRequest
+	(*ListVideoGenresResponse)(nil),        // 59: ingestion.v1.ListVideoGenresResponse
+	(*AssignVideoToGenreRequest)(nil),      // 60: ingestion.v1.AssignVideoToGenreRequest
+	(*AssignVideoToGenreResponse)(nil),     // 61: ingestion.v1.AssignVideoToGenreResponse
+	(*RemoveVideoFromGenreRequest)(nil),    // 62: ingestion.v1.RemoveVideoFromGenreRequest
+	(*RemoveVideoFromGenreResponse)(nil),   // 63: ingestion.v1.RemoveVideoFromGenreResponse
+	(*AuditLog)(nil),                       // 64: ingestion.v1.AuditLog
+	(*ListAuditLogsRequest)(nil),           // 65: ingestion.v1.ListAuditLogsRequest
+	(*ListAuditLogsResponse)(nil),          // 66: ingestion.v1.ListAuditLogsResponse
+	(*GetAuditLogRequest)(nil),             // 67: ingestion.v1.GetAuditLogRequest
+	(*GetAuditLogResponse)(nil),            // 68: ingestion.v1.GetAuditLogResponse
+	(*BatchJob)(nil),                       // 69: ingestion.v1.BatchJob
+	(*ListBatchJobsRequest)(nil),           // 70: ingestion.v1.ListBatchJobsRequest
+	(*ListBatchJobsResponse)(nil),          // 71: ingestion.v1.ListBatchJobsResponse
+	(*GetBatchJobRequest)(nil),             // 72: ingestion.v1.GetBatchJobRequest
+	(*GetBatchJobResponse)(nil),            // 73: ingestion.v1.GetBatchJobResponse
+	(*VideoSnapshot)(nil),                  // 74: ingestion.v1.VideoSnapshot
+	(*CreateSnapshotRequest)(nil),          // 75: ingestion.v1.CreateSnapshotRequest
+	(*CreateSnapshotResponse)(nil),         // 76: ingestion.v1.CreateSnapshotResponse
+	(*GetSnapshotRequest)(nil),             // 77: ingestion.v1.GetSnapshotRequest
+	(*GetSnapshotResponse)(nil),            // 78: ingestion.v1.GetSnapshotResponse
+	(*ListSnapshotsRequest)(nil),           // 79: ingestion.v1.ListSnapshotsRequest
+	(*ListSnapshotsResponse)(nil),          // 80: ingestion.v1.ListSnapshotsResponse
+	(*ScheduleSnapshotsRequest)(nil),       // 81: ingestion.v1.ScheduleSnapshotsRequest
+	(*ScheduleSnapshotsResponse)(nil),      // 82: ingestion.v1.ScheduleSnapshotsResponse
+	(*UpdateChannelsRequest)(nil),          // 83: ingestion.v1.UpdateChannelsRequest
+	(*UpdateChannelsResponse)(nil),         // 84: ingestion.v1.UpdateChannelsResponse
+	(*CollectTrendingByGenreRequest)(nil),  // 85: ingestion.v1.CollectTrendingByGenreRequest
+	(*CollectTrendingByGenreResponse)(nil), // 86: ingestion.v1.CollectTrendingByGenreResponse
+	(*CollectAllTrendingRequest)(nil),      // 87: ingestion.v1.CollectAllTrendingRequest
+	(*CollectAllTrendingResponse)(nil),     // 88: ingestion.v1.CollectAllTrendingResponse
+	nil,                                    // 89: ingestion.v1.AuditLog.OldValuesEntry
+	nil,                                    // 90: ingestion.v1.AuditLog.NewValuesEntry
+	nil,                                    // 91: ingestion.v1.BatchJob.ParametersEntry
+	nil,                                    // 92: ingestion.v1.BatchJob.StatisticsEntry
+	(*timestamppb.Timestamp)(nil),          // 93: google.protobuf.Timestamp
 }
 var file_ingestion_v1_ingestion_proto_depIdxs = []int32{
-	40, // 0: ingestion.v1.Channel.created_at:type_name -> google.protobuf.Timestamp
-	40, // 1: ingestion.v1.Channel.updated_at:type_name -> google.protobuf.Timestamp
-	40, // 2: ingestion.v1.Channel.deleted_at:type_name -> google.protobuf.Timestamp
+	93, // 0: ingestion.v1.Channel.created_at:type_name -> google.protobuf.Timestamp
+	93, // 1: ingestion.v1.Channel.updated_at:type_name -> google.protobuf.Timestamp
+	93, // 2: ingestion.v1.Channel.deleted_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: ingestion.v1.GetChannelResponse.channel:type_name -> ingestion.v1.Channel
 	0,  // 4: ingestion.v1.ListChannelsResponse.channels:type_name -> ingestion.v1.Channel
 	0,  // 5: ingestion.v1.SubscribeChannelResponse.channel:type_name -> ingestion.v1.Channel
 	0,  // 6: ingestion.v1.UnsubscribeChannelResponse.channel:type_name -> ingestion.v1.Channel
-	40, // 7: ingestion.v1.Video.published_at:type_name -> google.protobuf.Timestamp
-	40, // 8: ingestion.v1.Video.created_at:type_name -> google.protobuf.Timestamp
-	40, // 9: ingestion.v1.Video.updated_at:type_name -> google.protobuf.Timestamp
-	40, // 10: ingestion.v1.Video.deleted_at:type_name -> google.protobuf.Timestamp
+	93, // 7: ingestion.v1.Video.published_at:type_name -> google.protobuf.Timestamp
+	93, // 8: ingestion.v1.Video.created_at:type_name -> google.protobuf.Timestamp
+	93, // 9: ingestion.v1.Video.updated_at:type_name -> google.protobuf.Timestamp
+	93, // 10: ingestion.v1.Video.deleted_at:type_name -> google.protobuf.Timestamp
 	9,  // 11: ingestion.v1.GetVideoResponse.video:type_name -> ingestion.v1.Video
-	40, // 12: ingestion.v1.ListVideosRequest.published_after:type_name -> google.protobuf.Timestamp
+	93, // 12: ingestion.v1.ListVideosRequest.published_after:type_name -> google.protobuf.Timestamp
 	9,  // 13: ingestion.v1.ListVideosResponse.videos:type_name -> ingestion.v1.Video
-	40, // 14: ingestion.v1.VideoSnapshot.measured_at:type_name -> google.protobuf.Timestamp
-	40, // 15: ingestion.v1.VideoSnapshot.created_at:type_name -> google.protobuf.Timestamp
-	18, // 16: ingestion.v1.CreateSnapshotResponse.snapshot:type_name -> ingestion.v1.VideoSnapshot
-	18, // 17: ingestion.v1.GetSnapshotResponse.snapshot:type_name -> ingestion.v1.VideoSnapshot
-	18, // 18: ingestion.v1.ListSnapshotsResponse.snapshots:type_name -> ingestion.v1.VideoSnapshot
-	40, // 19: ingestion.v1.Keyword.created_at:type_name -> google.protobuf.Timestamp
-	40, // 20: ingestion.v1.Keyword.updated_at:type_name -> google.protobuf.Timestamp
-	29, // 21: ingestion.v1.GetKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
-	29, // 22: ingestion.v1.ListKeywordsResponse.keywords:type_name -> ingestion.v1.Keyword
-	29, // 23: ingestion.v1.CreateKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
-	29, // 24: ingestion.v1.UpdateKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
-	1,  // 25: ingestion.v1.IngestionService.GetChannel:input_type -> ingestion.v1.GetChannelRequest
-	3,  // 26: ingestion.v1.IngestionService.ListChannels:input_type -> ingestion.v1.ListChannelsRequest
-	5,  // 27: ingestion.v1.IngestionService.SubscribeChannel:input_type -> ingestion.v1.SubscribeChannelRequest
-	7,  // 28: ingestion.v1.IngestionService.UnsubscribeChannel:input_type -> ingestion.v1.UnsubscribeChannelRequest
-	10, // 29: ingestion.v1.IngestionService.GetVideo:input_type -> ingestion.v1.GetVideoRequest
-	12, // 30: ingestion.v1.IngestionService.ListVideos:input_type -> ingestion.v1.ListVideosRequest
-	14, // 31: ingestion.v1.IngestionService.CollectTrending:input_type -> ingestion.v1.CollectTrendingRequest
-	16, // 32: ingestion.v1.IngestionService.CollectSubscriptions:input_type -> ingestion.v1.CollectSubscriptionsRequest
-	19, // 33: ingestion.v1.IngestionService.CreateSnapshot:input_type -> ingestion.v1.CreateSnapshotRequest
-	21, // 34: ingestion.v1.IngestionService.GetSnapshot:input_type -> ingestion.v1.GetSnapshotRequest
-	23, // 35: ingestion.v1.IngestionService.ListSnapshots:input_type -> ingestion.v1.ListSnapshotsRequest
-	30, // 36: ingestion.v1.IngestionService.GetKeyword:input_type -> ingestion.v1.GetKeywordRequest
-	32, // 37: ingestion.v1.IngestionService.ListKeywords:input_type -> ingestion.v1.ListKeywordsRequest
-	34, // 38: ingestion.v1.IngestionService.CreateKeyword:input_type -> ingestion.v1.CreateKeywordRequest
-	36, // 39: ingestion.v1.IngestionService.UpdateKeyword:input_type -> ingestion.v1.UpdateKeywordRequest
-	38, // 40: ingestion.v1.IngestionService.DeleteKeyword:input_type -> ingestion.v1.DeleteKeywordRequest
-	25, // 41: ingestion.v1.IngestionService.ScheduleSnapshots:input_type -> ingestion.v1.ScheduleSnapshotsRequest
-	27, // 42: ingestion.v1.IngestionService.UpdateChannels:input_type -> ingestion.v1.UpdateChannelsRequest
-	2,  // 43: ingestion.v1.IngestionService.GetChannel:output_type -> ingestion.v1.GetChannelResponse
-	4,  // 44: ingestion.v1.IngestionService.ListChannels:output_type -> ingestion.v1.ListChannelsResponse
-	6,  // 45: ingestion.v1.IngestionService.SubscribeChannel:output_type -> ingestion.v1.SubscribeChannelResponse
-	8,  // 46: ingestion.v1.IngestionService.UnsubscribeChannel:output_type -> ingestion.v1.UnsubscribeChannelResponse
-	11, // 47: ingestion.v1.IngestionService.GetVideo:output_type -> ingestion.v1.GetVideoResponse
-	13, // 48: ingestion.v1.IngestionService.ListVideos:output_type -> ingestion.v1.ListVideosResponse
-	15, // 49: ingestion.v1.IngestionService.CollectTrending:output_type -> ingestion.v1.CollectTrendingResponse
-	17, // 50: ingestion.v1.IngestionService.CollectSubscriptions:output_type -> ingestion.v1.CollectSubscriptionsResponse
-	20, // 51: ingestion.v1.IngestionService.CreateSnapshot:output_type -> ingestion.v1.CreateSnapshotResponse
-	22, // 52: ingestion.v1.IngestionService.GetSnapshot:output_type -> ingestion.v1.GetSnapshotResponse
-	24, // 53: ingestion.v1.IngestionService.ListSnapshots:output_type -> ingestion.v1.ListSnapshotsResponse
-	31, // 54: ingestion.v1.IngestionService.GetKeyword:output_type -> ingestion.v1.GetKeywordResponse
-	33, // 55: ingestion.v1.IngestionService.ListKeywords:output_type -> ingestion.v1.ListKeywordsResponse
-	35, // 56: ingestion.v1.IngestionService.CreateKeyword:output_type -> ingestion.v1.CreateKeywordResponse
-	37, // 57: ingestion.v1.IngestionService.UpdateKeyword:output_type -> ingestion.v1.UpdateKeywordResponse
-	39, // 58: ingestion.v1.IngestionService.DeleteKeyword:output_type -> ingestion.v1.DeleteKeywordResponse
-	26, // 59: ingestion.v1.IngestionService.ScheduleSnapshots:output_type -> ingestion.v1.ScheduleSnapshotsResponse
-	28, // 60: ingestion.v1.IngestionService.UpdateChannels:output_type -> ingestion.v1.UpdateChannelsResponse
-	43, // [43:61] is the sub-list for method output_type
-	25, // [25:43] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	93, // 14: ingestion.v1.Genre.created_at:type_name -> google.protobuf.Timestamp
+	93, // 15: ingestion.v1.Genre.updated_at:type_name -> google.protobuf.Timestamp
+	18, // 16: ingestion.v1.ListGenresResponse.genres:type_name -> ingestion.v1.Genre
+	18, // 17: ingestion.v1.GetGenreResponse.genre:type_name -> ingestion.v1.Genre
+	18, // 18: ingestion.v1.GetGenreByCodeResponse.genre:type_name -> ingestion.v1.Genre
+	18, // 19: ingestion.v1.CreateGenreResponse.genre:type_name -> ingestion.v1.Genre
+	18, // 20: ingestion.v1.UpdateGenreResponse.genre:type_name -> ingestion.v1.Genre
+	18, // 21: ingestion.v1.EnableGenreResponse.genre:type_name -> ingestion.v1.Genre
+	18, // 22: ingestion.v1.DisableGenreResponse.genre:type_name -> ingestion.v1.Genre
+	93, // 23: ingestion.v1.YouTubeCategory.created_at:type_name -> google.protobuf.Timestamp
+	93, // 24: ingestion.v1.YouTubeCategory.updated_at:type_name -> google.protobuf.Timestamp
+	33, // 25: ingestion.v1.ListYouTubeCategoriesResponse.categories:type_name -> ingestion.v1.YouTubeCategory
+	33, // 26: ingestion.v1.GetYouTubeCategoryResponse.category:type_name -> ingestion.v1.YouTubeCategory
+	33, // 27: ingestion.v1.UpdateYouTubeCategoryResponse.category:type_name -> ingestion.v1.YouTubeCategory
+	93, // 28: ingestion.v1.Keyword.created_at:type_name -> google.protobuf.Timestamp
+	93, // 29: ingestion.v1.Keyword.updated_at:type_name -> google.protobuf.Timestamp
+	93, // 30: ingestion.v1.Keyword.deleted_at:type_name -> google.protobuf.Timestamp
+	40, // 31: ingestion.v1.GetKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
+	40, // 32: ingestion.v1.ListKeywordsResponse.keywords:type_name -> ingestion.v1.Keyword
+	40, // 33: ingestion.v1.ListKeywordsByGenreResponse.keywords:type_name -> ingestion.v1.Keyword
+	40, // 34: ingestion.v1.CreateKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
+	40, // 35: ingestion.v1.UpdateKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
+	40, // 36: ingestion.v1.EnableKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
+	40, // 37: ingestion.v1.DisableKeywordResponse.keyword:type_name -> ingestion.v1.Keyword
+	93, // 38: ingestion.v1.VideoGenre.created_at:type_name -> google.protobuf.Timestamp
+	57, // 39: ingestion.v1.ListVideoGenresResponse.video_genres:type_name -> ingestion.v1.VideoGenre
+	57, // 40: ingestion.v1.AssignVideoToGenreResponse.video_genre:type_name -> ingestion.v1.VideoGenre
+	89, // 41: ingestion.v1.AuditLog.old_values:type_name -> ingestion.v1.AuditLog.OldValuesEntry
+	90, // 42: ingestion.v1.AuditLog.new_values:type_name -> ingestion.v1.AuditLog.NewValuesEntry
+	93, // 43: ingestion.v1.AuditLog.created_at:type_name -> google.protobuf.Timestamp
+	64, // 44: ingestion.v1.ListAuditLogsResponse.audit_logs:type_name -> ingestion.v1.AuditLog
+	64, // 45: ingestion.v1.GetAuditLogResponse.audit_log:type_name -> ingestion.v1.AuditLog
+	91, // 46: ingestion.v1.BatchJob.parameters:type_name -> ingestion.v1.BatchJob.ParametersEntry
+	93, // 47: ingestion.v1.BatchJob.started_at:type_name -> google.protobuf.Timestamp
+	93, // 48: ingestion.v1.BatchJob.completed_at:type_name -> google.protobuf.Timestamp
+	92, // 49: ingestion.v1.BatchJob.statistics:type_name -> ingestion.v1.BatchJob.StatisticsEntry
+	93, // 50: ingestion.v1.BatchJob.created_at:type_name -> google.protobuf.Timestamp
+	69, // 51: ingestion.v1.ListBatchJobsResponse.batch_jobs:type_name -> ingestion.v1.BatchJob
+	69, // 52: ingestion.v1.GetBatchJobResponse.batch_job:type_name -> ingestion.v1.BatchJob
+	93, // 53: ingestion.v1.VideoSnapshot.measured_at:type_name -> google.protobuf.Timestamp
+	93, // 54: ingestion.v1.VideoSnapshot.created_at:type_name -> google.protobuf.Timestamp
+	74, // 55: ingestion.v1.CreateSnapshotResponse.snapshot:type_name -> ingestion.v1.VideoSnapshot
+	74, // 56: ingestion.v1.GetSnapshotResponse.snapshot:type_name -> ingestion.v1.VideoSnapshot
+	74, // 57: ingestion.v1.ListSnapshotsResponse.snapshots:type_name -> ingestion.v1.VideoSnapshot
+	86, // 58: ingestion.v1.CollectAllTrendingResponse.genre_results:type_name -> ingestion.v1.CollectTrendingByGenreResponse
+	1,  // 59: ingestion.v1.IngestionService.GetChannel:input_type -> ingestion.v1.GetChannelRequest
+	3,  // 60: ingestion.v1.IngestionService.ListChannels:input_type -> ingestion.v1.ListChannelsRequest
+	5,  // 61: ingestion.v1.IngestionService.SubscribeChannel:input_type -> ingestion.v1.SubscribeChannelRequest
+	7,  // 62: ingestion.v1.IngestionService.UnsubscribeChannel:input_type -> ingestion.v1.UnsubscribeChannelRequest
+	10, // 63: ingestion.v1.IngestionService.GetVideo:input_type -> ingestion.v1.GetVideoRequest
+	12, // 64: ingestion.v1.IngestionService.ListVideos:input_type -> ingestion.v1.ListVideosRequest
+	14, // 65: ingestion.v1.IngestionService.CollectTrending:input_type -> ingestion.v1.CollectTrendingRequest
+	16, // 66: ingestion.v1.IngestionService.CollectSubscriptions:input_type -> ingestion.v1.CollectSubscriptionsRequest
+	75, // 67: ingestion.v1.IngestionService.CreateSnapshot:input_type -> ingestion.v1.CreateSnapshotRequest
+	77, // 68: ingestion.v1.IngestionService.GetSnapshot:input_type -> ingestion.v1.GetSnapshotRequest
+	79, // 69: ingestion.v1.IngestionService.ListSnapshots:input_type -> ingestion.v1.ListSnapshotsRequest
+	19, // 70: ingestion.v1.IngestionService.ListGenres:input_type -> ingestion.v1.ListGenresRequest
+	21, // 71: ingestion.v1.IngestionService.GetGenre:input_type -> ingestion.v1.GetGenreRequest
+	23, // 72: ingestion.v1.IngestionService.GetGenreByCode:input_type -> ingestion.v1.GetGenreByCodeRequest
+	25, // 73: ingestion.v1.IngestionService.CreateGenre:input_type -> ingestion.v1.CreateGenreRequest
+	27, // 74: ingestion.v1.IngestionService.UpdateGenre:input_type -> ingestion.v1.UpdateGenreRequest
+	29, // 75: ingestion.v1.IngestionService.EnableGenre:input_type -> ingestion.v1.EnableGenreRequest
+	31, // 76: ingestion.v1.IngestionService.DisableGenre:input_type -> ingestion.v1.DisableGenreRequest
+	34, // 77: ingestion.v1.IngestionService.ListYouTubeCategories:input_type -> ingestion.v1.ListYouTubeCategoriesRequest
+	36, // 78: ingestion.v1.IngestionService.GetYouTubeCategory:input_type -> ingestion.v1.GetYouTubeCategoryRequest
+	38, // 79: ingestion.v1.IngestionService.UpdateYouTubeCategory:input_type -> ingestion.v1.UpdateYouTubeCategoryRequest
+	41, // 80: ingestion.v1.IngestionService.GetKeyword:input_type -> ingestion.v1.GetKeywordRequest
+	43, // 81: ingestion.v1.IngestionService.ListKeywords:input_type -> ingestion.v1.ListKeywordsRequest
+	45, // 82: ingestion.v1.IngestionService.ListKeywordsByGenre:input_type -> ingestion.v1.ListKeywordsByGenreRequest
+	47, // 83: ingestion.v1.IngestionService.CreateKeyword:input_type -> ingestion.v1.CreateKeywordRequest
+	49, // 84: ingestion.v1.IngestionService.UpdateKeyword:input_type -> ingestion.v1.UpdateKeywordRequest
+	51, // 85: ingestion.v1.IngestionService.EnableKeyword:input_type -> ingestion.v1.EnableKeywordRequest
+	53, // 86: ingestion.v1.IngestionService.DisableKeyword:input_type -> ingestion.v1.DisableKeywordRequest
+	55, // 87: ingestion.v1.IngestionService.DeleteKeyword:input_type -> ingestion.v1.DeleteKeywordRequest
+	58, // 88: ingestion.v1.IngestionService.ListVideoGenres:input_type -> ingestion.v1.ListVideoGenresRequest
+	60, // 89: ingestion.v1.IngestionService.AssignVideoToGenre:input_type -> ingestion.v1.AssignVideoToGenreRequest
+	62, // 90: ingestion.v1.IngestionService.RemoveVideoFromGenre:input_type -> ingestion.v1.RemoveVideoFromGenreRequest
+	65, // 91: ingestion.v1.IngestionService.ListAuditLogs:input_type -> ingestion.v1.ListAuditLogsRequest
+	67, // 92: ingestion.v1.IngestionService.GetAuditLog:input_type -> ingestion.v1.GetAuditLogRequest
+	70, // 93: ingestion.v1.IngestionService.ListBatchJobs:input_type -> ingestion.v1.ListBatchJobsRequest
+	72, // 94: ingestion.v1.IngestionService.GetBatchJob:input_type -> ingestion.v1.GetBatchJobRequest
+	81, // 95: ingestion.v1.IngestionService.ScheduleSnapshots:input_type -> ingestion.v1.ScheduleSnapshotsRequest
+	83, // 96: ingestion.v1.IngestionService.UpdateChannels:input_type -> ingestion.v1.UpdateChannelsRequest
+	85, // 97: ingestion.v1.IngestionService.CollectTrendingByGenre:input_type -> ingestion.v1.CollectTrendingByGenreRequest
+	87, // 98: ingestion.v1.IngestionService.CollectAllTrending:input_type -> ingestion.v1.CollectAllTrendingRequest
+	2,  // 99: ingestion.v1.IngestionService.GetChannel:output_type -> ingestion.v1.GetChannelResponse
+	4,  // 100: ingestion.v1.IngestionService.ListChannels:output_type -> ingestion.v1.ListChannelsResponse
+	6,  // 101: ingestion.v1.IngestionService.SubscribeChannel:output_type -> ingestion.v1.SubscribeChannelResponse
+	8,  // 102: ingestion.v1.IngestionService.UnsubscribeChannel:output_type -> ingestion.v1.UnsubscribeChannelResponse
+	11, // 103: ingestion.v1.IngestionService.GetVideo:output_type -> ingestion.v1.GetVideoResponse
+	13, // 104: ingestion.v1.IngestionService.ListVideos:output_type -> ingestion.v1.ListVideosResponse
+	15, // 105: ingestion.v1.IngestionService.CollectTrending:output_type -> ingestion.v1.CollectTrendingResponse
+	17, // 106: ingestion.v1.IngestionService.CollectSubscriptions:output_type -> ingestion.v1.CollectSubscriptionsResponse
+	76, // 107: ingestion.v1.IngestionService.CreateSnapshot:output_type -> ingestion.v1.CreateSnapshotResponse
+	78, // 108: ingestion.v1.IngestionService.GetSnapshot:output_type -> ingestion.v1.GetSnapshotResponse
+	80, // 109: ingestion.v1.IngestionService.ListSnapshots:output_type -> ingestion.v1.ListSnapshotsResponse
+	20, // 110: ingestion.v1.IngestionService.ListGenres:output_type -> ingestion.v1.ListGenresResponse
+	22, // 111: ingestion.v1.IngestionService.GetGenre:output_type -> ingestion.v1.GetGenreResponse
+	24, // 112: ingestion.v1.IngestionService.GetGenreByCode:output_type -> ingestion.v1.GetGenreByCodeResponse
+	26, // 113: ingestion.v1.IngestionService.CreateGenre:output_type -> ingestion.v1.CreateGenreResponse
+	28, // 114: ingestion.v1.IngestionService.UpdateGenre:output_type -> ingestion.v1.UpdateGenreResponse
+	30, // 115: ingestion.v1.IngestionService.EnableGenre:output_type -> ingestion.v1.EnableGenreResponse
+	32, // 116: ingestion.v1.IngestionService.DisableGenre:output_type -> ingestion.v1.DisableGenreResponse
+	35, // 117: ingestion.v1.IngestionService.ListYouTubeCategories:output_type -> ingestion.v1.ListYouTubeCategoriesResponse
+	37, // 118: ingestion.v1.IngestionService.GetYouTubeCategory:output_type -> ingestion.v1.GetYouTubeCategoryResponse
+	39, // 119: ingestion.v1.IngestionService.UpdateYouTubeCategory:output_type -> ingestion.v1.UpdateYouTubeCategoryResponse
+	42, // 120: ingestion.v1.IngestionService.GetKeyword:output_type -> ingestion.v1.GetKeywordResponse
+	44, // 121: ingestion.v1.IngestionService.ListKeywords:output_type -> ingestion.v1.ListKeywordsResponse
+	46, // 122: ingestion.v1.IngestionService.ListKeywordsByGenre:output_type -> ingestion.v1.ListKeywordsByGenreResponse
+	48, // 123: ingestion.v1.IngestionService.CreateKeyword:output_type -> ingestion.v1.CreateKeywordResponse
+	50, // 124: ingestion.v1.IngestionService.UpdateKeyword:output_type -> ingestion.v1.UpdateKeywordResponse
+	52, // 125: ingestion.v1.IngestionService.EnableKeyword:output_type -> ingestion.v1.EnableKeywordResponse
+	54, // 126: ingestion.v1.IngestionService.DisableKeyword:output_type -> ingestion.v1.DisableKeywordResponse
+	56, // 127: ingestion.v1.IngestionService.DeleteKeyword:output_type -> ingestion.v1.DeleteKeywordResponse
+	59, // 128: ingestion.v1.IngestionService.ListVideoGenres:output_type -> ingestion.v1.ListVideoGenresResponse
+	61, // 129: ingestion.v1.IngestionService.AssignVideoToGenre:output_type -> ingestion.v1.AssignVideoToGenreResponse
+	63, // 130: ingestion.v1.IngestionService.RemoveVideoFromGenre:output_type -> ingestion.v1.RemoveVideoFromGenreResponse
+	66, // 131: ingestion.v1.IngestionService.ListAuditLogs:output_type -> ingestion.v1.ListAuditLogsResponse
+	68, // 132: ingestion.v1.IngestionService.GetAuditLog:output_type -> ingestion.v1.GetAuditLogResponse
+	71, // 133: ingestion.v1.IngestionService.ListBatchJobs:output_type -> ingestion.v1.ListBatchJobsResponse
+	73, // 134: ingestion.v1.IngestionService.GetBatchJob:output_type -> ingestion.v1.GetBatchJobResponse
+	82, // 135: ingestion.v1.IngestionService.ScheduleSnapshots:output_type -> ingestion.v1.ScheduleSnapshotsResponse
+	84, // 136: ingestion.v1.IngestionService.UpdateChannels:output_type -> ingestion.v1.UpdateChannelsResponse
+	86, // 137: ingestion.v1.IngestionService.CollectTrendingByGenre:output_type -> ingestion.v1.CollectTrendingByGenreResponse
+	88, // 138: ingestion.v1.IngestionService.CollectAllTrending:output_type -> ingestion.v1.CollectAllTrendingResponse
+	99, // [99:139] is the sub-list for method output_type
+	59, // [59:99] is the sub-list for method input_type
+	59, // [59:59] is the sub-list for extension type_name
+	59, // [59:59] is the sub-list for extension extendee
+	0,  // [0:59] is the sub-list for field type_name
 }
 
 func init() { file_ingestion_v1_ingestion_proto_init() }
@@ -2595,7 +5892,7 @@ func file_ingestion_v1_ingestion_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ingestion_v1_ingestion_proto_rawDesc), len(file_ingestion_v1_ingestion_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   40,
+			NumMessages:   93,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
