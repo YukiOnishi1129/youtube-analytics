@@ -9,25 +9,72 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
+type IngestionAuditLog struct {
+	ID           uuid.UUID             `json:"id"`
+	ActorID      uuid.UUID             `json:"actor_id"`
+	ActorEmail   string                `json:"actor_email"`
+	Action       string                `json:"action"`
+	ResourceType string                `json:"resource_type"`
+	ResourceID   sql.NullString        `json:"resource_id"`
+	OldValues    pqtype.NullRawMessage `json:"old_values"`
+	NewValues    pqtype.NullRawMessage `json:"new_values"`
+	IpAddress    pqtype.Inet           `json:"ip_address"`
+	UserAgent    sql.NullString        `json:"user_agent"`
+	CreatedAt    time.Time             `json:"created_at"`
+}
+
+type IngestionBatchJob struct {
+	ID           uuid.UUID             `json:"id"`
+	JobType      string                `json:"job_type"`
+	Status       string                `json:"status"`
+	Parameters   pqtype.NullRawMessage `json:"parameters"`
+	StartedAt    sql.NullTime          `json:"started_at"`
+	CompletedAt  sql.NullTime          `json:"completed_at"`
+	ErrorMessage sql.NullString        `json:"error_message"`
+	Statistics   pqtype.NullRawMessage `json:"statistics"`
+	CreatedAt    time.Time             `json:"created_at"`
+}
+
 type IngestionChannel struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
-	DeletedAt        sql.NullTime `json:"deleted_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
+	DeletedAt         sql.NullTime   `json:"deleted_at"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
 }
 
 type IngestionChannelSnapshot struct {
-	ID                uuid.UUID    `json:"id"`
-	ChannelID         uuid.UUID    `json:"channel_id"`
-	MeasuredAt        time.Time    `json:"measured_at"`
-	SubscriptionCount int32        `json:"subscription_count"`
-	CreatedAt         sql.NullTime `json:"created_at"`
+	ID                uuid.UUID     `json:"id"`
+	ChannelID         uuid.UUID     `json:"channel_id"`
+	MeasuredAt        time.Time     `json:"measured_at"`
+	SubscriptionCount int32         `json:"subscription_count"`
+	CreatedAt         sql.NullTime  `json:"created_at"`
+	ViewCount         sql.NullInt64 `json:"view_count"`
+	VideoCount        sql.NullInt64 `json:"video_count"`
+	UpdatedAt         time.Time     `json:"updated_at"`
+}
+
+type IngestionGenre struct {
+	ID          uuid.UUID `json:"id"`
+	Code        string    `json:"code"`
+	Name        string    `json:"name"`
+	Language    string    `json:"language"`
+	RegionCode  string    `json:"region_code"`
+	CategoryIds []int32   `json:"category_ids"`
+	Enabled     bool      `json:"enabled"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type IngestionKeyword struct {
@@ -40,6 +87,8 @@ type IngestionKeyword struct {
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
 	DeletedAt   sql.NullTime   `json:"deleted_at"`
+	GenreID     uuid.UUID      `json:"genre_id"`
+	TargetField string         `json:"target_field"`
 }
 
 type IngestionSnapshotTask struct {
@@ -56,11 +105,16 @@ type IngestionVideo struct {
 	Title            string       `json:"title"`
 	PublishedAt      time.Time    `json:"published_at"`
 	CategoryID       int32        `json:"category_id"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	VideoUrl         string       `json:"video_url"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 	UpdatedAt        sql.NullTime `json:"updated_at"`
 	DeletedAt        sql.NullTime `json:"deleted_at"`
+}
+
+type IngestionVideoGenre struct {
+	ID        uuid.UUID `json:"id"`
+	VideoID   uuid.UUID `json:"video_id"`
+	GenreID   uuid.UUID `json:"genre_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type IngestionVideoSnapshot struct {
@@ -68,9 +122,18 @@ type IngestionVideoSnapshot struct {
 	VideoID           uuid.UUID    `json:"video_id"`
 	CheckpointHour    int32        `json:"checkpoint_hour"`
 	MeasuredAt        time.Time    `json:"measured_at"`
-	ViewsCount        int64        `json:"views_count"`
-	LikesCount        int64        `json:"likes_count"`
+	ViewCount         int64        `json:"view_count"`
+	LikeCount         int64        `json:"like_count"`
 	SubscriptionCount int64        `json:"subscription_count"`
 	Source            string       `json:"source"`
 	CreatedAt         sql.NullTime `json:"created_at"`
+	UpdatedAt         time.Time    `json:"updated_at"`
+}
+
+type IngestionYoutubeCategory struct {
+	ID         int32     `json:"id"`
+	Name       string    `json:"name"`
+	Assignable bool      `json:"assignable"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }

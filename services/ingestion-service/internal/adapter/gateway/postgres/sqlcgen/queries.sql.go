@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
+	"github.com/sqlc-dev/pqtype"
 )
 
 const checkVideoExists = `-- name: CheckVideoExists :one
@@ -22,6 +24,25 @@ SELECT EXISTS(
 
 func (q *Queries) CheckVideoExists(ctx context.Context, youtubeVideoID string) (bool, error) {
 	row := q.db.QueryRowContext(ctx, checkVideoExists, youtubeVideoID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const checkVideoGenreExists = `-- name: CheckVideoGenreExists :one
+SELECT EXISTS(
+    SELECT 1 FROM ingestion.video_genres
+    WHERE video_id = $1 AND genre_id = $2
+)
+`
+
+type CheckVideoGenreExistsParams struct {
+	VideoID uuid.UUID `json:"video_id"`
+	GenreID uuid.UUID `json:"genre_id"`
+}
+
+func (q *Queries) CheckVideoGenreExists(ctx context.Context, arg CheckVideoGenreExistsParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkVideoGenreExists, arg.VideoID, arg.GenreID)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
@@ -50,19 +71,90 @@ func (q *Queries) CountVideosByChannel(ctx context.Context, channelID uuid.UUID)
 	return count, err
 }
 
+const createAuditLog = `-- name: CreateAuditLog :exec
+INSERT INTO ingestion.audit_logs (
+    id, actor_id, actor_email, action, resource_type, resource_id,
+    old_values, new_values, ip_address, user_agent, created_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+`
+
+type CreateAuditLogParams struct {
+	ID           uuid.UUID             `json:"id"`
+	ActorID      uuid.UUID             `json:"actor_id"`
+	ActorEmail   string                `json:"actor_email"`
+	Action       string                `json:"action"`
+	ResourceType string                `json:"resource_type"`
+	ResourceID   sql.NullString        `json:"resource_id"`
+	OldValues    pqtype.NullRawMessage `json:"old_values"`
+	NewValues    pqtype.NullRawMessage `json:"new_values"`
+	IpAddress    pqtype.Inet           `json:"ip_address"`
+	UserAgent    sql.NullString        `json:"user_agent"`
+	CreatedAt    time.Time             `json:"created_at"`
+}
+
+// Audit Log queries
+func (q *Queries) CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) error {
+	_, err := q.db.ExecContext(ctx, createAuditLog,
+		arg.ID,
+		arg.ActorID,
+		arg.ActorEmail,
+		arg.Action,
+		arg.ResourceType,
+		arg.ResourceID,
+		arg.OldValues,
+		arg.NewValues,
+		arg.IpAddress,
+		arg.UserAgent,
+		arg.CreatedAt,
+	)
+	return err
+}
+
+const createBatchJob = `-- name: CreateBatchJob :exec
+INSERT INTO ingestion.batch_jobs (
+    id, job_type, status, parameters, created_at
+) VALUES ($1, $2, $3, $4, $5)
+`
+
+type CreateBatchJobParams struct {
+	ID         uuid.UUID             `json:"id"`
+	JobType    string                `json:"job_type"`
+	Status     string                `json:"status"`
+	Parameters pqtype.NullRawMessage `json:"parameters"`
+	CreatedAt  time.Time             `json:"created_at"`
+}
+
+// Batch Job queries
+func (q *Queries) CreateBatchJob(ctx context.Context, arg CreateBatchJobParams) error {
+	_, err := q.db.ExecContext(ctx, createBatchJob,
+		arg.ID,
+		arg.JobType,
+		arg.Status,
+		arg.Parameters,
+		arg.CreatedAt,
+	)
+	return err
+}
+
 const createChannel = `-- name: CreateChannel :exec
 INSERT INTO ingestion.channels (
-    id, youtube_channel_id, title, thumbnail_url, subscribed, created_at
-) VALUES ($1, $2, $3, $4, $5, $6)
+    id, youtube_channel_id, title, thumbnail_url, description, country, 
+    view_count, subscription_count, video_count, subscribed, created_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 `
 
 type CreateChannelParams struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
 }
 
 func (q *Queries) CreateChannel(ctx context.Context, arg CreateChannelParams) error {
@@ -71,23 +163,95 @@ func (q *Queries) CreateChannel(ctx context.Context, arg CreateChannelParams) er
 		arg.YoutubeChannelID,
 		arg.Title,
 		arg.ThumbnailUrl,
+		arg.Description,
+		arg.Country,
+		arg.ViewCount,
+		arg.SubscriptionCount,
+		arg.VideoCount,
 		arg.Subscribed,
 		arg.CreatedAt,
 	)
 	return err
 }
 
+const createChannelSnapshot = `-- name: CreateChannelSnapshot :exec
+INSERT INTO ingestion.channel_snapshots (
+    id, channel_id, measured_at, subscription_count, view_count, video_count, created_at, updated_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+`
+
+type CreateChannelSnapshotParams struct {
+	ID                uuid.UUID     `json:"id"`
+	ChannelID         uuid.UUID     `json:"channel_id"`
+	MeasuredAt        time.Time     `json:"measured_at"`
+	SubscriptionCount int32         `json:"subscription_count"`
+	ViewCount         sql.NullInt64 `json:"view_count"`
+	VideoCount        sql.NullInt64 `json:"video_count"`
+	CreatedAt         sql.NullTime  `json:"created_at"`
+	UpdatedAt         time.Time     `json:"updated_at"`
+}
+
+func (q *Queries) CreateChannelSnapshot(ctx context.Context, arg CreateChannelSnapshotParams) error {
+	_, err := q.db.ExecContext(ctx, createChannelSnapshot,
+		arg.ID,
+		arg.ChannelID,
+		arg.MeasuredAt,
+		arg.SubscriptionCount,
+		arg.ViewCount,
+		arg.VideoCount,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const createGenre = `-- name: CreateGenre :exec
+INSERT INTO ingestion.genres (
+    id, code, name, language, region_code, category_ids, enabled, created_at, updated_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+`
+
+type CreateGenreParams struct {
+	ID          uuid.UUID `json:"id"`
+	Code        string    `json:"code"`
+	Name        string    `json:"name"`
+	Language    string    `json:"language"`
+	RegionCode  string    `json:"region_code"`
+	CategoryIds []int32   `json:"category_ids"`
+	Enabled     bool      `json:"enabled"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// Genre queries
+func (q *Queries) CreateGenre(ctx context.Context, arg CreateGenreParams) error {
+	_, err := q.db.ExecContext(ctx, createGenre,
+		arg.ID,
+		arg.Code,
+		arg.Name,
+		arg.Language,
+		arg.RegionCode,
+		pq.Array(arg.CategoryIds),
+		arg.Enabled,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
 const createKeyword = `-- name: CreateKeyword :exec
 INSERT INTO ingestion.keywords (
-    id, name, filter_type, pattern, enabled, description, created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    id, genre_id, name, filter_type, pattern, target_field, enabled, description, created_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type CreateKeywordParams struct {
 	ID          uuid.UUID      `json:"id"`
+	GenreID     uuid.UUID      `json:"genre_id"`
 	Name        string         `json:"name"`
 	FilterType  string         `json:"filter_type"`
 	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
 	Enabled     sql.NullBool   `json:"enabled"`
 	Description sql.NullString `json:"description"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
@@ -96,9 +260,11 @@ type CreateKeywordParams struct {
 func (q *Queries) CreateKeyword(ctx context.Context, arg CreateKeywordParams) error {
 	_, err := q.db.ExecContext(ctx, createKeyword,
 		arg.ID,
+		arg.GenreID,
 		arg.Name,
 		arg.FilterType,
 		arg.Pattern,
+		arg.TargetField,
 		arg.Enabled,
 		arg.Description,
 		arg.CreatedAt,
@@ -126,8 +292,8 @@ func (q *Queries) CreateSnapshotTask(ctx context.Context, arg CreateSnapshotTask
 const createVideo = `-- name: CreateVideo :exec
 INSERT INTO ingestion.videos (
     id, youtube_video_id, channel_id, youtube_channel_id, title,
-    published_at, category_id, thumbnail_url, video_url, created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    published_at, category_id, created_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
 type CreateVideoParams struct {
@@ -138,8 +304,6 @@ type CreateVideoParams struct {
 	Title            string       `json:"title"`
 	PublishedAt      time.Time    `json:"published_at"`
 	CategoryID       int32        `json:"category_id"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	VideoUrl         string       `json:"video_url"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 }
 
@@ -152,8 +316,30 @@ func (q *Queries) CreateVideo(ctx context.Context, arg CreateVideoParams) error 
 		arg.Title,
 		arg.PublishedAt,
 		arg.CategoryID,
-		arg.ThumbnailUrl,
-		arg.VideoUrl,
+		arg.CreatedAt,
+	)
+	return err
+}
+
+const createVideoGenre = `-- name: CreateVideoGenre :exec
+INSERT INTO ingestion.video_genres (
+    id, video_id, genre_id, created_at
+) VALUES ($1, $2, $3, $4)
+`
+
+type CreateVideoGenreParams struct {
+	ID        uuid.UUID `json:"id"`
+	VideoID   uuid.UUID `json:"video_id"`
+	GenreID   uuid.UUID `json:"genre_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// Video Genre queries
+func (q *Queries) CreateVideoGenre(ctx context.Context, arg CreateVideoGenreParams) error {
+	_, err := q.db.ExecContext(ctx, createVideoGenre,
+		arg.ID,
+		arg.VideoID,
+		arg.GenreID,
 		arg.CreatedAt,
 	)
 	return err
@@ -161,9 +347,9 @@ func (q *Queries) CreateVideo(ctx context.Context, arg CreateVideoParams) error 
 
 const createVideoSnapshot = `-- name: CreateVideoSnapshot :exec
 INSERT INTO ingestion.video_snapshots (
-    id, video_id, checkpoint_hour, measured_at, views_count,
-    likes_count, subscription_count, source, created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    id, video_id, checkpoint_hour, measured_at, view_count,
+    like_count, subscription_count, source, created_at, updated_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 `
 
 type CreateVideoSnapshotParams struct {
@@ -171,11 +357,12 @@ type CreateVideoSnapshotParams struct {
 	VideoID           uuid.UUID    `json:"video_id"`
 	CheckpointHour    int32        `json:"checkpoint_hour"`
 	MeasuredAt        time.Time    `json:"measured_at"`
-	ViewsCount        int64        `json:"views_count"`
-	LikesCount        int64        `json:"likes_count"`
+	ViewCount         int64        `json:"view_count"`
+	LikeCount         int64        `json:"like_count"`
 	SubscriptionCount int64        `json:"subscription_count"`
 	Source            string       `json:"source"`
 	CreatedAt         sql.NullTime `json:"created_at"`
+	UpdatedAt         time.Time    `json:"updated_at"`
 }
 
 func (q *Queries) CreateVideoSnapshot(ctx context.Context, arg CreateVideoSnapshotParams) error {
@@ -184,11 +371,38 @@ func (q *Queries) CreateVideoSnapshot(ctx context.Context, arg CreateVideoSnapsh
 		arg.VideoID,
 		arg.CheckpointHour,
 		arg.MeasuredAt,
-		arg.ViewsCount,
-		arg.LikesCount,
+		arg.ViewCount,
+		arg.LikeCount,
 		arg.SubscriptionCount,
 		arg.Source,
 		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const createYouTubeCategory = `-- name: CreateYouTubeCategory :exec
+INSERT INTO ingestion.youtube_categories (
+    id, name, assignable, created_at, updated_at
+) VALUES ($1, $2, $3, $4, $5)
+`
+
+type CreateYouTubeCategoryParams struct {
+	ID         int32     `json:"id"`
+	Name       string    `json:"name"`
+	Assignable bool      `json:"assignable"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+// YouTube Category queries
+func (q *Queries) CreateYouTubeCategory(ctx context.Context, arg CreateYouTubeCategoryParams) error {
+	_, err := q.db.ExecContext(ctx, createYouTubeCategory,
+		arg.ID,
+		arg.Name,
+		arg.Assignable,
+		arg.CreatedAt,
+		arg.UpdatedAt,
 	)
 	return err
 }
@@ -208,20 +422,70 @@ func (q *Queries) DeleteSnapshotTask(ctx context.Context, arg DeleteSnapshotTask
 	return err
 }
 
+const deleteVideoGenresByGenre = `-- name: DeleteVideoGenresByGenre :exec
+DELETE FROM ingestion.video_genres
+WHERE genre_id = $1
+`
+
+func (q *Queries) DeleteVideoGenresByGenre(ctx context.Context, genreID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteVideoGenresByGenre, genreID)
+	return err
+}
+
+const deleteVideoGenresByVideo = `-- name: DeleteVideoGenresByVideo :exec
+DELETE FROM ingestion.video_genres
+WHERE video_id = $1
+`
+
+func (q *Queries) DeleteVideoGenresByVideo(ctx context.Context, videoID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteVideoGenresByVideo, videoID)
+	return err
+}
+
+const getBatchJobByID = `-- name: GetBatchJobByID :one
+SELECT id, job_type, status, parameters, started_at, completed_at,
+       error_message, statistics, created_at
+FROM ingestion.batch_jobs
+WHERE id = $1
+`
+
+func (q *Queries) GetBatchJobByID(ctx context.Context, id uuid.UUID) (IngestionBatchJob, error) {
+	row := q.db.QueryRowContext(ctx, getBatchJobByID, id)
+	var i IngestionBatchJob
+	err := row.Scan(
+		&i.ID,
+		&i.JobType,
+		&i.Status,
+		&i.Parameters,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.ErrorMessage,
+		&i.Statistics,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getChannelByID = `-- name: GetChannelByID :one
-SELECT id, youtube_channel_id, title, thumbnail_url, subscribed, created_at, updated_at
+SELECT id, youtube_channel_id, title, thumbnail_url, description, country,
+       view_count, subscription_count, video_count, subscribed, created_at, updated_at
 FROM ingestion.channels
 WHERE id = $1 AND deleted_at IS NULL
 `
 
 type GetChannelByIDRow struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) GetChannelByID(ctx context.Context, id uuid.UUID) (GetChannelByIDRow, error) {
@@ -232,6 +496,11 @@ func (q *Queries) GetChannelByID(ctx context.Context, id uuid.UUID) (GetChannelB
 		&i.YoutubeChannelID,
 		&i.Title,
 		&i.ThumbnailUrl,
+		&i.Description,
+		&i.Country,
+		&i.ViewCount,
+		&i.SubscriptionCount,
+		&i.VideoCount,
 		&i.Subscribed,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -240,19 +509,25 @@ func (q *Queries) GetChannelByID(ctx context.Context, id uuid.UUID) (GetChannelB
 }
 
 const getChannelByYouTubeID = `-- name: GetChannelByYouTubeID :one
-SELECT id, youtube_channel_id, title, thumbnail_url, subscribed, created_at, updated_at
+SELECT id, youtube_channel_id, title, thumbnail_url, description, country,
+       view_count, subscription_count, video_count, subscribed, created_at, updated_at
 FROM ingestion.channels
 WHERE youtube_channel_id = $1 AND deleted_at IS NULL
 `
 
 type GetChannelByYouTubeIDRow struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) GetChannelByYouTubeID(ctx context.Context, youtubeChannelID string) (GetChannelByYouTubeIDRow, error) {
@@ -263,6 +538,11 @@ func (q *Queries) GetChannelByYouTubeID(ctx context.Context, youtubeChannelID st
 		&i.YoutubeChannelID,
 		&i.Title,
 		&i.ThumbnailUrl,
+		&i.Description,
+		&i.Country,
+		&i.ViewCount,
+		&i.SubscriptionCount,
+		&i.VideoCount,
 		&i.Subscribed,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -270,17 +550,65 @@ func (q *Queries) GetChannelByYouTubeID(ctx context.Context, youtubeChannelID st
 	return i, err
 }
 
+const getGenreByCode = `-- name: GetGenreByCode :one
+SELECT id, code, name, language, region_code, category_ids, enabled, created_at, updated_at
+FROM ingestion.genres
+WHERE code = $1
+`
+
+func (q *Queries) GetGenreByCode(ctx context.Context, code string) (IngestionGenre, error) {
+	row := q.db.QueryRowContext(ctx, getGenreByCode, code)
+	var i IngestionGenre
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.Language,
+		&i.RegionCode,
+		pq.Array(&i.CategoryIds),
+		&i.Enabled,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getGenreByID = `-- name: GetGenreByID :one
+SELECT id, code, name, language, region_code, category_ids, enabled, created_at, updated_at
+FROM ingestion.genres
+WHERE id = $1
+`
+
+func (q *Queries) GetGenreByID(ctx context.Context, id uuid.UUID) (IngestionGenre, error) {
+	row := q.db.QueryRowContext(ctx, getGenreByID, id)
+	var i IngestionGenre
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.Language,
+		&i.RegionCode,
+		pq.Array(&i.CategoryIds),
+		&i.Enabled,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getKeywordByID = `-- name: GetKeywordByID :one
-SELECT id, name, filter_type, pattern, enabled, description, created_at, updated_at
+SELECT id, genre_id, name, filter_type, pattern, target_field, enabled, description, created_at, updated_at
 FROM ingestion.keywords
 WHERE id = $1 AND deleted_at IS NULL
 `
 
 type GetKeywordByIDRow struct {
 	ID          uuid.UUID      `json:"id"`
+	GenreID     uuid.UUID      `json:"genre_id"`
 	Name        string         `json:"name"`
 	FilterType  string         `json:"filter_type"`
 	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
 	Enabled     sql.NullBool   `json:"enabled"`
 	Description sql.NullString `json:"description"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
@@ -292,11 +620,48 @@ func (q *Queries) GetKeywordByID(ctx context.Context, id uuid.UUID) (GetKeywordB
 	var i GetKeywordByIDRow
 	err := row.Scan(
 		&i.ID,
+		&i.GenreID,
 		&i.Name,
 		&i.FilterType,
 		&i.Pattern,
+		&i.TargetField,
 		&i.Enabled,
 		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getLatestChannelSnapshot = `-- name: GetLatestChannelSnapshot :one
+SELECT id, channel_id, measured_at, subscription_count, view_count, video_count, created_at, updated_at
+FROM ingestion.channel_snapshots
+WHERE channel_id = $1
+ORDER BY measured_at DESC
+LIMIT 1
+`
+
+type GetLatestChannelSnapshotRow struct {
+	ID                uuid.UUID     `json:"id"`
+	ChannelID         uuid.UUID     `json:"channel_id"`
+	MeasuredAt        time.Time     `json:"measured_at"`
+	SubscriptionCount int32         `json:"subscription_count"`
+	ViewCount         sql.NullInt64 `json:"view_count"`
+	VideoCount        sql.NullInt64 `json:"video_count"`
+	CreatedAt         sql.NullTime  `json:"created_at"`
+	UpdatedAt         time.Time     `json:"updated_at"`
+}
+
+func (q *Queries) GetLatestChannelSnapshot(ctx context.Context, channelID uuid.UUID) (GetLatestChannelSnapshotRow, error) {
+	row := q.db.QueryRowContext(ctx, getLatestChannelSnapshot, channelID)
+	var i GetLatestChannelSnapshotRow
+	err := row.Scan(
+		&i.ID,
+		&i.ChannelID,
+		&i.MeasuredAt,
+		&i.SubscriptionCount,
+		&i.ViewCount,
+		&i.VideoCount,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -340,7 +705,7 @@ func (q *Queries) GetPendingSnapshotTasks(ctx context.Context, arg GetPendingSna
 }
 
 const getVideoByID = `-- name: GetVideoByID :one
-SELECT id, youtube_video_id, youtube_channel_id, title, thumbnail_url, published_at, created_at
+SELECT id, youtube_video_id, channel_id, youtube_channel_id, title, published_at, category_id, created_at
 FROM ingestion.videos
 WHERE id = $1 AND deleted_at IS NULL
 `
@@ -348,10 +713,11 @@ WHERE id = $1 AND deleted_at IS NULL
 type GetVideoByIDRow struct {
 	ID               uuid.UUID    `json:"id"`
 	YoutubeVideoID   string       `json:"youtube_video_id"`
+	ChannelID        uuid.UUID    `json:"channel_id"`
 	YoutubeChannelID string       `json:"youtube_channel_id"`
 	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
 	PublishedAt      time.Time    `json:"published_at"`
+	CategoryID       int32        `json:"category_id"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 }
 
@@ -361,17 +727,18 @@ func (q *Queries) GetVideoByID(ctx context.Context, id uuid.UUID) (GetVideoByIDR
 	err := row.Scan(
 		&i.ID,
 		&i.YoutubeVideoID,
+		&i.ChannelID,
 		&i.YoutubeChannelID,
 		&i.Title,
-		&i.ThumbnailUrl,
 		&i.PublishedAt,
+		&i.CategoryID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getVideoByYouTubeID = `-- name: GetVideoByYouTubeID :one
-SELECT id, youtube_video_id, youtube_channel_id, title, thumbnail_url, published_at, created_at
+SELECT id, youtube_video_id, channel_id, youtube_channel_id, title, published_at, category_id, created_at
 FROM ingestion.videos
 WHERE youtube_video_id = $1 AND deleted_at IS NULL
 `
@@ -379,10 +746,11 @@ WHERE youtube_video_id = $1 AND deleted_at IS NULL
 type GetVideoByYouTubeIDRow struct {
 	ID               uuid.UUID    `json:"id"`
 	YoutubeVideoID   string       `json:"youtube_video_id"`
+	ChannelID        uuid.UUID    `json:"channel_id"`
 	YoutubeChannelID string       `json:"youtube_channel_id"`
 	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
 	PublishedAt      time.Time    `json:"published_at"`
+	CategoryID       int32        `json:"category_id"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 }
 
@@ -392,18 +760,19 @@ func (q *Queries) GetVideoByYouTubeID(ctx context.Context, youtubeVideoID string
 	err := row.Scan(
 		&i.ID,
 		&i.YoutubeVideoID,
+		&i.ChannelID,
 		&i.YoutubeChannelID,
 		&i.Title,
-		&i.ThumbnailUrl,
 		&i.PublishedAt,
+		&i.CategoryID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getVideoSnapshotByVideoAndCheckpoint = `-- name: GetVideoSnapshotByVideoAndCheckpoint :one
-SELECT id, video_id, checkpoint_hour, measured_at, views_count, 
-       likes_count, subscription_count, source, created_at
+SELECT id, video_id, checkpoint_hour, measured_at, view_count, 
+       like_count, subscription_count, source, created_at, updated_at
 FROM ingestion.video_snapshots
 WHERE video_id = $1 AND checkpoint_hour = $2
 `
@@ -421,30 +790,56 @@ func (q *Queries) GetVideoSnapshotByVideoAndCheckpoint(ctx context.Context, arg 
 		&i.VideoID,
 		&i.CheckpointHour,
 		&i.MeasuredAt,
-		&i.ViewsCount,
-		&i.LikesCount,
+		&i.ViewCount,
+		&i.LikeCount,
 		&i.SubscriptionCount,
 		&i.Source,
 		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getYouTubeCategoryByID = `-- name: GetYouTubeCategoryByID :one
+SELECT id, name, assignable, created_at, updated_at
+FROM ingestion.youtube_categories
+WHERE id = $1
+`
+
+func (q *Queries) GetYouTubeCategoryByID(ctx context.Context, id int32) (IngestionYoutubeCategory, error) {
+	row := q.db.QueryRowContext(ctx, getYouTubeCategoryByID, id)
+	var i IngestionYoutubeCategory
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Assignable,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listActiveChannels = `-- name: ListActiveChannels :many
-SELECT id, youtube_channel_id, title, thumbnail_url, subscribed, created_at, updated_at
+SELECT id, youtube_channel_id, title, thumbnail_url, description, country,
+       view_count, subscription_count, video_count, subscribed, created_at, updated_at
 FROM ingestion.channels
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 `
 
 type ListActiveChannelsRow struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) ListActiveChannels(ctx context.Context) ([]ListActiveChannelsRow, error) {
@@ -461,6 +856,11 @@ func (q *Queries) ListActiveChannels(ctx context.Context) ([]ListActiveChannelsR
 			&i.YoutubeChannelID,
 			&i.Title,
 			&i.ThumbnailUrl,
+			&i.Description,
+			&i.Country,
+			&i.ViewCount,
+			&i.SubscriptionCount,
+			&i.VideoCount,
 			&i.Subscribed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -479,7 +879,7 @@ func (q *Queries) ListActiveChannels(ctx context.Context) ([]ListActiveChannelsR
 }
 
 const listActiveVideos = `-- name: ListActiveVideos :many
-SELECT id, youtube_video_id, youtube_channel_id, title, thumbnail_url, published_at, created_at
+SELECT id, youtube_video_id, channel_id, youtube_channel_id, title, published_at, category_id, created_at
 FROM ingestion.videos
 WHERE published_at > $1 AND deleted_at IS NULL
 ORDER BY published_at DESC
@@ -488,10 +888,11 @@ ORDER BY published_at DESC
 type ListActiveVideosRow struct {
 	ID               uuid.UUID    `json:"id"`
 	YoutubeVideoID   string       `json:"youtube_video_id"`
+	ChannelID        uuid.UUID    `json:"channel_id"`
 	YoutubeChannelID string       `json:"youtube_channel_id"`
 	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
 	PublishedAt      time.Time    `json:"published_at"`
+	CategoryID       int32        `json:"category_id"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 }
 
@@ -507,10 +908,11 @@ func (q *Queries) ListActiveVideos(ctx context.Context, publishedAt time.Time) (
 		if err := rows.Scan(
 			&i.ID,
 			&i.YoutubeVideoID,
+			&i.ChannelID,
 			&i.YoutubeChannelID,
 			&i.Title,
-			&i.ThumbnailUrl,
 			&i.PublishedAt,
+			&i.CategoryID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -526,8 +928,253 @@ func (q *Queries) ListActiveVideos(ctx context.Context, publishedAt time.Time) (
 	return items, nil
 }
 
+const listAssignableYouTubeCategories = `-- name: ListAssignableYouTubeCategories :many
+SELECT id, name, assignable, created_at, updated_at
+FROM ingestion.youtube_categories
+WHERE assignable = true
+ORDER BY id ASC
+`
+
+func (q *Queries) ListAssignableYouTubeCategories(ctx context.Context) ([]IngestionYoutubeCategory, error) {
+	rows, err := q.db.QueryContext(ctx, listAssignableYouTubeCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionYoutubeCategory
+	for rows.Next() {
+		var i IngestionYoutubeCategory
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Assignable,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAuditLogsByActor = `-- name: ListAuditLogsByActor :many
+SELECT id, actor_id, actor_email, action, resource_type, resource_id,
+       old_values, new_values, ip_address, user_agent, created_at
+FROM ingestion.audit_logs
+WHERE actor_id = $1
+ORDER BY created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListAuditLogsByActorParams struct {
+	ActorID uuid.UUID `json:"actor_id"`
+	Limit   int32     `json:"limit"`
+	Offset  int32     `json:"offset"`
+}
+
+func (q *Queries) ListAuditLogsByActor(ctx context.Context, arg ListAuditLogsByActorParams) ([]IngestionAuditLog, error) {
+	rows, err := q.db.QueryContext(ctx, listAuditLogsByActor, arg.ActorID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionAuditLog
+	for rows.Next() {
+		var i IngestionAuditLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.ActorID,
+			&i.ActorEmail,
+			&i.Action,
+			&i.ResourceType,
+			&i.ResourceID,
+			&i.OldValues,
+			&i.NewValues,
+			&i.IpAddress,
+			&i.UserAgent,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAuditLogsByResource = `-- name: ListAuditLogsByResource :many
+SELECT id, actor_id, actor_email, action, resource_type, resource_id,
+       old_values, new_values, ip_address, user_agent, created_at
+FROM ingestion.audit_logs
+WHERE resource_type = $1 AND resource_id = $2
+ORDER BY created_at DESC
+LIMIT $3 OFFSET $4
+`
+
+type ListAuditLogsByResourceParams struct {
+	ResourceType string         `json:"resource_type"`
+	ResourceID   sql.NullString `json:"resource_id"`
+	Limit        int32          `json:"limit"`
+	Offset       int32          `json:"offset"`
+}
+
+func (q *Queries) ListAuditLogsByResource(ctx context.Context, arg ListAuditLogsByResourceParams) ([]IngestionAuditLog, error) {
+	rows, err := q.db.QueryContext(ctx, listAuditLogsByResource,
+		arg.ResourceType,
+		arg.ResourceID,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionAuditLog
+	for rows.Next() {
+		var i IngestionAuditLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.ActorID,
+			&i.ActorEmail,
+			&i.Action,
+			&i.ResourceType,
+			&i.ResourceID,
+			&i.OldValues,
+			&i.NewValues,
+			&i.IpAddress,
+			&i.UserAgent,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBatchJobsByTypeAndStatus = `-- name: ListBatchJobsByTypeAndStatus :many
+SELECT id, job_type, status, parameters, started_at, completed_at,
+       error_message, statistics, created_at
+FROM ingestion.batch_jobs
+WHERE job_type = $1 AND status = $2
+ORDER BY created_at DESC
+`
+
+type ListBatchJobsByTypeAndStatusParams struct {
+	JobType string `json:"job_type"`
+	Status  string `json:"status"`
+}
+
+func (q *Queries) ListBatchJobsByTypeAndStatus(ctx context.Context, arg ListBatchJobsByTypeAndStatusParams) ([]IngestionBatchJob, error) {
+	rows, err := q.db.QueryContext(ctx, listBatchJobsByTypeAndStatus, arg.JobType, arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionBatchJob
+	for rows.Next() {
+		var i IngestionBatchJob
+		if err := rows.Scan(
+			&i.ID,
+			&i.JobType,
+			&i.Status,
+			&i.Parameters,
+			&i.StartedAt,
+			&i.CompletedAt,
+			&i.ErrorMessage,
+			&i.Statistics,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listChannelSnapshots = `-- name: ListChannelSnapshots :many
+SELECT id, channel_id, measured_at, subscription_count, view_count, video_count, created_at, updated_at
+FROM ingestion.channel_snapshots
+WHERE channel_id = $1
+ORDER BY measured_at DESC
+LIMIT $2
+`
+
+type ListChannelSnapshotsParams struct {
+	ChannelID uuid.UUID `json:"channel_id"`
+	Limit     int32     `json:"limit"`
+}
+
+type ListChannelSnapshotsRow struct {
+	ID                uuid.UUID     `json:"id"`
+	ChannelID         uuid.UUID     `json:"channel_id"`
+	MeasuredAt        time.Time     `json:"measured_at"`
+	SubscriptionCount int32         `json:"subscription_count"`
+	ViewCount         sql.NullInt64 `json:"view_count"`
+	VideoCount        sql.NullInt64 `json:"video_count"`
+	CreatedAt         sql.NullTime  `json:"created_at"`
+	UpdatedAt         time.Time     `json:"updated_at"`
+}
+
+func (q *Queries) ListChannelSnapshots(ctx context.Context, arg ListChannelSnapshotsParams) ([]ListChannelSnapshotsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listChannelSnapshots, arg.ChannelID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListChannelSnapshotsRow
+	for rows.Next() {
+		var i ListChannelSnapshotsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ChannelID,
+			&i.MeasuredAt,
+			&i.SubscriptionCount,
+			&i.ViewCount,
+			&i.VideoCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listChannels = `-- name: ListChannels :many
-SELECT id, youtube_channel_id, title, thumbnail_url, subscribed, created_at, updated_at
+SELECT id, youtube_channel_id, title, thumbnail_url, description, country,
+       view_count, subscription_count, video_count, subscribed, created_at, updated_at
 FROM ingestion.channels
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
@@ -540,13 +1187,18 @@ type ListChannelsParams struct {
 }
 
 type ListChannelsRow struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) ListChannels(ctx context.Context, arg ListChannelsParams) ([]ListChannelsRow, error) {
@@ -563,6 +1215,11 @@ func (q *Queries) ListChannels(ctx context.Context, arg ListChannelsParams) ([]L
 			&i.YoutubeChannelID,
 			&i.Title,
 			&i.ThumbnailUrl,
+			&i.Description,
+			&i.Country,
+			&i.ViewCount,
+			&i.SubscriptionCount,
+			&i.VideoCount,
 			&i.Subscribed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -580,8 +1237,48 @@ func (q *Queries) ListChannels(ctx context.Context, arg ListChannelsParams) ([]L
 	return items, nil
 }
 
+const listEnabledGenres = `-- name: ListEnabledGenres :many
+SELECT id, code, name, language, region_code, category_ids, enabled, created_at, updated_at
+FROM ingestion.genres
+WHERE enabled = true
+ORDER BY code ASC
+`
+
+func (q *Queries) ListEnabledGenres(ctx context.Context) ([]IngestionGenre, error) {
+	rows, err := q.db.QueryContext(ctx, listEnabledGenres)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionGenre
+	for rows.Next() {
+		var i IngestionGenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.Name,
+			&i.Language,
+			&i.RegionCode,
+			pq.Array(&i.CategoryIds),
+			&i.Enabled,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listEnabledKeywords = `-- name: ListEnabledKeywords :many
-SELECT id, name, filter_type, pattern, enabled, description, created_at, updated_at
+SELECT id, genre_id, name, filter_type, pattern, target_field, enabled, description, created_at, updated_at
 FROM ingestion.keywords
 WHERE enabled = true AND deleted_at IS NULL
 ORDER BY name ASC
@@ -589,9 +1286,11 @@ ORDER BY name ASC
 
 type ListEnabledKeywordsRow struct {
 	ID          uuid.UUID      `json:"id"`
+	GenreID     uuid.UUID      `json:"genre_id"`
 	Name        string         `json:"name"`
 	FilterType  string         `json:"filter_type"`
 	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
 	Enabled     sql.NullBool   `json:"enabled"`
 	Description sql.NullString `json:"description"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
@@ -609,9 +1308,11 @@ func (q *Queries) ListEnabledKeywords(ctx context.Context) ([]ListEnabledKeyword
 		var i ListEnabledKeywordsRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.GenreID,
 			&i.Name,
 			&i.FilterType,
 			&i.Pattern,
+			&i.TargetField,
 			&i.Enabled,
 			&i.Description,
 			&i.CreatedAt,
@@ -630,21 +1331,316 @@ func (q *Queries) ListEnabledKeywords(ctx context.Context) ([]ListEnabledKeyword
 	return items, nil
 }
 
+const listGenres = `-- name: ListGenres :many
+SELECT id, code, name, language, region_code, category_ids, enabled, created_at, updated_at
+FROM ingestion.genres
+ORDER BY code ASC
+`
+
+func (q *Queries) ListGenres(ctx context.Context) ([]IngestionGenre, error) {
+	rows, err := q.db.QueryContext(ctx, listGenres)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionGenre
+	for rows.Next() {
+		var i IngestionGenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.Name,
+			&i.Language,
+			&i.RegionCode,
+			pq.Array(&i.CategoryIds),
+			&i.Enabled,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listKeywordsByGenre = `-- name: ListKeywordsByGenre :many
+SELECT id, genre_id, name, filter_type, pattern, target_field, enabled, description, created_at, updated_at
+FROM ingestion.keywords
+WHERE genre_id = $1 AND ($2::boolean IS NULL OR enabled = $2) AND deleted_at IS NULL
+ORDER BY name ASC
+`
+
+type ListKeywordsByGenreParams struct {
+	GenreID uuid.UUID `json:"genre_id"`
+	Column2 bool      `json:"column_2"`
+}
+
+type ListKeywordsByGenreRow struct {
+	ID          uuid.UUID      `json:"id"`
+	GenreID     uuid.UUID      `json:"genre_id"`
+	Name        string         `json:"name"`
+	FilterType  string         `json:"filter_type"`
+	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
+	Enabled     sql.NullBool   `json:"enabled"`
+	Description sql.NullString `json:"description"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+}
+
+func (q *Queries) ListKeywordsByGenre(ctx context.Context, arg ListKeywordsByGenreParams) ([]ListKeywordsByGenreRow, error) {
+	rows, err := q.db.QueryContext(ctx, listKeywordsByGenre, arg.GenreID, arg.Column2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListKeywordsByGenreRow
+	for rows.Next() {
+		var i ListKeywordsByGenreRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.GenreID,
+			&i.Name,
+			&i.FilterType,
+			&i.Pattern,
+			&i.TargetField,
+			&i.Enabled,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listKeywordsByGenreAndType = `-- name: ListKeywordsByGenreAndType :many
+SELECT id, genre_id, name, filter_type, pattern, target_field, enabled, description, created_at, updated_at
+FROM ingestion.keywords
+WHERE genre_id = $1 AND filter_type = $2 AND ($3::boolean IS NULL OR enabled = $3) AND deleted_at IS NULL
+ORDER BY name ASC
+`
+
+type ListKeywordsByGenreAndTypeParams struct {
+	GenreID    uuid.UUID `json:"genre_id"`
+	FilterType string    `json:"filter_type"`
+	Column3    bool      `json:"column_3"`
+}
+
+type ListKeywordsByGenreAndTypeRow struct {
+	ID          uuid.UUID      `json:"id"`
+	GenreID     uuid.UUID      `json:"genre_id"`
+	Name        string         `json:"name"`
+	FilterType  string         `json:"filter_type"`
+	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
+	Enabled     sql.NullBool   `json:"enabled"`
+	Description sql.NullString `json:"description"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+}
+
+func (q *Queries) ListKeywordsByGenreAndType(ctx context.Context, arg ListKeywordsByGenreAndTypeParams) ([]ListKeywordsByGenreAndTypeRow, error) {
+	rows, err := q.db.QueryContext(ctx, listKeywordsByGenreAndType, arg.GenreID, arg.FilterType, arg.Column3)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListKeywordsByGenreAndTypeRow
+	for rows.Next() {
+		var i ListKeywordsByGenreAndTypeRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.GenreID,
+			&i.Name,
+			&i.FilterType,
+			&i.Pattern,
+			&i.TargetField,
+			&i.Enabled,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listRecentAuditLogs = `-- name: ListRecentAuditLogs :many
+SELECT id, actor_id, actor_email, action, resource_type, resource_id,
+       old_values, new_values, ip_address, user_agent, created_at
+FROM ingestion.audit_logs
+ORDER BY created_at DESC
+LIMIT $1
+`
+
+func (q *Queries) ListRecentAuditLogs(ctx context.Context, limit int32) ([]IngestionAuditLog, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentAuditLogs, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionAuditLog
+	for rows.Next() {
+		var i IngestionAuditLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.ActorID,
+			&i.ActorEmail,
+			&i.Action,
+			&i.ResourceType,
+			&i.ResourceID,
+			&i.OldValues,
+			&i.NewValues,
+			&i.IpAddress,
+			&i.UserAgent,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listRecentBatchJobs = `-- name: ListRecentBatchJobs :many
+SELECT id, job_type, status, parameters, started_at, completed_at,
+       error_message, statistics, created_at
+FROM ingestion.batch_jobs
+WHERE ($1::text IS NULL OR job_type = $1)
+ORDER BY created_at DESC
+LIMIT $2
+`
+
+type ListRecentBatchJobsParams struct {
+	Column1 string `json:"column_1"`
+	Limit   int32  `json:"limit"`
+}
+
+func (q *Queries) ListRecentBatchJobs(ctx context.Context, arg ListRecentBatchJobsParams) ([]IngestionBatchJob, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentBatchJobs, arg.Column1, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionBatchJob
+	for rows.Next() {
+		var i IngestionBatchJob
+		if err := rows.Scan(
+			&i.ID,
+			&i.JobType,
+			&i.Status,
+			&i.Parameters,
+			&i.StartedAt,
+			&i.CompletedAt,
+			&i.ErrorMessage,
+			&i.Statistics,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listRunningBatchJobs = `-- name: ListRunningBatchJobs :many
+SELECT id, job_type, status, parameters, started_at, completed_at,
+       error_message, statistics, created_at
+FROM ingestion.batch_jobs
+WHERE status = 'running'
+ORDER BY started_at ASC
+`
+
+func (q *Queries) ListRunningBatchJobs(ctx context.Context) ([]IngestionBatchJob, error) {
+	rows, err := q.db.QueryContext(ctx, listRunningBatchJobs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionBatchJob
+	for rows.Next() {
+		var i IngestionBatchJob
+		if err := rows.Scan(
+			&i.ID,
+			&i.JobType,
+			&i.Status,
+			&i.Parameters,
+			&i.StartedAt,
+			&i.CompletedAt,
+			&i.ErrorMessage,
+			&i.Statistics,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSubscribedChannels = `-- name: ListSubscribedChannels :many
-SELECT id, youtube_channel_id, title, thumbnail_url, subscribed, created_at, updated_at
+SELECT id, youtube_channel_id, title, thumbnail_url, description, country,
+       view_count, subscription_count, video_count, subscribed, created_at, updated_at
 FROM ingestion.channels
 WHERE subscribed = true AND deleted_at IS NULL
 ORDER BY created_at DESC
 `
 
 type ListSubscribedChannelsRow struct {
-	ID               uuid.UUID    `json:"id"`
-	YoutubeChannelID string       `json:"youtube_channel_id"`
-	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
-	Subscribed       sql.NullBool `json:"subscribed"`
-	CreatedAt        sql.NullTime `json:"created_at"`
-	UpdatedAt        sql.NullTime `json:"updated_at"`
+	ID                uuid.UUID      `json:"id"`
+	YoutubeChannelID  string         `json:"youtube_channel_id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	CreatedAt         sql.NullTime   `json:"created_at"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
 }
 
 func (q *Queries) ListSubscribedChannels(ctx context.Context) ([]ListSubscribedChannelsRow, error) {
@@ -661,6 +1657,11 @@ func (q *Queries) ListSubscribedChannels(ctx context.Context) ([]ListSubscribedC
 			&i.YoutubeChannelID,
 			&i.Title,
 			&i.ThumbnailUrl,
+			&i.Description,
+			&i.Country,
+			&i.ViewCount,
+			&i.SubscriptionCount,
+			&i.VideoCount,
 			&i.Subscribed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -678,9 +1679,77 @@ func (q *Queries) ListSubscribedChannels(ctx context.Context) ([]ListSubscribedC
 	return items, nil
 }
 
+const listVideoGenresByGenre = `-- name: ListVideoGenresByGenre :many
+SELECT id, video_id, genre_id, created_at
+FROM ingestion.video_genres
+WHERE genre_id = $1
+`
+
+func (q *Queries) ListVideoGenresByGenre(ctx context.Context, genreID uuid.UUID) ([]IngestionVideoGenre, error) {
+	rows, err := q.db.QueryContext(ctx, listVideoGenresByGenre, genreID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionVideoGenre
+	for rows.Next() {
+		var i IngestionVideoGenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.VideoID,
+			&i.GenreID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVideoGenresByVideo = `-- name: ListVideoGenresByVideo :many
+SELECT id, video_id, genre_id, created_at
+FROM ingestion.video_genres
+WHERE video_id = $1
+`
+
+func (q *Queries) ListVideoGenresByVideo(ctx context.Context, videoID uuid.UUID) ([]IngestionVideoGenre, error) {
+	rows, err := q.db.QueryContext(ctx, listVideoGenresByVideo, videoID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionVideoGenre
+	for rows.Next() {
+		var i IngestionVideoGenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.VideoID,
+			&i.GenreID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listVideoSnapshots = `-- name: ListVideoSnapshots :many
-SELECT id, video_id, checkpoint_hour, measured_at, views_count, 
-       likes_count, subscription_count, source, created_at
+SELECT id, video_id, checkpoint_hour, measured_at, view_count, 
+       like_count, subscription_count, source, created_at, updated_at
 FROM ingestion.video_snapshots
 WHERE video_id = $1
 ORDER BY checkpoint_hour ASC
@@ -700,11 +1769,12 @@ func (q *Queries) ListVideoSnapshots(ctx context.Context, videoID uuid.UUID) ([]
 			&i.VideoID,
 			&i.CheckpointHour,
 			&i.MeasuredAt,
-			&i.ViewsCount,
-			&i.LikesCount,
+			&i.ViewCount,
+			&i.LikeCount,
 			&i.SubscriptionCount,
 			&i.Source,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -720,7 +1790,7 @@ func (q *Queries) ListVideoSnapshots(ctx context.Context, videoID uuid.UUID) ([]
 }
 
 const listVideosByChannel = `-- name: ListVideosByChannel :many
-SELECT id, youtube_video_id, youtube_channel_id, title, thumbnail_url, published_at, created_at
+SELECT id, youtube_video_id, channel_id, youtube_channel_id, title, published_at, category_id, created_at
 FROM ingestion.videos
 WHERE channel_id = $1 AND deleted_at IS NULL
 ORDER BY published_at DESC
@@ -736,10 +1806,11 @@ type ListVideosByChannelParams struct {
 type ListVideosByChannelRow struct {
 	ID               uuid.UUID    `json:"id"`
 	YoutubeVideoID   string       `json:"youtube_video_id"`
+	ChannelID        uuid.UUID    `json:"channel_id"`
 	YoutubeChannelID string       `json:"youtube_channel_id"`
 	Title            string       `json:"title"`
-	ThumbnailUrl     string       `json:"thumbnail_url"`
 	PublishedAt      time.Time    `json:"published_at"`
+	CategoryID       int32        `json:"category_id"`
 	CreatedAt        sql.NullTime `json:"created_at"`
 }
 
@@ -755,10 +1826,11 @@ func (q *Queries) ListVideosByChannel(ctx context.Context, arg ListVideosByChann
 		if err := rows.Scan(
 			&i.ID,
 			&i.YoutubeVideoID,
+			&i.ChannelID,
 			&i.YoutubeChannelID,
 			&i.Title,
-			&i.ThumbnailUrl,
 			&i.PublishedAt,
+			&i.CategoryID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -774,19 +1846,104 @@ func (q *Queries) ListVideosByChannel(ctx context.Context, arg ListVideosByChann
 	return items, nil
 }
 
+const listYouTubeCategories = `-- name: ListYouTubeCategories :many
+SELECT id, name, assignable, created_at, updated_at
+FROM ingestion.youtube_categories
+ORDER BY id ASC
+`
+
+func (q *Queries) ListYouTubeCategories(ctx context.Context) ([]IngestionYoutubeCategory, error) {
+	rows, err := q.db.QueryContext(ctx, listYouTubeCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IngestionYoutubeCategory
+	for rows.Next() {
+		var i IngestionYoutubeCategory
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Assignable,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const softDeleteKeyword = `-- name: SoftDeleteKeyword :exec
+UPDATE ingestion.keywords
+SET deleted_at = $2, updated_at = $2
+WHERE id = $1 AND deleted_at IS NULL
+`
+
+type SoftDeleteKeywordParams struct {
+	ID        uuid.UUID    `json:"id"`
+	DeletedAt sql.NullTime `json:"deleted_at"`
+}
+
+func (q *Queries) SoftDeleteKeyword(ctx context.Context, arg SoftDeleteKeywordParams) error {
+	_, err := q.db.ExecContext(ctx, softDeleteKeyword, arg.ID, arg.DeletedAt)
+	return err
+}
+
+const updateBatchJob = `-- name: UpdateBatchJob :exec
+UPDATE ingestion.batch_jobs
+SET status = $2, started_at = $3, completed_at = $4, error_message = $5, statistics = $6
+WHERE id = $1
+`
+
+type UpdateBatchJobParams struct {
+	ID           uuid.UUID             `json:"id"`
+	Status       string                `json:"status"`
+	StartedAt    sql.NullTime          `json:"started_at"`
+	CompletedAt  sql.NullTime          `json:"completed_at"`
+	ErrorMessage sql.NullString        `json:"error_message"`
+	Statistics   pqtype.NullRawMessage `json:"statistics"`
+}
+
+func (q *Queries) UpdateBatchJob(ctx context.Context, arg UpdateBatchJobParams) error {
+	_, err := q.db.ExecContext(ctx, updateBatchJob,
+		arg.ID,
+		arg.Status,
+		arg.StartedAt,
+		arg.CompletedAt,
+		arg.ErrorMessage,
+		arg.Statistics,
+	)
+	return err
+}
+
 const updateChannel = `-- name: UpdateChannel :exec
 UPDATE ingestion.channels
-SET title = $2, thumbnail_url = $3, subscribed = $4, updated_at = $5, deleted_at = $6
+SET title = $2, thumbnail_url = $3, description = $4, country = $5,
+    view_count = $6, subscription_count = $7, video_count = $8,
+    subscribed = $9, updated_at = $10, deleted_at = $11
 WHERE id = $1 AND deleted_at IS NULL
 `
 
 type UpdateChannelParams struct {
-	ID           uuid.UUID    `json:"id"`
-	Title        string       `json:"title"`
-	ThumbnailUrl string       `json:"thumbnail_url"`
-	Subscribed   sql.NullBool `json:"subscribed"`
-	UpdatedAt    sql.NullTime `json:"updated_at"`
-	DeletedAt    sql.NullTime `json:"deleted_at"`
+	ID                uuid.UUID      `json:"id"`
+	Title             string         `json:"title"`
+	ThumbnailUrl      string         `json:"thumbnail_url"`
+	Description       sql.NullString `json:"description"`
+	Country           sql.NullString `json:"country"`
+	ViewCount         sql.NullInt64  `json:"view_count"`
+	SubscriptionCount sql.NullInt64  `json:"subscription_count"`
+	VideoCount        sql.NullInt64  `json:"video_count"`
+	Subscribed        sql.NullBool   `json:"subscribed"`
+	UpdatedAt         sql.NullTime   `json:"updated_at"`
+	DeletedAt         sql.NullTime   `json:"deleted_at"`
 }
 
 func (q *Queries) UpdateChannel(ctx context.Context, arg UpdateChannelParams) error {
@@ -794,9 +1951,94 @@ func (q *Queries) UpdateChannel(ctx context.Context, arg UpdateChannelParams) er
 		arg.ID,
 		arg.Title,
 		arg.ThumbnailUrl,
+		arg.Description,
+		arg.Country,
+		arg.ViewCount,
+		arg.SubscriptionCount,
+		arg.VideoCount,
 		arg.Subscribed,
 		arg.UpdatedAt,
 		arg.DeletedAt,
+	)
+	return err
+}
+
+const updateGenre = `-- name: UpdateGenre :exec
+UPDATE ingestion.genres
+SET name = $2, category_ids = $3, enabled = $4, updated_at = $5
+WHERE id = $1
+`
+
+type UpdateGenreParams struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	CategoryIds []int32   `json:"category_ids"`
+	Enabled     bool      `json:"enabled"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+func (q *Queries) UpdateGenre(ctx context.Context, arg UpdateGenreParams) error {
+	_, err := q.db.ExecContext(ctx, updateGenre,
+		arg.ID,
+		arg.Name,
+		pq.Array(arg.CategoryIds),
+		arg.Enabled,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const updateKeyword = `-- name: UpdateKeyword :exec
+UPDATE ingestion.keywords
+SET name = $2, filter_type = $3, pattern = $4, target_field = $5, 
+    enabled = $6, description = $7, updated_at = $8
+WHERE id = $1 AND deleted_at IS NULL
+`
+
+type UpdateKeywordParams struct {
+	ID          uuid.UUID      `json:"id"`
+	Name        string         `json:"name"`
+	FilterType  string         `json:"filter_type"`
+	Pattern     string         `json:"pattern"`
+	TargetField string         `json:"target_field"`
+	Enabled     sql.NullBool   `json:"enabled"`
+	Description sql.NullString `json:"description"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+}
+
+func (q *Queries) UpdateKeyword(ctx context.Context, arg UpdateKeywordParams) error {
+	_, err := q.db.ExecContext(ctx, updateKeyword,
+		arg.ID,
+		arg.Name,
+		arg.FilterType,
+		arg.Pattern,
+		arg.TargetField,
+		arg.Enabled,
+		arg.Description,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const updateYouTubeCategory = `-- name: UpdateYouTubeCategory :exec
+UPDATE ingestion.youtube_categories
+SET name = $2, assignable = $3, updated_at = $4
+WHERE id = $1
+`
+
+type UpdateYouTubeCategoryParams struct {
+	ID         int32     `json:"id"`
+	Name       string    `json:"name"`
+	Assignable bool      `json:"assignable"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+func (q *Queries) UpdateYouTubeCategory(ctx context.Context, arg UpdateYouTubeCategoryParams) error {
+	_, err := q.db.ExecContext(ctx, updateYouTubeCategory,
+		arg.ID,
+		arg.Name,
+		arg.Assignable,
+		arg.UpdatedAt,
 	)
 	return err
 }

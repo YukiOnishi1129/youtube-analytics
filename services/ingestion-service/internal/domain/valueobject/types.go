@@ -1,5 +1,7 @@
 package valueobject
 
+import "time"
+
 // UUID represents a v7 UUID
 type UUID string
 
@@ -107,4 +109,13 @@ func (s Source) IsValid() bool {
 func GenerateUUID() UUID {
 	// This is a placeholder - in production, use a proper UUID generator
 	return UUID("generated-uuid")
+}
+
+// VideoMeta represents video metadata for registration
+type VideoMeta struct {
+	YouTubeVideoID   YouTubeVideoID
+	YouTubeChannelID YouTubeChannelID
+	Title            string
+	PublishedAt      time.Time
+	CategoryID       CategoryID
 }

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/adapter/gateway/postgres/sqlcgen"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/domain"
@@ -28,14 +29,21 @@ func (r *keywordRepository) Save(ctx context.Context, k *domain.Keyword) error {
 		return err
 	}
 
+	genreID, err := uuid.Parse(string(k.GenreID))
+	if err != nil {
+		return err
+	}
+
 	return r.q.CreateKeyword(ctx, sqlcgen.CreateKeywordParams{
 		ID:          id,
+		GenreID:     genreID,
 		Name:        k.Name,
 		FilterType:  string(k.FilterType),
 		Pattern:     k.Pattern,
-		Enabled:     sql.NullBool{Bool: k.Enabled, Valid: true},
+		TargetField: k.TargetField,
+		Enabled:     k.Enabled,
 		Description: toNullString(k.Description),
-		CreatedAt:   sql.NullTime{Time: k.CreatedAt, Valid: true},
+		CreatedAt:   k.CreatedAt,
 	})
 }
 
@@ -53,12 +61,14 @@ func (r *keywordRepository) FindAll(ctx context.Context, enabledOnly bool) ([]*d
 		for i, row := range rows {
 			keywords[i] = &domain.Keyword{
 				ID:          valueobject.UUID(row.ID.String()),
+				GenreID:     valueobject.UUID(row.GenreID.String()),
 				Name:        row.Name,
 				FilterType:  valueobject.FilterType(row.FilterType),
 				Pattern:     row.Pattern,
-				Enabled:     row.Enabled.Bool,
+				TargetField: row.TargetField,
+				Enabled:     row.Enabled,
 				Description: nullStringToPtr(row.Description),
-				CreatedAt:   row.CreatedAt.Time,
+				CreatedAt:   row.CreatedAt,
 				UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
 			}
 		}
@@ -87,20 +97,134 @@ func (r *keywordRepository) FindByID(ctx context.Context, id valueobject.UUID) (
 
 	return &domain.Keyword{
 		ID:          valueobject.UUID(row.ID.String()),
+		GenreID:     valueobject.UUID(row.GenreID.String()),
 		Name:        row.Name,
 		FilterType:  valueobject.FilterType(row.FilterType),
 		Pattern:     row.Pattern,
-		Enabled:     row.Enabled.Bool,
+		TargetField: row.TargetField,
+		Enabled:     row.Enabled,
 		Description: nullStringToPtr(row.Description),
-		CreatedAt:   row.CreatedAt.Time,
+		CreatedAt:   row.CreatedAt,
 		UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
 	}, nil
 }
 
+// Update updates an existing keyword
+func (r *keywordRepository) Update(ctx context.Context, k *domain.Keyword) error {
+	id, err := uuid.Parse(string(k.ID))
+	if err != nil {
+		return err
+	}
+
+	return r.q.UpdateKeyword(ctx, sqlcgen.UpdateKeywordParams{
+		ID:          id,
+		Name:        k.Name,
+		FilterType:  string(k.FilterType),
+		Pattern:     k.Pattern,
+		TargetField: k.TargetField,
+		Enabled:     k.Enabled,
+		Description: toNullString(k.Description),
+		UpdatedAt:   *k.UpdatedAt,
+	})
+}
+
+// FindByGenre finds keywords by genre ID
+func (r *keywordRepository) FindByGenre(ctx context.Context, genreID valueobject.UUID, enabledOnly bool) ([]*domain.Keyword, error) {
+	gid, err := uuid.Parse(string(genreID))
+	if err != nil {
+		return nil, err
+	}
+
+	var enabledParam sql.NullBool
+	if enabledOnly {
+		enabledParam = sql.NullBool{Bool: true, Valid: true}
+	}
+
+	rows, err := r.q.ListKeywordsByGenre(ctx, sqlcgen.ListKeywordsByGenreParams{
+		GenreID: gid,
+		Column2: enabledParam,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	keywords := make([]*domain.Keyword, len(rows))
+	for i, row := range rows {
+		keywords[i] = &domain.Keyword{
+			ID:          valueobject.UUID(row.ID.String()),
+			GenreID:     valueobject.UUID(row.GenreID.String()),
+			Name:        row.Name,
+			FilterType:  valueobject.FilterType(row.FilterType),
+			Pattern:     row.Pattern,
+			TargetField: row.TargetField,
+			Enabled:     row.Enabled,
+			Description: nullStringToPtr(row.Description),
+			CreatedAt:   row.CreatedAt,
+			UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
+		}
+		if row.DeletedAt.Valid {
+			keywords[i].DeletedAt = &row.DeletedAt.Time
+		}
+	}
+
+	return keywords, nil
+}
+
+// FindByGenreAndType finds keywords by genre ID and filter type
+func (r *keywordRepository) FindByGenreAndType(ctx context.Context, genreID valueobject.UUID, filterType valueobject.FilterType, enabledOnly bool) ([]*domain.Keyword, error) {
+	gid, err := uuid.Parse(string(genreID))
+	if err != nil {
+		return nil, err
+	}
+
+	var enabledParam sql.NullBool
+	if enabledOnly {
+		enabledParam = sql.NullBool{Bool: true, Valid: true}
+	}
+
+	rows, err := r.q.ListKeywordsByGenreAndType(ctx, sqlcgen.ListKeywordsByGenreAndTypeParams{
+		GenreID:    gid,
+		FilterType: string(filterType),
+		Column3:    enabledParam,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	keywords := make([]*domain.Keyword, len(rows))
+	for i, row := range rows {
+		keywords[i] = &domain.Keyword{
+			ID:          valueobject.UUID(row.ID.String()),
+			GenreID:     valueobject.UUID(row.GenreID.String()),
+			Name:        row.Name,
+			FilterType:  valueobject.FilterType(row.FilterType),
+			Pattern:     row.Pattern,
+			TargetField: row.TargetField,
+			Enabled:     row.Enabled,
+			Description: nullStringToPtr(row.Description),
+			CreatedAt:   row.CreatedAt,
+			UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
+		}
+		if row.DeletedAt.Valid {
+			keywords[i].DeletedAt = &row.DeletedAt.Time
+		}
+	}
+
+	return keywords, nil
+}
+
 // SoftDelete soft deletes a keyword
 func (r *keywordRepository) SoftDelete(ctx context.Context, id valueobject.UUID) error {
-	// TODO: Implement soft delete query
-	return nil
+	kid, err := uuid.Parse(string(id))
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+	return r.q.SoftDeleteKeyword(ctx, sqlcgen.SoftDeleteKeywordParams{
+		ID:        kid,
+		DeletedAt: sql.NullTime{Time: now, Valid: true},
+	})
 }
 
 // toNullString converts *string to sql.NullString
@@ -117,4 +241,26 @@ func nullStringToPtr(ns sql.NullString) *string {
 		return &ns.String
 	}
 	return nil
+}
+
+// toDomainKeyword converts database row to domain keyword
+func toDomainKeyword(row sqlcgen.IngestionKeyword) *domain.Keyword {
+	k := &domain.Keyword{
+		ID:          valueobject.UUID(row.ID.String()),
+		GenreID:     valueobject.UUID(row.GenreID.String()),
+		Name:        row.Name,
+		FilterType:  valueobject.FilterType(row.FilterType),
+		Pattern:     row.Pattern,
+		TargetField: row.TargetField,
+		Enabled:     row.Enabled.Bool,
+		Description: nullStringToPtr(row.Description),
+		CreatedAt:   row.CreatedAt.Time,
+		UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
+	}
+
+	if row.DeletedAt.Valid {
+		k.DeletedAt = &row.DeletedAt.Time
+	}
+
+	return k
 }

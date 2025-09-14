@@ -22,8 +22,6 @@ type Video struct {
 	Title            string
 	PublishedAt      time.Time
 	CategoryID       valueobject.CategoryID
-	ThumbnailURL     string
-	VideoURL         string
 	CreatedAt        time.Time
 	UpdatedAt        *time.Time
 	DeletedAt        *time.Time
@@ -41,8 +39,6 @@ func NewVideo(
 	title string,
 	publishedAt time.Time,
 	categoryID valueobject.CategoryID,
-	thumbnailURL string,
-	videoURL string,
 ) (*Video, error) {
 	if youtubeVideoID == "" {
 		return nil, ErrEmptyYouTubeVideoID
@@ -64,17 +60,13 @@ func NewVideo(
 		Title:            title,
 		PublishedAt:      publishedAt,
 		CategoryID:       categoryID,
-		ThumbnailURL:     thumbnailURL,
-		VideoURL:         videoURL,
 		CreatedAt:        time.Now(),
 	}, nil
 }
 
 // Update updates video metadata
-func (v *Video) Update(title string, thumbnailURL string, videoURL string) {
+func (v *Video) Update(title string) {
 	v.Title = title
-	v.ThumbnailURL = thumbnailURL
-	v.VideoURL = videoURL
 	now := time.Now()
 	v.UpdatedAt = &now
 }

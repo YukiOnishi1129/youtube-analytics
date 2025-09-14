@@ -17,9 +17,11 @@ var (
 // Keyword represents a filter keyword entity
 type Keyword struct {
 	ID          valueobject.UUID
+	GenreID     valueobject.UUID       // Associated genre
 	Name        string
 	FilterType  valueobject.FilterType
 	Pattern     string
+	TargetField string                 // TITLE, DESCRIPTION, etc.
 	Enabled     bool
 	Description *string
 	CreatedAt   time.Time
@@ -30,9 +32,11 @@ type Keyword struct {
 // NewKeyword creates a new keyword
 func NewKeyword(
 	id valueobject.UUID,
+	genreID valueobject.UUID,
 	name string,
 	filterType valueobject.FilterType,
 	pattern string,
+	targetField string,
 	description *string,
 ) (*Keyword, error) {
 	if strings.TrimSpace(name) == "" {
@@ -47,11 +51,17 @@ func NewKeyword(
 		return nil, ErrInvalidFilterType
 	}
 
+	if targetField == "" {
+		targetField = "TITLE" // Default to TITLE
+	}
+
 	return &Keyword{
 		ID:          id,
+		GenreID:     genreID,
 		Name:        name,
 		FilterType:  filterType,
 		Pattern:     pattern,
+		TargetField: targetField,
 		Enabled:     true,
 		Description: description,
 		CreatedAt:   time.Now(),

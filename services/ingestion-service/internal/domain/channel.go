@@ -13,14 +13,19 @@ var (
 
 // Channel represents a YouTube channel entity
 type Channel struct {
-	ID               valueobject.UUID
-	YouTubeChannelID valueobject.YouTubeChannelID
-	Title            string
-	ThumbnailURL     string
-	Subscribed       bool
-	CreatedAt        time.Time
-	UpdatedAt        *time.Time
-	DeletedAt        *time.Time
+	ID                valueobject.UUID
+	YouTubeChannelID  valueobject.YouTubeChannelID
+	Title             string
+	ThumbnailURL      string
+	Description       string
+	Country           string
+	ViewCount         int64
+	SubscriptionCount int64
+	VideoCount        int64
+	Subscribed        bool
+	CreatedAt         time.Time
+	UpdatedAt         *time.Time
+	DeletedAt         *time.Time
 	
 	// Snapshots that need to be persisted (transient field)
 	newSnapshots []*ChannelSnapshot
@@ -32,18 +37,28 @@ func NewChannel(
 	youtubeChannelID valueobject.YouTubeChannelID,
 	title string,
 	thumbnailURL string,
+	description string,
+	country string,
+	viewCount int64,
+	subscriptionCount int64,
+	videoCount int64,
 ) (*Channel, error) {
 	if youtubeChannelID == "" {
 		return nil, ErrEmptyYouTubeChannelID
 	}
 
 	return &Channel{
-		ID:               id,
-		YouTubeChannelID: youtubeChannelID,
-		Title:            title,
-		ThumbnailURL:     thumbnailURL,
-		Subscribed:       false,
-		CreatedAt:        time.Now(),
+		ID:                id,
+		YouTubeChannelID:  youtubeChannelID,
+		Title:             title,
+		ThumbnailURL:      thumbnailURL,
+		Description:       description,
+		Country:           country,
+		ViewCount:         viewCount,
+		SubscriptionCount: subscriptionCount,
+		VideoCount:        videoCount,
+		Subscribed:        false,
+		CreatedAt:         time.Now(),
 	}, nil
 }
 
@@ -62,9 +77,14 @@ func (c *Channel) Unsubscribe() {
 }
 
 // UpdateProfile updates channel profile information
-func (c *Channel) UpdateProfile(title string, thumbnailURL string) {
+func (c *Channel) UpdateProfile(title string, thumbnailURL string, description string, country string, viewCount int64, subscriptionCount int64, videoCount int64) {
 	c.Title = title
 	c.ThumbnailURL = thumbnailURL
+	c.Description = description
+	c.Country = country
+	c.ViewCount = viewCount
+	c.SubscriptionCount = subscriptionCount
+	c.VideoCount = videoCount
 	now := time.Now()
 	c.UpdatedAt = &now
 }
