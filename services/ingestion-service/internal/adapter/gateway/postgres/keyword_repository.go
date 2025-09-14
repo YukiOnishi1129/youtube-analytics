@@ -41,9 +41,9 @@ func (r *keywordRepository) Save(ctx context.Context, k *domain.Keyword) error {
 		FilterType:  string(k.FilterType),
 		Pattern:     k.Pattern,
 		TargetField: k.TargetField,
-		Enabled:     k.Enabled,
+		Enabled:     sql.NullBool{Bool: k.Enabled, Valid: true},
 		Description: toNullString(k.Description),
-		CreatedAt:   k.CreatedAt,
+		CreatedAt:   sql.NullTime{Time: k.CreatedAt, Valid: true},
 	})
 }
 
@@ -66,9 +66,9 @@ func (r *keywordRepository) FindAll(ctx context.Context, enabledOnly bool) ([]*d
 				FilterType:  valueobject.FilterType(row.FilterType),
 				Pattern:     row.Pattern,
 				TargetField: row.TargetField,
-				Enabled:     row.Enabled,
+				Enabled:     row.Enabled.Bool,
 				Description: nullStringToPtr(row.Description),
-				CreatedAt:   row.CreatedAt,
+				CreatedAt:   row.CreatedAt.Time,
 				UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
 			}
 		}
@@ -102,9 +102,9 @@ func (r *keywordRepository) FindByID(ctx context.Context, id valueobject.UUID) (
 		FilterType:  valueobject.FilterType(row.FilterType),
 		Pattern:     row.Pattern,
 		TargetField: row.TargetField,
-		Enabled:     row.Enabled,
+		Enabled:     row.Enabled.Bool,
 		Description: nullStringToPtr(row.Description),
-		CreatedAt:   row.CreatedAt,
+		CreatedAt:   row.CreatedAt.Time,
 		UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
 	}, nil
 }
@@ -122,9 +122,9 @@ func (r *keywordRepository) Update(ctx context.Context, k *domain.Keyword) error
 		FilterType:  string(k.FilterType),
 		Pattern:     k.Pattern,
 		TargetField: k.TargetField,
-		Enabled:     k.Enabled,
+		Enabled:     sql.NullBool{Bool: k.Enabled, Valid: true},
 		Description: toNullString(k.Description),
-		UpdatedAt:   *k.UpdatedAt,
+		UpdatedAt:   sql.NullTime{Time: *k.UpdatedAt, Valid: true},
 	})
 }
 
@@ -135,14 +135,9 @@ func (r *keywordRepository) FindByGenre(ctx context.Context, genreID valueobject
 		return nil, err
 	}
 
-	var enabledParam sql.NullBool
-	if enabledOnly {
-		enabledParam = sql.NullBool{Bool: true, Valid: true}
-	}
-
 	rows, err := r.q.ListKeywordsByGenre(ctx, sqlcgen.ListKeywordsByGenreParams{
 		GenreID: gid,
-		Column2: enabledParam,
+		Column2: enabledOnly,
 	})
 	if err != nil {
 		return nil, err
@@ -157,13 +152,10 @@ func (r *keywordRepository) FindByGenre(ctx context.Context, genreID valueobject
 			FilterType:  valueobject.FilterType(row.FilterType),
 			Pattern:     row.Pattern,
 			TargetField: row.TargetField,
-			Enabled:     row.Enabled,
+			Enabled:     row.Enabled.Bool,
 			Description: nullStringToPtr(row.Description),
-			CreatedAt:   row.CreatedAt,
+			CreatedAt:   row.CreatedAt.Time,
 			UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
-		}
-		if row.DeletedAt.Valid {
-			keywords[i].DeletedAt = &row.DeletedAt.Time
 		}
 	}
 
@@ -177,15 +169,10 @@ func (r *keywordRepository) FindByGenreAndType(ctx context.Context, genreID valu
 		return nil, err
 	}
 
-	var enabledParam sql.NullBool
-	if enabledOnly {
-		enabledParam = sql.NullBool{Bool: true, Valid: true}
-	}
-
 	rows, err := r.q.ListKeywordsByGenreAndType(ctx, sqlcgen.ListKeywordsByGenreAndTypeParams{
 		GenreID:    gid,
 		FilterType: string(filterType),
-		Column3:    enabledParam,
+		Column3:    enabledOnly,
 	})
 	if err != nil {
 		return nil, err
@@ -200,13 +187,10 @@ func (r *keywordRepository) FindByGenreAndType(ctx context.Context, genreID valu
 			FilterType:  valueobject.FilterType(row.FilterType),
 			Pattern:     row.Pattern,
 			TargetField: row.TargetField,
-			Enabled:     row.Enabled,
+			Enabled:     row.Enabled.Bool,
 			Description: nullStringToPtr(row.Description),
-			CreatedAt:   row.CreatedAt,
+			CreatedAt:   row.CreatedAt.Time,
 			UpdatedAt:   nullTimeToPtr(row.UpdatedAt),
-		}
-		if row.DeletedAt.Valid {
-			keywords[i].DeletedAt = &row.DeletedAt.Time
 		}
 	}
 

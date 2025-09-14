@@ -67,7 +67,9 @@ func (s *Server) AdminCollectSubscriptions(c *gin.Context, params generated.Admi
 func (s *Server) AdminCollectTrending(c *gin.Context, params generated.AdminCollectTrendingParams) {
 	start := time.Now()
 
-	result, err := s.videoUseCase.CollectTrending(c.Request.Context())
+	// TODO: Add genre_id parameter to OpenAPI spec and regenerate
+	// For now, collect trending for all genres
+	result, err := s.videoUseCase.CollectTrending(c.Request.Context(), nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, generated.Error{
 			Code:    "INTERNAL_ERROR",

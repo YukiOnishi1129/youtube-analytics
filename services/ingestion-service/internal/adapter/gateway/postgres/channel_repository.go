@@ -30,12 +30,17 @@ func (r *channelRepository) Save(ctx context.Context, ch *domain.Channel) error 
 	}
 
 	return r.q.CreateChannel(ctx, sqlcgen.CreateChannelParams{
-		ID:               id,
-		YoutubeChannelID: string(ch.YouTubeChannelID),
-		Title:            ch.Title,
-		ThumbnailUrl:     ch.ThumbnailURL,
-		Subscribed:       sql.NullBool{Bool: ch.Subscribed, Valid: true},
-		CreatedAt:        sql.NullTime{Time: ch.CreatedAt, Valid: true},
+		ID:                id,
+		YoutubeChannelID:  string(ch.YouTubeChannelID),
+		Title:             ch.Title,
+		ThumbnailUrl:      ch.ThumbnailURL,
+		Description:       sql.NullString{String: ch.Description, Valid: ch.Description != ""},
+		Country:           sql.NullString{String: ch.Country, Valid: ch.Country != ""},
+		ViewCount:         sql.NullInt64{Int64: ch.ViewCount, Valid: true},
+		SubscriptionCount: sql.NullInt64{Int64: ch.SubscriptionCount, Valid: true},
+		VideoCount:        sql.NullInt64{Int64: ch.VideoCount, Valid: true},
+		Subscribed:        sql.NullBool{Bool: ch.Subscribed, Valid: true},
+		CreatedAt:         sql.NullTime{Time: ch.CreatedAt, Valid: true},
 	})
 }
 
@@ -57,12 +62,17 @@ func (r *channelRepository) Update(ctx context.Context, ch *domain.Channel) erro
 	}
 
 	return r.q.UpdateChannel(ctx, sqlcgen.UpdateChannelParams{
-		ID:           id,
-		Title:        ch.Title,
-		ThumbnailUrl: ch.ThumbnailURL,
-		Subscribed:   sql.NullBool{Bool: ch.Subscribed, Valid: true},
-		UpdatedAt:    updatedAt,
-		DeletedAt:    deletedAt,
+		ID:                id,
+		Title:             ch.Title,
+		ThumbnailUrl:      ch.ThumbnailURL,
+		Description:       sql.NullString{String: ch.Description, Valid: ch.Description != ""},
+		Country:           sql.NullString{String: ch.Country, Valid: ch.Country != ""},
+		ViewCount:         sql.NullInt64{Int64: ch.ViewCount, Valid: true},
+		SubscriptionCount: sql.NullInt64{Int64: ch.SubscriptionCount, Valid: true},
+		VideoCount:        sql.NullInt64{Int64: ch.VideoCount, Valid: true},
+		Subscribed:        sql.NullBool{Bool: ch.Subscribed, Valid: true},
+		UpdatedAt:         updatedAt,
+		DeletedAt:         deletedAt,
 	})
 }
 
@@ -83,7 +93,7 @@ func (r *channelRepository) SaveWithSnapshots(ctx context.Context, ch *domain.Ch
 
 	// Clear new snapshots after saving
 	ch.ClearNewSnapshots()
-	
+
 	return nil
 }
 
@@ -102,15 +112,7 @@ func (r *channelRepository) GetByID(ctx context.Context, id valueobject.UUID) (*
 		return nil, err
 	}
 
-	return &domain.Channel{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		Subscribed:       row.Subscribed.Bool,
-		CreatedAt:        row.CreatedAt.Time,
-		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-	}, nil
+	return toDomainChannelFromRow(row), nil
 }
 
 // FindByID finds a channel by ID
@@ -128,15 +130,7 @@ func (r *channelRepository) FindByID(ctx context.Context, id valueobject.UUID) (
 		return nil, err
 	}
 
-	return &domain.Channel{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		Subscribed:       row.Subscribed.Bool,
-		CreatedAt:        row.CreatedAt.Time,
-		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-	}, nil
+	return toDomainChannelFromRow(row), nil
 }
 
 // FindByYouTubeID finds a channel by YouTube ID
@@ -149,15 +143,7 @@ func (r *channelRepository) FindByYouTubeID(ctx context.Context, ytID valueobjec
 		return nil, err
 	}
 
-	return &domain.Channel{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		Subscribed:       row.Subscribed.Bool,
-		CreatedAt:        row.CreatedAt.Time,
-		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-	}, nil
+	return toDomainChannelFromYouTubeRow(row), nil
 }
 
 // FindByYouTubeChannelID finds a channel by YouTube channel ID
@@ -179,15 +165,7 @@ func (r *channelRepository) List(ctx context.Context, subscribed *bool, q *strin
 
 	channels := make([]*domain.Channel, len(rows))
 	for i, row := range rows {
-		channels[i] = &domain.Channel{
-			ID:               valueobject.UUID(row.ID.String()),
-			YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-			Title:            row.Title,
-			ThumbnailURL:     row.ThumbnailUrl,
-			Subscribed:       row.Subscribed.Bool,
-			CreatedAt:        row.CreatedAt.Time,
-			UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-		}
+		channels[i] = toDomainChannelFromListRow(row)
 	}
 	return channels, nil
 }
@@ -211,15 +189,7 @@ func (r *channelRepository) ListActive(ctx context.Context) ([]*domain.Channel, 
 
 	channels := make([]*domain.Channel, len(rows))
 	for i, row := range rows {
-		channels[i] = &domain.Channel{
-			ID:               valueobject.UUID(row.ID.String()),
-			YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-			Title:            row.Title,
-			ThumbnailURL:     row.ThumbnailUrl,
-			Subscribed:       row.Subscribed.Bool,
-			CreatedAt:        row.CreatedAt.Time,
-			UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-		}
+		channels[i] = toDomainChannelFromListRow(row)
 	}
 	return channels, nil
 }
@@ -233,15 +203,7 @@ func (r *channelRepository) ListSubscribed(ctx context.Context) ([]*domain.Chann
 
 	channels := make([]*domain.Channel, len(rows))
 	for i, row := range rows {
-		channels[i] = &domain.Channel{
-			ID:               valueobject.UUID(row.ID.String()),
-			YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-			Title:            row.Title,
-			ThumbnailURL:     row.ThumbnailUrl,
-			Subscribed:       row.Subscribed.Bool,
-			CreatedAt:        row.CreatedAt.Time,
-			UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
-		}
+		channels[i] = toDomainChannelFromListRow(row)
 	}
 	return channels, nil
 }
@@ -252,4 +214,169 @@ func nullTimeToPtr(nt sql.NullTime) *time.Time {
 		return &nt.Time
 	}
 	return nil
+}
+
+// toDomainChannel converts database row to domain channel
+func toDomainChannel(row sqlcgen.IngestionChannel) *domain.Channel {
+	ch := &domain.Channel{
+		ID:               valueobject.UUID(row.ID.String()),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		ThumbnailURL:     row.ThumbnailUrl,
+		Subscribed:       row.Subscribed.Bool,
+		CreatedAt:        row.CreatedAt.Time,
+		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
+	}
+
+	if row.Description.Valid {
+		ch.Description = row.Description.String
+	}
+	if row.Country.Valid {
+		ch.Country = row.Country.String
+	}
+	if row.ViewCount.Valid {
+		ch.ViewCount = row.ViewCount.Int64
+	}
+	if row.SubscriptionCount.Valid {
+		ch.SubscriptionCount = row.SubscriptionCount.Int64
+	}
+	if row.VideoCount.Valid {
+		ch.VideoCount = row.VideoCount.Int64
+	}
+	if row.DeletedAt.Valid {
+		ch.DeletedAt = &row.DeletedAt.Time
+	}
+
+	return ch
+}
+
+// toDomainChannelFromRow converts GetChannelByIDRow to domain channel
+func toDomainChannelFromRow(row sqlcgen.GetChannelByIDRow) *domain.Channel {
+	ch := &domain.Channel{
+		ID:               valueobject.UUID(row.ID.String()),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		ThumbnailURL:     row.ThumbnailUrl,
+		Subscribed:       row.Subscribed.Bool,
+		CreatedAt:        row.CreatedAt.Time,
+		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
+	}
+
+	if row.Description.Valid {
+		ch.Description = row.Description.String
+	}
+	if row.Country.Valid {
+		ch.Country = row.Country.String
+	}
+	if row.ViewCount.Valid {
+		ch.ViewCount = row.ViewCount.Int64
+	}
+	if row.SubscriptionCount.Valid {
+		ch.SubscriptionCount = row.SubscriptionCount.Int64
+	}
+	if row.VideoCount.Valid {
+		ch.VideoCount = row.VideoCount.Int64
+	}
+
+	return ch
+}
+
+// toDomainChannelFromYouTubeRow converts GetChannelByYouTubeIDRow to domain channel
+func toDomainChannelFromYouTubeRow(row sqlcgen.GetChannelByYouTubeIDRow) *domain.Channel {
+	ch := &domain.Channel{
+		ID:               valueobject.UUID(row.ID.String()),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		ThumbnailURL:     row.ThumbnailUrl,
+		Subscribed:       row.Subscribed.Bool,
+		CreatedAt:        row.CreatedAt.Time,
+		UpdatedAt:        nullTimeToPtr(row.UpdatedAt),
+	}
+
+	if row.Description.Valid {
+		ch.Description = row.Description.String
+	}
+	if row.Country.Valid {
+		ch.Country = row.Country.String
+	}
+	if row.ViewCount.Valid {
+		ch.ViewCount = row.ViewCount.Int64
+	}
+	if row.SubscriptionCount.Valid {
+		ch.SubscriptionCount = row.SubscriptionCount.Int64
+	}
+	if row.VideoCount.Valid {
+		ch.VideoCount = row.VideoCount.Int64
+	}
+
+	return ch
+}
+
+// toDomainChannelFromListRow converts ListChannelsRow, ListActiveChannelsRow, ListSubscribedChannelsRow to domain channel
+func toDomainChannelFromListRow(row interface{}) *domain.Channel {
+	switch r := row.(type) {
+	case sqlcgen.ListChannelsRow:
+		return &domain.Channel{
+			ID:               valueobject.UUID(r.ID.String()),
+			YouTubeChannelID: valueobject.YouTubeChannelID(r.YoutubeChannelID),
+			Title:            r.Title,
+			ThumbnailURL:     r.ThumbnailUrl,
+			Subscribed:       r.Subscribed.Bool,
+			CreatedAt:        r.CreatedAt.Time,
+			UpdatedAt:        nullTimeToPtr(r.UpdatedAt),
+			Description:      nullStringToString(r.Description),
+			Country:          nullStringToString(r.Country),
+			ViewCount:        nullInt64ToInt64(r.ViewCount),
+			SubscriptionCount: nullInt64ToInt64(r.SubscriptionCount),
+			VideoCount:        nullInt64ToInt64(r.VideoCount),
+		}
+	case sqlcgen.ListActiveChannelsRow:
+		return &domain.Channel{
+			ID:               valueobject.UUID(r.ID.String()),
+			YouTubeChannelID: valueobject.YouTubeChannelID(r.YoutubeChannelID),
+			Title:            r.Title,
+			ThumbnailURL:     r.ThumbnailUrl,
+			Subscribed:       r.Subscribed.Bool,
+			CreatedAt:        r.CreatedAt.Time,
+			UpdatedAt:        nullTimeToPtr(r.UpdatedAt),
+			Description:      nullStringToString(r.Description),
+			Country:          nullStringToString(r.Country),
+			ViewCount:        nullInt64ToInt64(r.ViewCount),
+			SubscriptionCount: nullInt64ToInt64(r.SubscriptionCount),
+			VideoCount:        nullInt64ToInt64(r.VideoCount),
+		}
+	case sqlcgen.ListSubscribedChannelsRow:
+		return &domain.Channel{
+			ID:               valueobject.UUID(r.ID.String()),
+			YouTubeChannelID: valueobject.YouTubeChannelID(r.YoutubeChannelID),
+			Title:            r.Title,
+			ThumbnailURL:     r.ThumbnailUrl,
+			Subscribed:       r.Subscribed.Bool,
+			CreatedAt:        r.CreatedAt.Time,
+			UpdatedAt:        nullTimeToPtr(r.UpdatedAt),
+			Description:      nullStringToString(r.Description),
+			Country:          nullStringToString(r.Country),
+			ViewCount:        nullInt64ToInt64(r.ViewCount),
+			SubscriptionCount: nullInt64ToInt64(r.SubscriptionCount),
+			VideoCount:        nullInt64ToInt64(r.VideoCount),
+		}
+	default:
+		panic("unsupported row type")
+	}
+}
+
+// nullStringToString converts sql.NullString to string
+func nullStringToString(ns sql.NullString) string {
+	if ns.Valid {
+		return ns.String
+	}
+	return ""
+}
+
+// nullInt64ToInt64 converts sql.NullInt64 to int64
+func nullInt64ToInt64(ni sql.NullInt64) int64 {
+	if ni.Valid {
+		return ni.Int64
+	}
+	return 0
 }

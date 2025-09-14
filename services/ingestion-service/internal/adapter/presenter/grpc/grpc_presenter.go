@@ -169,7 +169,6 @@ func domainVideoToProto(video *domain.Video) *pb.Video {
 		YoutubeVideoId:   string(video.YouTubeVideoID),
 		YoutubeChannelId: string(video.YouTubeChannelID),
 		Title:            video.Title,
-		ThumbnailUrl:     video.ThumbnailURL,
 		PublishedAt:      timestamppb.New(video.PublishedAt),
 		CategoryId:       int32(video.CategoryID),
 		CreatedAt:        timestamppb.New(video.CreatedAt),

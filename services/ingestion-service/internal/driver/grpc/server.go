@@ -108,7 +108,9 @@ func (s *Server) ListChannels(ctx context.Context, req *pb.ListChannelsRequest) 
 }
 
 func (s *Server) CollectTrending(ctx context.Context, req *pb.CollectTrendingRequest) (*pb.CollectTrendingResponse, error) {
-	result, err := s.videoUseCase.CollectTrending(ctx)
+	// TODO: Add genre_id to protobuf definition and regenerate
+	// For now, collect trending for all genres
+	result, err := s.videoUseCase.CollectTrending(ctx, nil)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to collect trending videos: %v", err))
 	}

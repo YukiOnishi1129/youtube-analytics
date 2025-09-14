@@ -31,7 +31,7 @@ func NewVideoUseCase(
 	}
 }
 
-func (u *videoUseCase) CollectTrending(ctx context.Context) (*input.CollectTrendingResult, error) {
+func (u *videoUseCase) CollectTrending(ctx context.Context, genreID *string) (*input.CollectTrendingResult, error) {
 	start := time.Now()
 	// Fetch trending videos from YouTube API
 	trendingVideos, err := u.youtubeAPI.GetTrendingVideos(ctx)
@@ -56,7 +56,6 @@ func (u *videoUseCase) CollectTrending(ctx context.Context) (*input.CollectTrend
 			YouTubeVideoID:   valueobject.YouTubeVideoID(videoMeta.ID),
 			YouTubeChannelID: valueobject.YouTubeChannelID(videoMeta.ChannelID),
 			Title:            videoMeta.Title,
-			ThumbnailURL:     videoMeta.ThumbnailURL,
 			PublishedAt:      videoMeta.PublishedAt,
 			CreatedAt:        time.Now(),
 		}
@@ -117,7 +116,6 @@ func (u *videoUseCase) CollectSubscriptions(ctx context.Context) (*input.Collect
 				YouTubeVideoID:   valueobject.YouTubeVideoID(videoMeta.ID),
 				YouTubeChannelID: channel.YouTubeChannelID,
 				Title:            videoMeta.Title,
-				ThumbnailURL:     videoMeta.ThumbnailURL,
 				PublishedAt:      videoMeta.PublishedAt,
 				CreatedAt:        time.Now(),
 			}
@@ -141,5 +139,23 @@ func (u *videoUseCase) CollectSubscriptions(ctx context.Context) (*input.Collect
 		VideosProcessed:   totalVideos,
 		VideosAdded:       videosAdded,
 		Duration:          time.Since(start),
+	}, nil
+}
+
+func (u *videoUseCase) CollectTrendingByGenre(ctx context.Context, genreID string) (*input.CollectTrendingResult, error) {
+	// This is a wrapper around CollectTrending with a required genreID
+	return u.CollectTrending(ctx, &genreID)
+}
+
+func (u *videoUseCase) CollectAllTrending(ctx context.Context) (*input.CollectAllTrendingResult, error) {
+	start := time.Now()
+	// TODO: Implement collecting trending videos for all enabled genres
+	// For now, return empty result
+	return &input.CollectAllTrendingResult{
+		GenresProcessed: 0,
+		TotalVideos:     0,
+		TotalAdded:      0,
+		GenreResults:    []*input.CollectTrendingResult{},
+		Duration:        time.Since(start),
 	}, nil
 }

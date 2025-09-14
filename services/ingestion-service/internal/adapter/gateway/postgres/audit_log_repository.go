@@ -55,7 +55,7 @@ func (r *auditLogRepository) Save(ctx context.Context, log *domain.AuditLog) err
 
 	var ipAddress pqtype.Inet
 	if log.IPAddress != nil {
-		ipAddress = pqtype.Inet{IPNet: &net.IPNet{IP: log.IPAddress}, Valid: true}
+		ipAddress = pqtype.Inet{IPNet: net.IPNet{IP: log.IPAddress}, Valid: true}
 	}
 
 	return r.q.CreateAuditLog(ctx, sqlcgen.CreateAuditLogParams{
@@ -159,7 +159,7 @@ func toDomainAuditLog(row sqlcgen.IngestionAuditLog) *domain.AuditLog {
 		}
 	}
 
-	if row.IpAddress.Valid && row.IpAddress.IPNet != nil {
+	if row.IpAddress.Valid {
 		log.IPAddress = row.IpAddress.IPNet.IP
 	}
 

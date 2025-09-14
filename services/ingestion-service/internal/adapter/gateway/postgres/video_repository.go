@@ -29,10 +29,10 @@ func (r *videoRepository) Save(ctx context.Context, v *domain.Video) error {
 		return err
 	}
 
-	// TODO: Get channel_id from channels table based on youtube_channel_id
-	// For now, using a placeholder
-	channelID := uuid.New()
-	videoURL := "https://www.youtube.com/watch?v=" + string(v.YouTubeVideoID)
+	channelID, err := uuid.Parse(string(v.ChannelID))
+	if err != nil {
+		return err
+	}
 
 	return r.q.CreateVideo(ctx, sqlcgen.CreateVideoParams{
 		ID:               id,
@@ -41,9 +41,7 @@ func (r *videoRepository) Save(ctx context.Context, v *domain.Video) error {
 		YoutubeChannelID: string(v.YouTubeChannelID),
 		Title:            v.Title,
 		PublishedAt:      v.PublishedAt,
-		CategoryID:       0, // Default category
-		ThumbnailUrl:     v.ThumbnailURL,
-		VideoUrl:         videoURL,
+		CategoryID:       int32(v.CategoryID),
 		CreatedAt:        sql.NullTime{Time: v.CreatedAt, Valid: true},
 	})
 }
@@ -84,15 +82,7 @@ func (r *videoRepository) GetByID(ctx context.Context, id valueobject.UUID) (*do
 		return nil, err
 	}
 
-	return &domain.Video{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		PublishedAt:      row.PublishedAt,
-		CreatedAt:        row.CreatedAt.Time,
-	}, nil
+	return toDomainVideoFromRow(row), nil
 }
 
 // FindByID finds a video by ID
@@ -110,15 +100,7 @@ func (r *videoRepository) FindByID(ctx context.Context, id valueobject.UUID) (*d
 		return nil, err
 	}
 
-	return &domain.Video{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		PublishedAt:      row.PublishedAt,
-		CreatedAt:        row.CreatedAt.Time,
-	}, nil
+	return toDomainVideoFromRow(row), nil
 }
 
 // FindByYouTubeID finds a video by YouTube ID
@@ -131,15 +113,7 @@ func (r *videoRepository) FindByYouTubeID(ctx context.Context, ytID valueobject.
 		return nil, err
 	}
 
-	return &domain.Video{
-		ID:               valueobject.UUID(row.ID.String()),
-		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
-		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-		Title:            row.Title,
-		ThumbnailURL:     row.ThumbnailUrl,
-		PublishedAt:      row.PublishedAt,
-		CreatedAt:        row.CreatedAt.Time,
-	}, nil
+	return toDomainVideoFromYouTubeRow(row), nil
 }
 
 // ExistsByYouTubeVideoID checks if a video exists by YouTube ID
@@ -165,15 +139,8 @@ func (r *videoRepository) ListByChannel(ctx context.Context, channelID valueobje
 
 	videos := make([]*domain.Video, len(rows))
 	for i, row := range rows {
-		videos[i] = &domain.Video{
-			ID:               valueobject.UUID(row.ID.String()),
-			YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
-			YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-			Title:            row.Title,
-			ThumbnailURL:     row.ThumbnailUrl,
-			PublishedAt:      row.PublishedAt,
-			CreatedAt:        row.CreatedAt.Time,
-		}
+		videos[i] = toDomainVideo(row.ID, row.ChannelID, row.YoutubeVideoID, row.YoutubeChannelID, row.Title,
+			row.PublishedAt, row.CategoryID, row.CreatedAt, sql.NullTime{}, sql.NullTime{})
 	}
 	return videos, nil
 }
@@ -201,15 +168,60 @@ func (r *videoRepository) ListActive(ctx context.Context, since time.Time) ([]*d
 
 	videos := make([]*domain.Video, len(rows))
 	for i, row := range rows {
-		videos[i] = &domain.Video{
-			ID:               valueobject.UUID(row.ID.String()),
-			YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
-			YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
-			Title:            row.Title,
-			ThumbnailURL:     row.ThumbnailUrl,
-			PublishedAt:      row.PublishedAt,
-			CreatedAt:        row.CreatedAt.Time,
-		}
+		videos[i] = toDomainVideo(row.ID, row.ChannelID, row.YoutubeVideoID, row.YoutubeChannelID, row.Title,
+			row.PublishedAt, row.CategoryID, row.CreatedAt, sql.NullTime{}, sql.NullTime{})
 	}
 	return videos, nil
+}
+
+// toDomainVideo converts database row to domain video
+func toDomainVideo(id uuid.UUID, channelID uuid.UUID, youtubeVideoID, youtubeChannelID, title string, 
+	publishedAt time.Time, categoryID int32, createdAt sql.NullTime, updatedAt, deletedAt sql.NullTime) *domain.Video {
+	v := &domain.Video{
+		ID:               valueobject.UUID(id.String()),
+		ChannelID:        valueobject.UUID(channelID.String()),
+		YouTubeVideoID:   valueobject.YouTubeVideoID(youtubeVideoID),
+		YouTubeChannelID: valueobject.YouTubeChannelID(youtubeChannelID),
+		Title:            title,
+		PublishedAt:      publishedAt,
+		CategoryID:       valueobject.CategoryID(categoryID),
+		CreatedAt:        createdAt.Time,
+	}
+
+	if updatedAt.Valid {
+		v.UpdatedAt = &updatedAt.Time
+	}
+	if deletedAt.Valid {
+		v.DeletedAt = &deletedAt.Time
+	}
+
+	return v
+}
+
+// toDomainVideoFromRow converts GetVideoByIDRow to domain video
+func toDomainVideoFromRow(row sqlcgen.GetVideoByIDRow) *domain.Video {
+	return &domain.Video{
+		ID:               valueobject.UUID(row.ID.String()),
+		ChannelID:        valueobject.UUID(row.ChannelID.String()),
+		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		PublishedAt:      row.PublishedAt,
+		CategoryID:       valueobject.CategoryID(row.CategoryID),
+		CreatedAt:        row.CreatedAt.Time,
+	}
+}
+
+// toDomainVideoFromYouTubeRow converts GetVideoByYouTubeIDRow to domain video  
+func toDomainVideoFromYouTubeRow(row sqlcgen.GetVideoByYouTubeIDRow) *domain.Video {
+	return &domain.Video{
+		ID:               valueobject.UUID(row.ID.String()),
+		ChannelID:        valueobject.UUID(row.ChannelID.String()),
+		YouTubeVideoID:   valueobject.YouTubeVideoID(row.YoutubeVideoID),
+		YouTubeChannelID: valueobject.YouTubeChannelID(row.YoutubeChannelID),
+		Title:            row.Title,
+		PublishedAt:      row.PublishedAt,
+		CategoryID:       valueobject.CategoryID(row.CategoryID),
+		CreatedAt:        row.CreatedAt.Time,
+	}
 }

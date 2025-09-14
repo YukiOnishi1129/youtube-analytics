@@ -37,9 +37,11 @@ func (u *keywordUseCase) CreateKeyword(ctx context.Context, input *input.CreateK
 	// Create keyword using the constructor
 	keyword, err := domain.NewKeyword(
 		valueobject.UUID(uuid.New().String()),
+		valueobject.UUID(input.GenreID.String()),
 		input.Name,
 		ft,
 		input.Pattern,
+		input.TargetField,
 		input.Description,
 	)
 	if err != nil {
@@ -129,6 +131,11 @@ func (u *keywordUseCase) DisableKeyword(ctx context.Context, keywordID uuid.UUID
 	}
 
 	return keyword, nil
+}
+
+func (u *keywordUseCase) ListKeywordsByGenre(ctx context.Context, genreID uuid.UUID) ([]*domain.Keyword, error) {
+	// Get all keywords for the genre (not just enabled ones)
+	return u.keywordRepo.FindByGenre(ctx, valueobject.UUID(genreID.String()), false)
 }
 
 func (u *keywordUseCase) DeleteKeyword(ctx context.Context, keywordID uuid.UUID) error {

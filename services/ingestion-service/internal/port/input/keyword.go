@@ -10,6 +10,7 @@ import (
 // KeywordInputPort is the interface for keyword use cases
 type KeywordInputPort interface {
 	ListKeywords(ctx context.Context) ([]*domain.Keyword, error)
+	ListKeywordsByGenre(ctx context.Context, genreID uuid.UUID) ([]*domain.Keyword, error)
 	CreateKeyword(ctx context.Context, input *CreateKeywordInput) (*domain.Keyword, error)
 	GetKeyword(ctx context.Context, keywordID uuid.UUID) (*domain.Keyword, error)
 	UpdateKeyword(ctx context.Context, input *UpdateKeywordInput) (*domain.Keyword, error)
@@ -20,9 +21,11 @@ type KeywordInputPort interface {
 
 // CreateKeywordInput represents the input for creating a keyword
 type CreateKeywordInput struct {
+	GenreID     uuid.UUID
 	Name        string
 	FilterType  string
 	Pattern     string
+	TargetField string
 	Description *string
 }
 
@@ -32,6 +35,7 @@ type UpdateKeywordInput struct {
 	Name        string
 	FilterType  string
 	Pattern     string
+	TargetField string
 	Enabled     bool
 	Description *string
 }
