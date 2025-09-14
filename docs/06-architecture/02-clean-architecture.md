@@ -27,6 +27,13 @@ Dependency always points inward
 - Outer layers may depend on inner layers
 - Inner layers do not know outer layers
 
+**Key Principle: Dependencies Only Point Inward**
+- Any outer layer can reference Domain objects directly
+- Repository (Adapter layer) can return Domain entities
+- Presenter (Adapter layer) can accept Domain entities
+- Driver layer can work with Domain objects through Use Cases
+- This follows Uncle Bob's original Clean Architecture principles
+
 ### Layer Responsibilities
 
 #### Domain Layer (innermost)
@@ -49,8 +56,8 @@ Dependency always points inward
 
 #### Adapter Layer
 - Controller: gRPC/HTTP handlers
-- Presenter: Response shaping
-- Gateway: Repository and external API implementations
+- Presenter: Response shaping (can work with Domain objects)
+- Gateway: Repository and external API implementations (can return Domain objects)
   - PostgresVideoRepository
   - YouTubeAPIClient
   - CloudTasksClient
@@ -158,7 +165,8 @@ type PostgresVideoRepository struct {
 }
 
 func (r *PostgresVideoRepository) Save(ctx context.Context, video *domain.Video) error {
-    // ...
+    // Repository handles the conversion to SQL internally
+    // Domain object is passed directly
     return nil
 }
 ```
@@ -185,5 +193,35 @@ type RoleRepository interface {
     ListByAccount(ctx context.Context, accountID string) ([]domain.Role, error)
     Assign(ctx context.Context, accountID string, role domain.Role) error
     Revoke(ctx context.Context, accountID string, role domain.Role) error
+}
+```
+
+### Direct Domain Usage in Adapters
+
+**Following Clean Architecture Principles:**
+- Repositories can directly work with Domain entities
+- Presenters can accept Domain objects and convert to response formats
+- This simplifies code while maintaining the Dependency Rule
+- Domain remains unaware of technical details (DB, HTTP, etc.)
+
+**Example Repository Implementation:**
+```go
+// adapter/gateway/postgres_video_repository.go
+func (r *PostgresVideoRepository) FindByID(ctx context.Context, id domain.VideoID) (*domain.Video, error) {
+    row := r.db.QueryRow("SELECT * FROM videos WHERE id = $1", id)
+    // Convert SQL row to domain.Video
+    return toDomainVideo(row), nil
+}
+```
+
+**Example Presenter Usage:**
+```go
+// adapter/presenter/grpc_presenter.go
+func (p *GRPCPresenter) PresentVideo(video *domain.Video) *pb.VideoResponse {
+    return &pb.VideoResponse{
+        Id:          string(video.ID),
+        Title:       video.Title,
+        PublishedAt: video.PublishedAt.Format(time.RFC3339),
+    }
 }
 ```

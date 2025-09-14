@@ -9,7 +9,7 @@ import (
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/driver/grpc"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/output/gateway"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/usecase"
-	// pb "github.com/YukiOnishi1129/youtube-analytics/pkg/proto/ingestion/v1"
+	pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/ingestion/v1"
 	googlegrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -51,7 +51,7 @@ func BootstrapGRPC(
 	)
 
 	// Create gRPC server handler
-	_ = grpc.NewServer(
+	handler := grpc.NewServer(
 		channelUseCase,
 		videoUseCase,
 		systemUseCase,
@@ -64,7 +64,7 @@ func BootstrapGRPC(
 	)
 
 	// Register service
-	// pb.RegisterIngestionServiceServer(grpcServer, handler)
+	pb.RegisterIngestionServiceServer(grpcServer, handler)
 
 	// Register reflection service on gRPC server for debugging
 	reflection.Register(grpcServer)
@@ -120,7 +120,7 @@ func BootstrapGRPCWithKeyword(
 	)
 
 	// Create extended gRPC server handler with keyword support
-	_ = grpc.NewServerWithKeyword(
+	handler := grpc.NewServerWithKeyword(
 		channelUseCase,
 		videoUseCase,
 		systemUseCase,
@@ -131,7 +131,7 @@ func BootstrapGRPCWithKeyword(
 	grpcServer := googlegrpc.NewServer()
 
 	// Register service
-	// pb.RegisterIngestionServiceServer(grpcServer, handler)
+	pb.RegisterIngestionServiceServer(grpcServer, handler)
 
 	// Register reflection service
 	reflection.Register(grpcServer)

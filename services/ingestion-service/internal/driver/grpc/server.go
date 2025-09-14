@@ -8,13 +8,13 @@ import (
 
 	pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/ingestion/v1"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/domain"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/port/input"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Server implements the gRPC server for ingestion service

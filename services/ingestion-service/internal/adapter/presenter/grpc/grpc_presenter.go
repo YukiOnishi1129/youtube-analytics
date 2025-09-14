@@ -1,6 +1,8 @@
 package grpc
 
 import (
+	"fmt"
+	
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -19,118 +21,98 @@ func NewGRPCPresenter() presenter.GRPCPresenter {
 }
 
 // PresentChannel presents a single channel for gRPC
-func (p *grpcPresenter) PresentChannel(channel *domain.Channel) interface{} {
-	return &pb.GetChannelResponse{
-		Channel: domainChannelToProto(channel),
-	}
+func (p *grpcPresenter) PresentChannel(channel *domain.Channel) *pb.Channel {
+	return domainChannelToProto(channel)
 }
 
 // PresentChannels presents multiple channels for gRPC
-func (p *grpcPresenter) PresentChannels(channels []*domain.Channel) interface{} {
+func (p *grpcPresenter) PresentChannels(channels []*domain.Channel) []*pb.Channel {
 	items := make([]*pb.Channel, len(channels))
 	for i, channel := range channels {
 		items[i] = domainChannelToProto(channel)
 	}
-	return &pb.ListChannelsResponse{
-		Channels: items,
-	}
+	return items
 }
 
 // PresentVideo presents a single video for gRPC
-func (p *grpcPresenter) PresentVideo(video *domain.Video) interface{} {
-	return &pb.GetVideoResponse{
-		Video: domainVideoToProto(video),
-	}
+func (p *grpcPresenter) PresentVideo(video *domain.Video) *pb.Video {
+	return domainVideoToProto(video)
 }
 
 // PresentVideos presents multiple videos for gRPC
-func (p *grpcPresenter) PresentVideos(videos []*domain.Video) interface{} {
+func (p *grpcPresenter) PresentVideos(videos []*domain.Video) []*pb.Video {
 	items := make([]*pb.Video, len(videos))
 	for i, video := range videos {
 		items[i] = domainVideoToProto(video)
 	}
-	return &pb.ListVideosResponse{
-		Videos: items,
-	}
+	return items
 }
 
 // PresentSnapshot presents a single snapshot for gRPC
-func (p *grpcPresenter) PresentSnapshot(snapshot *domain.VideoSnapshot) interface{} {
-	return &pb.GetSnapshotResponse{
-		Snapshot: domainSnapshotToProto(snapshot),
-	}
+func (p *grpcPresenter) PresentSnapshot(snapshot *domain.VideoSnapshot) *pb.VideoSnapshot {
+	return domainSnapshotToProto(snapshot)
 }
 
 // PresentSnapshots presents multiple snapshots for gRPC
-func (p *grpcPresenter) PresentSnapshots(snapshots []*domain.VideoSnapshot) interface{} {
+func (p *grpcPresenter) PresentSnapshots(snapshots []*domain.VideoSnapshot) []*pb.VideoSnapshot {
 	items := make([]*pb.VideoSnapshot, len(snapshots))
 	for i, snapshot := range snapshots {
 		items[i] = domainSnapshotToProto(snapshot)
 	}
-	return &pb.ListSnapshotsResponse{
-		Snapshots: items,
-	}
+	return items
 }
 
 // PresentKeyword presents a single keyword for gRPC
-func (p *grpcPresenter) PresentKeyword(keyword *domain.Keyword) interface{} {
-	return &pb.GetKeywordResponse{
-		Keyword: domainKeywordToProto(keyword),
-	}
+func (p *grpcPresenter) PresentKeyword(keyword *domain.Keyword) *pb.Keyword {
+	return domainKeywordToProto(keyword)
 }
 
 // PresentKeywords presents multiple keywords for gRPC
-func (p *grpcPresenter) PresentKeywords(keywords []*domain.Keyword) interface{} {
+func (p *grpcPresenter) PresentKeywords(keywords []*domain.Keyword) []*pb.Keyword {
 	items := make([]*pb.Keyword, len(keywords))
 	for i, keyword := range keywords {
 		items[i] = domainKeywordToProto(keyword)
 	}
-	return &pb.ListKeywordsResponse{
-		Keywords: items,
-	}
+	return items
 }
 
 // PresentScheduleSnapshotsResult presents the result of scheduling snapshots
-func (p *grpcPresenter) PresentScheduleSnapshotsResult(result interface{}) interface{} {
+func (p *grpcPresenter) PresentScheduleSnapshotsResult(count int32) *pb.ScheduleSnapshotsResponse {
 	return &pb.ScheduleSnapshotsResponse{
-		VideosProcessed: 0, // Not used in gRPC - this is HTTP admin endpoint
-		TasksScheduled:  0,
+		VideosProcessed: count,
+		TasksScheduled:  count,
 		DurationMs:      0,
 	}
 }
 
 // PresentUpdateChannelsResult presents the result of updating channels
-func (p *grpcPresenter) PresentUpdateChannelsResult(result interface{}) interface{} {
+func (p *grpcPresenter) PresentUpdateChannelsResult(count int32) *pb.UpdateChannelsResponse {
 	return &pb.UpdateChannelsResponse{
-		ChannelsProcessed: 0, // Not used in gRPC - this is HTTP admin endpoint
-		ChannelsUpdated:   0,
+		ChannelsProcessed: count,
+		ChannelsUpdated:   count,
 		DurationMs:        0,
 	}
 }
 
 // PresentCollectTrendingResult presents the result of collecting trending videos
-func (p *grpcPresenter) PresentCollectTrendingResult(result interface{}) interface{} {
+func (p *grpcPresenter) PresentCollectTrendingResult(count int32) *pb.CollectTrendingResponse {
 	return &pb.CollectTrendingResponse{
-		VideosProcessed: 0, // Not used in gRPC - this is HTTP admin endpoint
-		VideosAdded:     0,
+		VideosProcessed: count,
+		VideosAdded:     count,
 		DurationMs:      0,
 	}
 }
 
 // PresentCollectSubscriptionsResult presents the result of collecting subscription videos
-func (p *grpcPresenter) PresentCollectSubscriptionsResult(result interface{}) interface{} {
+func (p *grpcPresenter) PresentCollectSubscriptionsResult(count int32) *pb.CollectSubscriptionsResponse {
 	return &pb.CollectSubscriptionsResponse{
-		ChannelsProcessed: 0, // Not used in gRPC - this is HTTP admin endpoint
-		VideosProcessed:   0,
-		VideosAdded:       0,
+		ChannelsProcessed: count,
+		VideosProcessed:   count,
+		VideosAdded:       count,
 		DurationMs:        0,
 	}
 }
 
-// PresentDeleted presents a successful deletion
-func (p *grpcPresenter) PresentDeleted() interface{} {
-	return nil // gRPC uses empty response
-}
 
 // PresentError presents an error for gRPC
 func (p *grpcPresenter) PresentError(err error) error {
@@ -196,9 +178,12 @@ func domainSnapshotToProto(snapshot *domain.VideoSnapshot) *pb.VideoSnapshot {
 func domainKeywordToProto(keyword *domain.Keyword) *pb.Keyword {
 	pbKeyword := &pb.Keyword{
 		Id:          string(keyword.ID),
+		GenreId:     string(keyword.GenreID),
 		Name:        keyword.Name,
 		FilterType:  string(keyword.FilterType),
 		Pattern:     keyword.Pattern,
+		TargetField: keyword.TargetField,
+		Enabled:     keyword.Enabled,
 		CreatedAt:   timestamppb.New(keyword.CreatedAt),
 	}
 	if keyword.Description != nil {
@@ -207,5 +192,183 @@ func domainKeywordToProto(keyword *domain.Keyword) *pb.Keyword {
 	if keyword.UpdatedAt != nil {
 		pbKeyword.UpdatedAt = timestamppb.New(*keyword.UpdatedAt)
 	}
+	if keyword.DeletedAt != nil {
+		pbKeyword.DeletedAt = timestamppb.New(*keyword.DeletedAt)
+	}
 	return pbKeyword
+}
+
+// PresentGenre presents a single genre for gRPC
+func (p *grpcPresenter) PresentGenre(genre *domain.Genre) *pb.Genre {
+	return domainGenreToProto(genre)
+}
+
+// PresentGenres presents multiple genres for gRPC
+func (p *grpcPresenter) PresentGenres(genres []*domain.Genre) []*pb.Genre {
+	items := make([]*pb.Genre, len(genres))
+	for i, genre := range genres {
+		items[i] = domainGenreToProto(genre)
+	}
+	return items
+}
+
+// PresentYouTubeCategory presents a single YouTube category for gRPC
+func (p *grpcPresenter) PresentYouTubeCategory(category *domain.YouTubeCategory) *pb.YouTubeCategory {
+	return domainYouTubeCategoryToProto(category)
+}
+
+// PresentYouTubeCategories presents multiple YouTube categories for gRPC
+func (p *grpcPresenter) PresentYouTubeCategories(categories []*domain.YouTubeCategory) []*pb.YouTubeCategory {
+	items := make([]*pb.YouTubeCategory, len(categories))
+	for i, category := range categories {
+		items[i] = domainYouTubeCategoryToProto(category)
+	}
+	return items
+}
+
+// PresentVideoGenre presents a single video-genre association for gRPC
+func (p *grpcPresenter) PresentVideoGenre(videoGenre *domain.VideoGenre) *pb.VideoGenre {
+	return domainVideoGenreToProto(videoGenre)
+}
+
+// PresentVideoGenres presents multiple video-genre associations for gRPC
+func (p *grpcPresenter) PresentVideoGenres(videoGenres []*domain.VideoGenre) []*pb.VideoGenre {
+	items := make([]*pb.VideoGenre, len(videoGenres))
+	for i, vg := range videoGenres {
+		items[i] = domainVideoGenreToProto(vg)
+	}
+	return items
+}
+
+// PresentAuditLog presents a single audit log for gRPC
+func (p *grpcPresenter) PresentAuditLog(auditLog *domain.AuditLog) *pb.AuditLog {
+	return domainAuditLogToProto(auditLog)
+}
+
+// PresentAuditLogs presents multiple audit logs for gRPC
+func (p *grpcPresenter) PresentAuditLogs(auditLogs []*domain.AuditLog) []*pb.AuditLog {
+	items := make([]*pb.AuditLog, len(auditLogs))
+	for i, log := range auditLogs {
+		items[i] = domainAuditLogToProto(log)
+	}
+	return items
+}
+
+// PresentBatchJob presents a single batch job for gRPC
+func (p *grpcPresenter) PresentBatchJob(batchJob *domain.BatchJob) *pb.BatchJob {
+	return domainBatchJobToProto(batchJob)
+}
+
+// PresentBatchJobs presents multiple batch jobs for gRPC
+func (p *grpcPresenter) PresentBatchJobs(batchJobs []*domain.BatchJob) []*pb.BatchJob {
+	items := make([]*pb.BatchJob, len(batchJobs))
+	for i, job := range batchJobs {
+		items[i] = domainBatchJobToProto(job)
+	}
+	return items
+}
+
+// Helper functions for new domain objects
+
+func domainGenreToProto(genre *domain.Genre) *pb.Genre {
+	categoryIDs := make([]int32, len(genre.CategoryIDs))
+	for i, id := range genre.CategoryIDs {
+		categoryIDs[i] = int32(id)
+	}
+
+	return &pb.Genre{
+		Id:          string(genre.ID),
+		Code:        genre.Code,
+		Name:        genre.Name,
+		Language:    genre.Language,
+		RegionCode:  genre.RegionCode,
+		CategoryIds: categoryIDs,
+		Enabled:     genre.Enabled,
+	}
+}
+
+func domainYouTubeCategoryToProto(category *domain.YouTubeCategory) *pb.YouTubeCategory {
+	return &pb.YouTubeCategory{
+		Id:         int32(category.ID),
+		Title:      category.Name,
+		Assignable: category.Assignable,
+	}
+}
+
+func domainVideoGenreToProto(vg *domain.VideoGenre) *pb.VideoGenre {
+	return &pb.VideoGenre{
+		VideoId:   string(vg.VideoID),
+		GenreId:   string(vg.GenreID),
+		CreatedAt: timestamppb.New(vg.CreatedAt),
+	}
+}
+
+func domainAuditLogToProto(log *domain.AuditLog) *pb.AuditLog {
+	proto := &pb.AuditLog{
+		Id:           string(log.ID),
+		ActorId:      string(log.ActorID),
+		ActorEmail:   log.ActorEmail,
+		Action:       log.Action,
+		ResourceType: log.ResourceType,
+		ResourceId:   log.ResourceID,
+		UserAgent:    log.UserAgent,
+		CreatedAt:    timestamppb.New(log.CreatedAt),
+	}
+
+	if log.IPAddress != nil {
+		proto.IpAddress = log.IPAddress.String()
+	}
+
+	// Convert old/new values
+	if log.OldValues != nil {
+		proto.OldValues = make(map[string]string)
+		for k, v := range log.OldValues {
+			proto.OldValues[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	if log.NewValues != nil {
+		proto.NewValues = make(map[string]string)
+		for k, v := range log.NewValues {
+			proto.NewValues[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	return proto
+}
+
+func domainBatchJobToProto(job *domain.BatchJob) *pb.BatchJob {
+	proto := &pb.BatchJob{
+		Id:           string(job.ID),
+		JobType:      string(job.JobType),
+		Status:       string(job.Status),
+		ErrorMessage: job.ErrorMessage,
+		CreatedAt:    timestamppb.New(job.CreatedAt),
+	}
+
+	if job.StartedAt != nil {
+		proto.StartedAt = timestamppb.New(*job.StartedAt)
+	}
+
+	if job.CompletedAt != nil {
+		proto.CompletedAt = timestamppb.New(*job.CompletedAt)
+	}
+
+	// Convert parameters
+	if job.Parameters != nil {
+		proto.Parameters = make(map[string]string)
+		for k, v := range job.Parameters {
+			proto.Parameters[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	// Convert statistics
+	if job.Statistics != nil {
+		proto.Statistics = make(map[string]string)
+		for k, v := range job.Statistics {
+			proto.Statistics[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	return proto
 }

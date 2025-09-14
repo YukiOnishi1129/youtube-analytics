@@ -15,7 +15,6 @@ import (
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/adapter/gateway/postgres"
 	pubsubgw "github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/adapter/gateway/pubsub"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/adapter/gateway/youtube"
-	httpPresenter "github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/adapter/presenter/http"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/domain/service"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/usecase"
 	"github.com/YukiOnishi1129/youtube-analytics/services/ingestion-service/internal/driver/datastore"
@@ -32,11 +31,8 @@ func BootstrapHTTP(
 	taskQueue string,
 	eventTopic string,
 ) error {
-	// Initialize presenters
-	channelPresenter := httpPresenter.NewChannelPresenter()
-	videoPresenter := httpPresenter.NewVideoPresenter()
-	systemPresenter := httpPresenter.NewSystemPresenter()
-	keywordPresenter := httpPresenter.NewKeywordPresenter()
+	// Note: HTTP handlers currently handle their own response formatting
+	// The HTTPPresenter interface is available for future use
 
 	// Initialize gateways
 	repo := postgres.NewRepository(db)
@@ -99,16 +95,12 @@ func BootstrapHTTP(
 		keywordRepo,
 	)
 
-	// Create router with presenters
-	router := httpdriver.SetupRouterWithPresenters(
+	// Create router
+	router := httpdriver.SetupRouterWithKeyword(
 		channelUseCase,
 		videoUseCase,
 		systemUseCase,
 		keywordUseCase,
-		channelPresenter,
-		videoPresenter,
-		systemPresenter,
-		keywordPresenter,
 	)
 
 	// Create HTTP server
