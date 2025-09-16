@@ -90,12 +90,12 @@ EnableGenre(id UUID) error
 DisableGenre(id UUID) error
 ```
 
-### A-3) Keyword
+### A-3) KeywordGroup
 
 #### Purpose
-Define inclusion/exclusion rules for video selection within a genre
+Define inclusion/exclusion rules for video selection within a genre. Keywords are organized into groups with individual keyword items.
 
-#### Entity
+#### Aggregate Root Entity
 ```go
 type FilterType string
 const (
@@ -103,44 +103,65 @@ const (
     Exclude FilterType = "exclude"
 )
 
-type Keyword struct {
+type KeywordGroup struct {
     ID          UUID
     GenreID     UUID           // Associated genre
-    Name        string
+    Name        string         // Group name (e.g., "JavaScript/JS")
     FilterType  FilterType     // include / exclude
-    Pattern     string         // Normalized regex pattern
-    TargetField string         // TITLE, DESCRIPTION, etc.
+    TargetField string         // title, description, etc.
     Enabled     bool
     Description *string
+    Items       []KeywordItem  // Individual keywords in the group
     DeletedAt   *time.Time     // Soft delete timestamp
+}
+```
+
+#### Value Object
+```go
+type KeywordItem struct {
+    ID        UUID
+    GroupID   UUID
+    Keyword   string         // Individual keyword (e.g., "React", "Vue")
+    CreatedAt time.Time
+    UpdatedAt *time.Time
 }
 ```
 
 #### Domain Service
 ```go
-// Pure function to build pattern from name
-func BuildPattern(name string) (string, error)
+// Generate regex pattern from keyword items
+type KeywordPatternGenerator interface {
+    GeneratePattern(keywords []string) string
+}
 ```
 
 #### Invariants
-- Pattern != "" (must not be empty)
+- KeywordGroup must have at least one KeywordItem
 - FilterType ∈ {include, exclude}
 - (GenreID, Name, FilterType) logical uniqueness (enforced at app/repo level)
-- Disabled keywords are not used for judgment
-- Pattern is auto-generated from Name
-- Keywords belong to exactly one genre
+- No duplicate keywords within the same group
+- Disabled groups are not used for filtering
+- Patterns are generated dynamically from keyword items
+- Keyword groups belong to exactly one genre
 
 #### Commands
 ```go
-// Register or update a keyword for a genre
-PutKeyword(genreID UUID, name string, filterType FilterType, description string) error
+// Create a new keyword group with items
+CreateKeywordGroup(genreID UUID, name string, filterType FilterType, keywords []string, description string) error
+
+// Update keywords in a group
+UpdateKeywords(groupID UUID, keywords []string) error
+
+// Add/Remove individual keywords
+AddKeyword(groupID UUID, keyword string) error
+RemoveKeyword(groupID UUID, keyword string) error
 
 // Enable/Disable
-EnableKeyword(id UUID) error
-DisableKeyword(id UUID) error
+EnableKeywordGroup(id UUID) error
+DisableKeywordGroup(id UUID) error
 
 // Remove (soft delete - sets DeletedAt)
-RemoveKeyword(id UUID) error
+RemoveKeywordGroup(id UUID) error
 ```
 
 ### A-4) Channel

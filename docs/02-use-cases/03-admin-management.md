@@ -118,75 +118,94 @@ Administrative functions for managing the YouTube Analytics system configuration
 
 ## Keyword Management
 
-### List Keywords by Genre
+### List Keyword Groups by Genre
 
 - **Actor**: Administrator
 - **Precondition**: Logged in with admin role, genre selected
 - **Input**: Genre ID, optional filters (enabled/disabled, filter type)
 - **Processing**:
-  1. Retrieve keywords for the genre
-  2. Sort by filter type (include/exclude)
-  3. Show enabled/disabled status
-- **Output**: List of keywords with patterns
+  1. Retrieve keyword groups for the genre
+  2. Load associated keyword items for each group
+  3. Sort by filter type (include/exclude)
+  4. Show enabled/disabled status
+- **Output**: List of keyword groups with their individual keywords
 - **UI Elements**:
   - Genre selector
   - Filter type tabs (All/Include/Exclude)
-  - Keyword table with regex patterns
-  - Test pattern tool
+  - Keyword group cards showing individual keywords
+  - Pattern preview (dynamically generated)
 
-### Create Keyword
+### Create Keyword Group
 
 - **Actor**: Administrator
 - **Precondition**: Logged in with admin role, genre selected
 - **Input**:
   - Genre ID
-  - Name (e.g., "プログラミング")
-  - Filter type (INCLUDE/EXCLUDE)
-  - Pattern (regex, auto-generated from name if not provided)
+  - Group name (e.g., "JavaScript/JS")
+  - Keywords array (e.g., ["JavaScript", "JS", "React", "Vue"])
+  - Filter type (include/exclude)
+  - Target field (title/description)
   - Description (optional)
 - **Processing**:
-  1. Validate regex pattern syntax
-  2. Check for duplicate name in genre
-  3. Create keyword record
-  4. Set as enabled by default
-- **Output**: Created keyword or validation errors
+  1. Validate group name uniqueness in genre
+  2. Validate at least one keyword provided
+  3. Create keyword group with items
+  4. Generate pattern dynamically for preview
+  5. Set as enabled by default
+- **Output**: Created keyword group or validation errors
 - **UI Elements**:
   - Form within genre context
   - Filter type radio buttons
-  - Pattern input with regex validation
-  - Pattern test tool
+  - Keywords input (tag-style UI)
+  - Pattern preview (auto-generated)
 
-### Update Keyword
-
-- **Actor**: Administrator
-- **Precondition**: Logged in with admin role
-- **Input**: Keyword ID, updated fields
-- **Processing**:
-  1. Validate regex pattern if changed
-  2. Update keyword properties
-  3. Log the change
-- **Output**: Updated keyword or errors
-- **Notes**: Genre association cannot be changed
-
-### Delete Keyword
+### Update Keyword Group
 
 - **Actor**: Administrator
 - **Precondition**: Logged in with admin role
-- **Input**: Keyword ID
+- **Input**: Group ID, updated fields (name, filter type, description)
 - **Processing**:
-  1. Soft delete (set deleted_at)
-  2. Maintain history for audit
+  1. Update group properties (excluding keywords)
+  2. Log the change
+- **Output**: Updated group or errors
+- **Notes**: To update keywords, use separate keyword management endpoints
+
+### Manage Keywords in Group
+
+- **Actor**: Administrator
+- **Precondition**: Logged in with admin role, keyword group selected
+- **Input**: Group ID, keywords array
+- **Processing**:
+  1. Replace all keywords in the group
+  2. Validate no duplicates
+  3. Ensure at least one keyword remains
+- **Output**: Updated keyword list
+- **UI Elements**:
+  - Add/remove keywords UI
+  - Bulk edit option
+  - Real-time pattern preview
+
+### Delete Keyword Group
+
+- **Actor**: Administrator
+- **Precondition**: Logged in with admin role
+- **Input**: Group ID
+- **Processing**:
+  1. Soft delete group (set deleted_at)
+  2. Cascade delete to keyword items
+  3. Maintain history for audit
 - **Output**: Success message
 - **Notes**: Soft delete preserves historical data
 
-### Test Keyword Pattern
+### Test Generated Pattern
 
 - **Actor**: Administrator
-- **Precondition**: Creating or editing keyword
-- **Input**: Pattern (regex), test strings
+- **Precondition**: Creating or editing keyword group
+- **Input**: Keywords array, test strings
 - **Processing**:
-  1. Compile regex pattern
-  2. Test against provided strings
+  1. Generate pattern from keywords
+  2. Test pattern against provided strings
+  3. Show matches
   3. Show matches/non-matches
 - **Output**: Test results with highlighted matches
 - **UI Elements**:

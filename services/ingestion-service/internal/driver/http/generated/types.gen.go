@@ -25,15 +25,16 @@ const (
 type CollectSubscriptionsResponse struct {
 	ChannelsProcessed int32  `json:"channelsProcessed"`
 	Duration          string `json:"duration"`
-	VideosAdded       int32  `json:"videosAdded"`
-	VideosProcessed   int32  `json:"videosProcessed"`
+	VideosCollected   int32  `json:"videosCollected"`
+	VideosCreated     int32  `json:"videosCreated"`
 }
 
 // CollectTrendingResponse defines model for CollectTrendingResponse.
 type CollectTrendingResponse struct {
 	Duration        string `json:"duration"`
-	VideosAdded     int32  `json:"videosAdded"`
-	VideosProcessed int32  `json:"videosProcessed"`
+	VideosCollected int32  `json:"videosCollected"`
+	VideosCreated   int32  `json:"videosCreated"`
+	VideosUpdated   int32  `json:"videosUpdated"`
 }
 
 // CreateSnapshotRequest defines model for CreateSnapshotRequest.

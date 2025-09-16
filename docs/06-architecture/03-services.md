@@ -63,14 +63,15 @@ Service: `ingestion.v1.IngestionService`
 | UpdateGenre | Update genre settings | Admin required | {id,name,enabled,category_ids} → Genre |
 | DeleteGenre | Delete genre | Admin required | {id} → void |
 
-#### Keyword Management (Admin only)
+#### Keyword Group Management (Admin only)
 
 | Method | Purpose | Auth | Request/Response |
 |--------|---------|------|------------------|
-| ListKeywordsByGenre | List keywords for genre | Admin required | {genre_id} → [Keyword] |
-| CreateKeyword | Create keyword for genre | Admin required | {genre_id,name,pattern,filter_type,description} → Keyword |
-| UpdateKeyword | Update keyword | Admin required | {id,name,pattern,filter_type,enabled,description} → Keyword |
-| DeleteKeyword | Delete keyword | Admin required | {id} → void |
+| ListKeywordGroupsByGenre | List keyword groups for genre | Admin required | {genre_id} → [KeywordGroup] |
+| CreateKeywordGroup | Create keyword group | Admin required | {genre_id,name,keywords[],filter_type,target_field,description} → KeywordGroup |
+| UpdateKeywordGroup | Update group properties | Admin required | {id,name,filter_type,enabled,description} → KeywordGroup |
+| UpdateKeywords | Update keywords in group | Admin required | {group_id,keywords[]} → KeywordGroup |
+| DeleteKeywordGroup | Delete keyword group | Admin required | {id} → void |
 
 #### Channel Management
 
@@ -118,9 +119,9 @@ Service: `ingestion.v1.IngestionService`
 
 **Collect Trending Details:**
 - Process: For each enabled genre:
-  1. Get genre settings (region_code, category_ids, keywords)
+  1. Get genre settings (region_code, category_ids, keyword_groups)
   2. Fetch YouTube trending for that region/categories
-  3. Apply genre-specific keyword filters
+  3. Generate patterns from keyword groups and apply filters
   4. Register matched videos with genre_id
 - Idempotency: `youtube_video_id UNIQUE` ignores duplicates
 - Genre Examples:

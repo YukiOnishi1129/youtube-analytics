@@ -1,27 +1,45 @@
-# Ingestion Service Seeder
+# Database Seeder
 
-A command-line tool for seeding the ingestion service database with initial data.
+Database seeder for YouTube Analytics ingestion service master data.
+
+## Master Data
+
+All seeds are production-ready master data:
+
+- **youtube_categories**: Official YouTube API categories (27: Education, 28: Science & Technology, etc.)
+- **genres**: Japanese Engineering genre only (combining categories 27 & 28)
+- **keywords**: Search patterns for Japanese engineering content
 
 ## Usage
-
-### Local Development
 
 ```bash
 # Run all seeds
 make seed
 
-# Run only keyword seeds
+# Run specific seeds
+make seed-categories
+make seed-genres  
 make seed-keywords
 
-# Preview SQL without executing (dry run)
+# Preview SQL without executing
 make seed-dry-run
-
-# Build seeder binary
-make build-seeder
-./bin/seeder -target=all
 ```
 
-### Docker
+## Seed Order
+
+Seeds are executed in dependency order:
+1. youtube_categories
+2. genres (depends on categories)
+3. keywords (depends on genres)
+
+## Initial Launch Configuration
+
+For the initial launch, we're focusing on:
+- **Single Genre**: Japanese Engineering (エンジニア)
+- **Categories**: 27 (Education) + 28 (Science & Technology)
+- **Keywords**: ~20 patterns covering programming languages, frameworks, and Japanese tech terms
+
+## Docker
 
 ```bash
 # Build Docker image
@@ -34,7 +52,7 @@ docker run --rm \
   -target=all
 ```
 
-### Kubernetes Job
+## Kubernetes Job
 
 ```yaml
 apiVersion: batch/v1
@@ -57,7 +75,7 @@ spec:
       restartPolicy: Never
 ```
 
-### Cloud Run Job
+## Cloud Run Job
 
 ```bash
 # Deploy as Cloud Run Job
@@ -71,31 +89,17 @@ gcloud run jobs create ingestion-seeder \
 gcloud run jobs execute ingestion-seeder --region=us-central1
 ```
 
-## Options
-
-- `-target`: Seed target (default: "all")
-  - `all`: Run all seeds
-  - `keywords`: Run only keyword seeds
-- `-dry-run`: Show SQL without executing
-
-## Seed Data
-
-### Keywords
-
-Default keywords for video filtering (Japanese programming content):
-- Programming Languages with Japanese terms (JavaScript/ジャバスクリプト, Python/パイソン, Go/ゴー言語, etc.)
-- Japanese programming terms (プログラミング, エンジニア, Web開発, アプリ開発)
-- Cloud Platforms with Japanese terms (AWS/アマゾンウェブサービス, GCP/グーグルクラウド, etc.)
-- DevOps Tools with Japanese terms (Docker/ドッカー, Kubernetes/クバネティス, etc.)
-- Japanese tutorial terms (入門, 解説, ハンズオン)
-
 ## Environment Variables
 
 - `DATABASE_URL`: PostgreSQL connection string
-- Or individual components:
+- Or individual DB components:
   - `DB_HOST`
   - `DB_PORT`
   - `DB_USER`
   - `DB_PASSWORD`
   - `DB_NAME`
   - `DB_SSLMODE`
+
+## Idempotency
+
+All seeds use `ON CONFLICT DO UPDATE` to ensure they can be run multiple times safely.

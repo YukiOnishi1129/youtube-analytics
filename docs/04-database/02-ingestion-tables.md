@@ -25,30 +25,49 @@ Defines collection targets with region, category, and language settings.
 **Indexes:**
 - `idx_genres_enabled` on (enabled)
 
-### keywords
+### keyword_groups
 
-Filtering patterns for video selection within genres.
+Groups of related keywords for video filtering within genres.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | UUID (v7) | PRIMARY KEY | Unique identifier |
 | genre_id | UUID | NOT NULL, FOREIGN KEY | Associated genre |
-| name | VARCHAR(100) | NOT NULL | Keyword name |
-| filter_type | VARCHAR(20) | NOT NULL CHECK IN ('INCLUDE','EXCLUDE') | Filter type |
-| pattern | TEXT | NOT NULL | Regex pattern for matching |
-| enabled | BOOLEAN | NOT NULL DEFAULT true | Whether keyword is active |
+| name | VARCHAR(100) | NOT NULL | Group name (e.g., "JavaScript/JS") |
+| filter_type | VARCHAR(20) | NOT NULL CHECK IN ('include','exclude') | Filter type |
+| target_field | VARCHAR(20) | NOT NULL DEFAULT 'title' | Field to match against |
+| enabled | BOOLEAN | NOT NULL DEFAULT true | Whether group is active |
 | description | TEXT | | Optional description |
-| target_field | VARCHAR(20) | NOT NULL DEFAULT 'TITLE' | Field to match against |
 | deleted_at | TIMESTAMP | | Soft delete timestamp |
 | created_at | TIMESTAMP | NOT NULL DEFAULT NOW() | Creation timestamp |
 | updated_at | TIMESTAMP | NOT NULL DEFAULT NOW() | Last update timestamp |
 
 **Indexes:**
-- `idx_keywords_genre_enabled` on (genre_id, enabled)
-- `idx_keywords_deleted` on (deleted_at)
+- `idx_keyword_groups_genre_enabled` on (genre_id, enabled)
+- `idx_keyword_groups_deleted` on (deleted_at)
 
 **Constraints:**
 - UNIQUE on (genre_id, name, filter_type) WHERE deleted_at IS NULL
+
+### keyword_items
+
+Individual keywords within a keyword group.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | UUID (v7) | PRIMARY KEY | Unique identifier |
+| keyword_group_id | UUID | NOT NULL, FOREIGN KEY | Parent keyword group |
+| keyword | TEXT | NOT NULL | The actual keyword |
+| created_at | TIMESTAMP | NOT NULL DEFAULT NOW() | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+**Indexes:**
+- `idx_keyword_items_group` on (keyword_group_id)
+
+**Constraints:**
+- UNIQUE on (keyword_group_id, keyword)
+
+**Note:** Regex patterns are generated dynamically from keyword_items rather than stored in database
 
 ### youtube_categories
 
@@ -169,7 +188,7 @@ Time-series video metrics at checkpoint hours.
 ## Data Flow
 
 1. **Genre Configuration**: Admin enables genres with specific region/category/language settings
-2. **Keyword Setup**: Admin adds inclusion/exclusion keywords for each genre
+2. **Keyword Setup**: Admin creates keyword groups with individual keywords for each genre
 3. **Trending Collection**: Batch process fetches trending videos for enabled genres
 4. **Filtering**: Videos are filtered by genre-specific keywords
 5. **Registration**: Matched videos are registered with genre associations

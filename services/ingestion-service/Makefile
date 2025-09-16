@@ -44,14 +44,23 @@ generate-http:
 	@echo "==> Generating HTTP types from TypeSpec"
 	@bash scripts/generate-http-types.sh
 
-# Run database seeds
+# Run database seeds (all seeds are production-safe master data)
 seed:
-	@echo "==> Running database seeds"
+	@echo "==> Running all database seeds"
 	@go run cmd/seeder/main.go -target=all
+
+seed-categories:
+	@echo "==> Running YouTube categories seeds"
+	@go run cmd/seeder/main.go -target=youtube_categories
+
+seed-genres:
+	@echo "==> Running genres seeds"
+	@go run cmd/seeder/main.go -target=genres
 
 seed-keywords:
 	@echo "==> Running keyword seeds"
 	@go run cmd/seeder/main.go -target=keywords
+
 
 seed-dry-run:
 	@echo "==> Showing seed SQL (dry run)"
