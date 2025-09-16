@@ -29,6 +29,15 @@ type Config struct {
 	// WebSub configuration
 	WebSubCallbackURL string
 	WebSubSecret      string
+	
+	// Cloud Tasks configuration
+	CloudTasksProjectID  string
+	CloudTasksLocation   string
+	CloudTasksQueueName  string
+	CloudTasksServiceURL string
+	
+	// Pub/Sub configuration
+	PubSubProjectID string
 }
 
 // Load loads configuration from environment variables
@@ -56,6 +65,15 @@ func Load() *Config {
 		// WebSub
 		WebSubCallbackURL: getEnv("WEBSUB_CALLBACK_URL", ""),
 		WebSubSecret:      getEnv("WEBSUB_SECRET", ""),
+		
+		// Cloud Tasks
+		CloudTasksProjectID:  getEnv("CLOUDTASKS_PROJECT_ID", ""),
+		CloudTasksLocation:   getEnv("CLOUDTASKS_LOCATION", "us-central1"),
+		CloudTasksQueueName:  getEnv("CLOUDTASKS_QUEUE_NAME", "snapshot-tasks"),
+		CloudTasksServiceURL: getEnv("CLOUDTASKS_SERVICE_URL", ""),
+		
+		// Pub/Sub
+		PubSubProjectID: getEnv("PUBSUB_PROJECT_ID", ""),
 	}
 }
 

@@ -3,14 +3,28 @@
 .PHONY: help sqlc sqlc-clean build-postgres migrate-up migrate-down generate-http seed
 
 help:
-	@echo "Targets:"
-	@echo "  sqlc          Generate typed queries (sqlc generate)"
-	@echo "  sqlc-clean    Remove generated sql (sqlcgen)"
-	@echo "  build-postgres Build with Postgres+sqlc tags"
-	@echo "  migrate-up    Run DB migrations (golang-migrate)"
-	@echo "  migrate-down  Rollback one migration"
-	@echo "  generate-http Generate HTTP types from TypeSpec"
-	@echo "  seed          Run database seeds"
+	@echo "== Database & Code Generation =="
+	@echo "  sqlc              Generate typed queries (sqlc generate)"
+	@echo "  sqlc-clean        Remove generated sql (sqlcgen)"
+	@echo "  build-postgres    Build with Postgres+sqlc tags"
+	@echo "  migrate-up        Run DB migrations (golang-migrate)"
+	@echo "  migrate-down      Rollback one migration"
+	@echo "  generate-http     Generate HTTP types from TypeSpec"
+	@echo "  seed              Run database seeds"
+	@echo ""
+	@echo "== Batch Processing Commands =="
+	@echo "  batch-trending    Collect trending videos for all enabled genres"
+	@echo "  batch-schedule-snapshots  Schedule snapshot tasks for recent videos"
+	@echo "  batch-websub-renewal  Renew expiring WebSub subscriptions"
+	@echo "  batch-rankings    Generate daily rankings"
+	@echo "  batch-daily       Run all batches in sequence"
+	@echo ""
+	@echo "== Batch Options =="
+	@echo "  DRY_RUN=true      Run in dry-run mode (no changes)"
+	@echo "  GENRE_ID=xxx      Target specific genre"
+	@echo "  HOURS=24          Time window in hours"
+	@echo "  DAYS=7            Time window in days"
+	@echo "  TOP=10            Number of top videos in ranking"
 
 # Generate sqlc code into internal/adapter/gateway/postgres/sqlcgen
 sqlc:
@@ -75,3 +89,55 @@ build-seeder:
 docker-build-seeder:
 	@echo "==> Building seeder Docker image"
 	@docker build -f Dockerfile.seeder -t ingestion-seeder:latest .
+
+# ===========================================
+# Batch Processing Commands
+# ===========================================
+
+# Trending video collection
+.PHONY: batch-trending
+batch-trending:
+	go run ./cmd/batch/trending/main.go $(if $(DRY_RUN),-dry-run)
+
+.PHONY: batch-trending-genre
+batch-trending-genre:
+	@if [ -z "$(GENRE_ID)" ]; then echo "GENRE_ID is required"; exit 1; fi
+	go run ./cmd/batch/trending/main.go -genre $(GENRE_ID) $(if $(DRY_RUN),-dry-run)
+
+# Snapshot scheduling
+.PHONY: batch-schedule-snapshots
+batch-schedule-snapshots:
+	go run ./cmd/batch/schedule-snapshots/main.go $(if $(HOURS),-hours $(HOURS)) $(if $(DRY_RUN),-dry-run)
+
+# WebSub renewal
+.PHONY: batch-websub-renewal
+batch-websub-renewal:
+	go run ./cmd/batch/websub-renewal/main.go $(if $(DAYS),-days $(DAYS)) $(if $(DRY_RUN),-dry-run)
+
+# Rankings generation
+.PHONY: batch-rankings
+batch-rankings:
+	go run ./cmd/batch/rankings/main.go $(if $(GENRE_ID),-genre $(GENRE_ID)) $(if $(CHECKPOINT),-checkpoint $(CHECKPOINT)) $(if $(TOP),-top $(TOP)) $(if $(DRY_RUN),-dry-run)
+
+# Daily batch sequence (typically run by cron/scheduler)
+.PHONY: batch-daily
+batch-daily:
+	@echo "Running daily batch sequence..."
+	@echo "1. Collecting trending videos..."
+	@$(MAKE) batch-trending
+	@echo "2. Scheduling snapshots..."
+	@$(MAKE) batch-schedule-snapshots
+	@echo "3. Generating rankings..."
+	@$(MAKE) batch-rankings
+	@echo "4. Renewing WebSub subscriptions..."
+	@$(MAKE) batch-websub-renewal
+	@echo "Daily batch sequence completed!"
+
+# Build all batch commands
+.PHONY: build-batch
+build-batch:
+	go build -o bin/batch-trending ./cmd/batch/trending
+	go build -o bin/batch-schedule-snapshots ./cmd/batch/schedule-snapshots
+	go build -o bin/batch-websub-renewal ./cmd/batch/websub-renewal
+	go build -o bin/batch-rankings ./cmd/batch/rankings
+	@echo "All batch commands built to ./bin/"
