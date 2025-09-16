@@ -16,16 +16,18 @@ type VideoInputPort interface {
 // CollectTrendingResult represents the result of collecting trending videos
 type CollectTrendingResult struct {
 	GenreCode       string
-	VideosProcessed int
-	VideosAdded     int
+	VideosCollected int // Total videos fetched from YouTube API
+	VideosCreated   int // New videos added to database
+	VideosUpdated   int // Existing videos updated
 	Duration        time.Duration
 }
 
 // CollectAllTrendingResult represents the result of collecting trending videos for all genres
 type CollectAllTrendingResult struct {
 	GenresProcessed int
-	TotalVideos     int
-	TotalAdded      int
+	TotalCollected  int // Total videos collected from all genres
+	TotalCreated    int // Total new videos created
+	TotalUpdated    int // Total videos updated
 	GenreResults    []*CollectTrendingResult
 	Duration        time.Duration
 }
@@ -33,7 +35,7 @@ type CollectAllTrendingResult struct {
 // CollectSubscriptionsResult represents the result of collecting subscription videos
 type CollectSubscriptionsResult struct {
 	ChannelsProcessed int
-	VideosProcessed   int
-	VideosAdded       int
+	VideosCollected   int // Total videos fetched from subscribed channels
+	VideosCreated     int // New videos added to database
 	Duration          time.Duration
 }

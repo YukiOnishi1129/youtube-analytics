@@ -74,8 +74,9 @@ func (u *videoUseCase) CollectTrending(ctx context.Context, genreID *string) (*i
 	}
 
 	return &input.CollectTrendingResult{
-		VideosProcessed: len(trendingVideos),
-		VideosAdded:     videosAdded,
+		VideosCollected: len(trendingVideos),
+		VideosCreated:   videosAdded,
+		VideosUpdated:   0, // TODO: Track updated videos
 		Duration:        time.Since(start),
 	}, nil
 }
@@ -136,8 +137,8 @@ func (u *videoUseCase) CollectSubscriptions(ctx context.Context) (*input.Collect
 
 	return &input.CollectSubscriptionsResult{
 		ChannelsProcessed: len(channels),
-		VideosProcessed:   totalVideos,
-		VideosAdded:       videosAdded,
+		VideosCollected:   totalVideos,
+		VideosCreated:     videosAdded,
 		Duration:          time.Since(start),
 	}, nil
 }
@@ -153,8 +154,9 @@ func (u *videoUseCase) CollectAllTrending(ctx context.Context) (*input.CollectAl
 	// For now, return empty result
 	return &input.CollectAllTrendingResult{
 		GenresProcessed: 0,
-		TotalVideos:     0,
-		TotalAdded:      0,
+		TotalCollected:  0,
+		TotalCreated:    0,
+		TotalUpdated:    0,
 		GenreResults:    []*input.CollectTrendingResult{},
 		Duration:        time.Since(start),
 	}, nil

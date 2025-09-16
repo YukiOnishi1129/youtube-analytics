@@ -21,7 +21,7 @@ func (g *KeywordPatternGenerator) GeneratePattern(keywords []string) string {
 		return ""
 	}
 
-	var patterns []string
+	var allVariations []string
 	for _, keyword := range keywords {
 		keyword = strings.TrimSpace(keyword)
 		if keyword == "" {
@@ -30,15 +30,18 @@ func (g *KeywordPatternGenerator) GeneratePattern(keywords []string) string {
 
 		// Detect if keyword is Japanese or English
 		if isJapanese(keyword) {
-			patterns = append(patterns, g.generateJapaneseVariations(keyword)...)
+			allVariations = append(allVariations, g.generateJapaneseVariations(keyword)...)
 		} else {
-			patterns = append(patterns, g.generateEnglishVariations(keyword)...)
+			allVariations = append(allVariations, g.generateEnglishVariations(keyword)...)
 		}
 	}
 
-	if len(patterns) == 0 {
+	if len(allVariations) == 0 {
 		return ""
 	}
+
+	// Remove duplicates across all keywords
+	patterns := uniqueStrings(allVariations)
 
 	// Create case-insensitive regex pattern
 	return fmt.Sprintf("(?i)(%s)", strings.Join(patterns, "|"))
@@ -46,6 +49,7 @@ func (g *KeywordPatternGenerator) GeneratePattern(keywords []string) string {
 
 // generateEnglishVariations generates variations for English keywords
 func (g *KeywordPatternGenerator) generateEnglishVariations(keyword string) []string {
+	// Start with the escaped version
 	variations := []string{escapeRegex(keyword)}
 
 	// Handle dots in technology names (e.g., Next.js)
@@ -53,12 +57,6 @@ func (g *KeywordPatternGenerator) generateEnglishVariations(keyword string) []st
 		// Add variation without dots
 		noDots := strings.ReplaceAll(keyword, ".", "")
 		variations = append(variations, escapeRegex(noDots))
-		
-		// Add variation with escaped dots
-		escapedDots := strings.ReplaceAll(keyword, ".", "\\.")
-		if escapedDots != keyword {
-			variations = append(variations, escapedDots)
-		}
 	}
 
 	// Handle spaces and hyphens
@@ -225,7 +223,7 @@ func katakanaToHiragana(s string) string {
 }
 
 func escapeRegex(s string) string {
-	specialChars := []string{".", "*", "+", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|", "\\"}
+	specialChars := []string{"\\", ".", "*", "+", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|"}
 	result := s
 	for _, char := range specialChars {
 		result = strings.ReplaceAll(result, char, "\\"+char)

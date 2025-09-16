@@ -142,15 +142,15 @@ func (s *Server) CollectTrending(ctx context.Context, req *pb.CollectTrendingReq
 	if req.GenreId != "" {
 		genreID = &req.GenreId
 	}
-	
+
 	result, err := s.videoUseCase.CollectTrending(ctx, genreID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to collect trending videos: %v", err))
 	}
 
 	return &pb.CollectTrendingResponse{
-		VideosProcessed: int32(result.VideosProcessed),
-		VideosAdded:     int32(result.VideosAdded),
+		VideosProcessed: int32(result.VideosCollected),
+		VideosAdded:     int32(result.VideosCreated),
 		DurationMs:      result.Duration.Milliseconds(),
 		GenreCode:       result.GenreCode,
 	}, nil
@@ -164,8 +164,8 @@ func (s *Server) CollectSubscriptions(ctx context.Context, req *pb.CollectSubscr
 
 	return &pb.CollectSubscriptionsResponse{
 		ChannelsProcessed: int32(result.ChannelsProcessed),
-		VideosProcessed:   int32(result.VideosProcessed),
-		VideosAdded:       int32(result.VideosAdded),
+		VideosProcessed:   int32(result.VideosCollected),
+		VideosAdded:       int32(result.VideosCreated),
 		DurationMs:        result.Duration.Milliseconds(),
 	}, nil
 }
@@ -256,13 +256,13 @@ func (s *Server) ListGenres(ctx context.Context, req *pb.ListGenresRequest) (*pb
 
 	var genres []*domain.Genre
 	var err error
-	
+
 	if req.EnabledOnly {
 		genres, err = s.genreUseCase.ListEnabledGenres(ctx)
 	} else {
 		genres, err = s.genreUseCase.ListGenres(ctx)
 	}
-	
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -434,13 +434,13 @@ func (s *Server) ListYouTubeCategories(ctx context.Context, req *pb.ListYouTubeC
 
 	var categories []*domain.YouTubeCategory
 	var err error
-	
+
 	if req.AssignableOnly {
 		categories, err = s.youtubeCategoryUseCase.ListAssignableYouTubeCategories(ctx)
 	} else {
 		categories, err = s.youtubeCategoryUseCase.ListYouTubeCategories(ctx)
 	}
-	
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -856,7 +856,7 @@ func (s *Server) ListAuditLogs(ctx context.Context, req *pb.ListAuditLogsRequest
 
 	var logs []*domain.AuditLog
 	var err error
-	
+
 	if req.ActorId != "" {
 		actorID, err := uuid.Parse(req.ActorId)
 		if err != nil {
@@ -868,7 +868,7 @@ func (s *Server) ListAuditLogs(ctx context.Context, req *pb.ListAuditLogsRequest
 	} else {
 		logs, err = s.auditLogUseCase.ListRecentAuditLogs(ctx, pageSize)
 	}
-	
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -897,7 +897,7 @@ func (s *Server) ListBatchJobs(ctx context.Context, req *pb.ListBatchJobsRequest
 
 	// TODO: Implement pagination and filtering
 	pageSize := 100
-	
+
 	var jobType *domain.JobType
 	if req.JobType != "" {
 		jt := domain.JobType(req.JobType)
@@ -962,8 +962,8 @@ func (s *Server) CollectTrendingByGenre(ctx context.Context, req *pb.CollectTren
 
 	return &pb.CollectTrendingByGenreResponse{
 		GenreCode:       result.GenreCode,
-		VideosProcessed: int32(result.VideosProcessed),
-		VideosAdded:     int32(result.VideosAdded),
+		VideosProcessed: int32(result.VideosCollected),
+		VideosAdded:     int32(result.VideosCreated),
 		DurationMs:      result.Duration.Milliseconds(),
 	}, nil
 }
@@ -982,16 +982,16 @@ func (s *Server) CollectAllTrending(ctx context.Context, req *pb.CollectAllTrend
 	for i, gr := range result.GenreResults {
 		genreResults[i] = &pb.CollectTrendingByGenreResponse{
 			GenreCode:       gr.GenreCode,
-			VideosProcessed: int32(gr.VideosProcessed),
-			VideosAdded:     int32(gr.VideosAdded),
+			VideosProcessed: int32(gr.VideosCollected),
+			VideosAdded:     int32(gr.VideosCreated),
 			DurationMs:      gr.Duration.Milliseconds(),
 		}
 	}
 
 	return &pb.CollectAllTrendingResponse{
 		GenresProcessed: int32(result.GenresProcessed),
-		TotalVideos:     int32(result.TotalVideos),
-		TotalAdded:      int32(result.TotalAdded),
+		TotalVideos:     int32(result.TotalCollected),
+		TotalAdded:      int32(result.TotalCreated),
 		GenreResults:    genreResults,
 		DurationMs:      result.Duration.Milliseconds(),
 	}, nil

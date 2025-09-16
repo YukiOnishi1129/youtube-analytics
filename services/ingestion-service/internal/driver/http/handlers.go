@@ -58,8 +58,8 @@ func (s *Server) AdminCollectSubscriptions(c *gin.Context, params generated.Admi
 
 	c.JSON(http.StatusOK, generated.CollectSubscriptionsResponse{
 		ChannelsProcessed: int32(result.ChannelsProcessed),
-		VideosAdded:       int32(result.VideosAdded),
-		VideosProcessed:   int32(result.VideosProcessed),
+		VideosCollected:   int32(result.VideosCollected),
+		VideosCreated:     int32(result.VideosCreated),
 		Duration:          time.Since(start).String(),
 	})
 }
@@ -79,8 +79,9 @@ func (s *Server) AdminCollectTrending(c *gin.Context, params generated.AdminColl
 	}
 
 	c.JSON(http.StatusOK, generated.CollectTrendingResponse{
-		VideosAdded:     int32(result.VideosAdded),
-		VideosProcessed: int32(result.VideosProcessed),
+		VideosCollected: int32(result.VideosCollected),
+		VideosCreated:   int32(result.VideosCreated),
+		VideosUpdated:   int32(result.VideosUpdated),
 		Duration:        time.Since(start).String(),
 	})
 }
