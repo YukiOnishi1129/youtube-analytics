@@ -11,7 +11,7 @@ import (
 	inport "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/input"
 	outgateway "github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/port/output/gateway"
 	"github.com/YukiOnishi1129/youtube-analytics/services/authority-service/internal/usecase"
-    pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/proto/authority/v1"
+	pb "github.com/YukiOnishi1129/youtube-analytics/services/pkg/pb/authority/v1"
 	"google.golang.org/grpc"
 )
 

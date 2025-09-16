@@ -1,9 +1,8 @@
-go 1.22
+go 1.23.0
 
 use (
-    ./authority-service
-    ./analytics-service
-    ./ingestion-service
-    ./pkg
+	./analytics-service
+	./authority-service
+	./ingestion-service
+	./pkg
 )
-
