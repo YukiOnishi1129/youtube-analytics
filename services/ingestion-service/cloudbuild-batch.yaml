@@ -1,0 +1,119 @@
+# Cloud Build configuration for batch jobs
+steps:
+  # Build batch job images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-batch-trending'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/ingestion-batch-trending:$SHORT_SHA'
+      - '-f'
+      - 'deployments/Dockerfile.batch'
+      - '--build-arg'
+      - 'BATCH_CMD=/app/bin/batch-trending'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-batch-snapshots'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/ingestion-batch-snapshots:$SHORT_SHA'
+      - '-f'
+      - 'deployments/Dockerfile.batch'
+      - '--build-arg'
+      - 'BATCH_CMD=/app/bin/batch-schedule-snapshots'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-batch-websub'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/ingestion-batch-websub:$SHORT_SHA'
+      - '-f'
+      - 'deployments/Dockerfile.batch'
+      - '--build-arg'
+      - 'BATCH_CMD=/app/bin/batch-websub-renewal'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-batch-rankings'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/ingestion-batch-rankings:$SHORT_SHA'
+      - '-f'
+      - 'deployments/Dockerfile.batch'
+      - '--build-arg'
+      - 'BATCH_CMD=/app/bin/batch-rankings'
+      - '.'
+
+  # Push images
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ingestion-batch-trending:$SHORT_SHA']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ingestion-batch-snapshots:$SHORT_SHA']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ingestion-batch-websub:$SHORT_SHA']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ingestion-batch-rankings:$SHORT_SHA']
+
+  # Deploy Cloud Run Jobs
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-job-trending'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'jobs'
+      - 'replace'
+      - 'ingestion-batch-trending'
+      - '--image=gcr.io/$PROJECT_ID/ingestion-batch-trending:$SHORT_SHA'
+      - '--region=$_REGION'
+      - '--set-env-vars=DATABASE_URL=$$DATABASE_URL,YOUTUBE_API_KEY=$$YOUTUBE_API_KEY,PUBSUB_PROJECT_ID=$PROJECT_ID'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-job-snapshots'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'jobs'
+      - 'replace'
+      - 'ingestion-batch-snapshots'
+      - '--image=gcr.io/$PROJECT_ID/ingestion-batch-snapshots:$SHORT_SHA'
+      - '--region=$_REGION'
+      - '--set-env-vars=DATABASE_URL=$$DATABASE_URL,YOUTUBE_API_KEY=$$YOUTUBE_API_KEY,CLOUDTASKS_PROJECT_ID=$PROJECT_ID'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-job-websub'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'jobs'
+      - 'replace'
+      - 'ingestion-batch-websub'
+      - '--image=gcr.io/$PROJECT_ID/ingestion-batch-websub:$SHORT_SHA'
+      - '--region=$_REGION'
+      - '--set-env-vars=DATABASE_URL=$$DATABASE_URL'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-job-rankings'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'jobs'
+      - 'replace'
+      - 'ingestion-batch-rankings'
+      - '--image=gcr.io/$PROJECT_ID/ingestion-batch-rankings:$SHORT_SHA'
+      - '--region=$_REGION'
+      - '--set-env-vars=DATABASE_URL=$$DATABASE_URL'
+
+substitutions:
+  _REGION: us-central1
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  substitution_option: 'ALLOW_LOOSE'
